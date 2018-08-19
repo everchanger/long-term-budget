@@ -1,2 +1,3 @@
 tailwind.config.js
 router.js
+store.js

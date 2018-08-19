@@ -1,9 +1,9 @@
 <template>
-	<div class="h-auto ">
-		<div class="w-1/2 border-2 border-black-light p-2 mb-2 rounded text-blue-light font-bold">
+	<div class="h-auto w-1/2 float-left">
+		<div class=" border-2 border-black-light p-2 mb-2 rounded text-blue-light font-bold">
 			Steg {{ step + 1 }} av {{ steps }}
 		</div>
-		<div class="w-1/2 h-full border-2 border-black-light p-2 rounded">
+		<div class="w-full h-full border-2 border-black-light p-2 rounded">
 			<input-form :formdata="forms[step]" />
 			<div class="flex flex-row-reverse">
 				<button class="btn btn-blue mr-0" @click="nextstep">Nästa</button>

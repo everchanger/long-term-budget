@@ -1,23 +1,23 @@
 <template>
 	<div class="mb-4">
-		<h3 class="text-grey-darker mb-3">{{ formdata.header }}</h3>
-		<div v-for="data in formdata.entries" :key="data.id" class="mb-2">
-			<label class="block text-grey-darker text-sm font-bold mb-2">{{ data.label }}</label>
-			<input class="m-aut input-text w-1/4" type="text" v-model="data.value" placeholder="SEK"/>
+		<div v-for="data in formdata" :key="data.id" class="mb-2">
+			<input-field :field="data" />
 		</div>
 	</div>
 </template>
 
 <script>
 export default {
+	data: function () {
+		return {
+			editing: false,
+		};
+	},
 	props: {
 		formdata: {
-			type: Object,
+			type: Array,
 			required: true,
 		},
 	},
-	mounted () {
-		console.log(this.formdata);
-	}
 }
 </script>
