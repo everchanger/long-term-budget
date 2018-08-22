@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-4">
+	<div class="">
 		<div v-for="data in formdata" :key="data.id" class="mb-2">
 			<input-field :field="data" />
 		</div>
