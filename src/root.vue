@@ -31,6 +31,7 @@ export default {
 		},
 	},
 	mounted() {
+		this.$store.dispatch('refreshUser');
 		bus.$on('alert', this.alert);
 	}
 }

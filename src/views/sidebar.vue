@@ -1,7 +1,7 @@
 <template>
 	<div class="h-full w-1/4 float-left p-4 bg-grey-light text-grey-darker">
 		<h3 class="font-bold mb-2">Hushåll</h3>
-		<div v-for="person in persons" :key="person.id">
+		<div v-for="person of persons" :key="person.id">
 			<router-link :to="'/collector/' + person.id" tag="button" class="btn btn-orange-inverted mb-2" @click="setActivePerson(person.id)">{{ person.name }}</router-link>
 		</div>
 		<button class="btn btn-blue mb-2" @click="adding = true">Lägg till person</button>
