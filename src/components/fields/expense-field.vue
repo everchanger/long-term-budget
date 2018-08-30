@@ -23,12 +23,8 @@ export default {
 		};
 	},
 	props: {
-		dataId: {
+		incomeId: {
 			type: Number,
-			required: true,
-		},
-		type: {
-			type: String,
 			required: true,
 		},
 	},
@@ -43,27 +39,18 @@ export default {
 			return this.fieldTitle + ' - ' + this.fieldValue + ' kr';
 		},
 		field: function () {
-			return this.$store.state.income[this.dataId];
+			return this.$store.state.income[this.incomeId];
 		},
 		fieldTitle: function () {
 			return this.field.title;
 		},
 		fieldValue: {
 			get: function () {
-				switch (this.type) {
-					case 'income':
-						return this.field.income;
-					break;
-					case 'expense':
-					break;
-					case 'loan':
-					break;
-					case 'saving':
-					break;
-				}
+				return this.field.income;
 			},
 			set: function (value) {
 				// Do an vuex action to set the right data!
+				console.log(value);
 			},
 		}
 	}

@@ -36,6 +36,15 @@ export default new Vuex.Store({
 			console.log('in')
 			return  state.persons[personId].income.map(incomeId => state.income[incomeId]);
 		}),
+		personExpenses: (state => function (personId) {
+			return [];
+		}),
+		personLoans: (state => function (personId) {
+			return [];
+		}),
+		personSavings: (state => function (personId) {
+			return [];
+		}),
 	},
 	mutations: {
 		addPerson (state, person) {
@@ -54,6 +63,13 @@ export default new Vuex.Store({
 				}
 			}
 		},
+		addIncome (state, income) {
+			Vue.set(state.income, income.id, income);
+			state.persons[income.person_id].income.push(income.id);
+		},
+		updateIncome (state, income) {
+			Vue.set(state.income, income.id, income);
+		}
 	},
 	actions: {
 		addPerson ({ commit, state }, name) {
@@ -70,6 +86,16 @@ export default new Vuex.Store({
 			api.users().then((user) => {
 				// Store the income, expenses, loans and savings
 				commit('updateUser', user);
+			});
+		},
+		addIncome({ commit }, data) {
+			api.addIncome(data.personId, data.title, data.income).then(income => {
+				commit('addIncome', income);
+			});
+		},
+		updateIncome({ commit }, data) {
+			api.updateIncome(data.incomeId, data.income).then(income => {
+				commit('updateIncome', income);
 			});
 		},
 	}

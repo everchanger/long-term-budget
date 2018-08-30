@@ -3,7 +3,7 @@
 namespace model;
 
 class income {
-		public function addIncome ($title, $income, $personId) {
+		public function addIncome ($personId, $title, $income) {
 			if(!isset($title) || !isset($income) || !isset($personId)) {
 				throw new \Exception("One or more input parameters are not set", ERROR_CODE_INVALID_PARAMETERS);
 			}
@@ -17,7 +17,25 @@ class income {
 			catch (\Exception $e) {
 				throw $e;
 			}
-			return DB::pdo()->lastInsertId();
+			$id = DB::pdo()->lastInsertId();
+
+			return $this->get($id);
+		}
+
+		public function updateIncome ($id, $income) {
+			if(!isset($id) || !isset($income)) {
+				throw new \Exception("One or more input parameters are not set", ERROR_CODE_INVALID_PARAMETERS);
+			}
+			try {
+				$stmt = DB::pdo()->prepare("UPDATE incomes SET income = :income WHERE id = :id");
+				$stmt->bindParam(":id", $id);
+                $stmt->bindParam(":income", $income);
+				$stmt->execute();
+			}
+			catch (\Exception $e) {
+				throw $e;
+			}
+			return $this->get($id);
 		}
 
 		public function get ($id) {
@@ -26,7 +44,7 @@ class income {
 			}
 			try {
 				$stmt = null;
-				$stmt = DB::pdo()->prepare("SELECT title, income, person_id FROM incomes WHERE id = :id");
+				$stmt = DB::pdo()->prepare("SELECT id, title, income, person_id FROM incomes WHERE id = :id");
 				$stmt->bindParam(":id", $id);
 				$stmt->execute();
 				if ($stmt->rowCount() <= 0){

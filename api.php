@@ -14,7 +14,13 @@ $method = $_SERVER['REQUEST_METHOD'];
 $request = explode('/', trim($_SERVER['PATH_INFO'], '/'));
 $input = json_decode(file_get_contents('php://input'), true);
 
+if ($method === 'POST' || $method === 'PATCH') {
+	$input = $_REQUEST;
+}
 
+if ($method === 'POST' && $input == null) {
+	die('no data in post :/');
+}
 
 // retrieve the table and key from the path
 $controller = preg_replace('/[^a-z0-9_]+/i','',array_shift($request));

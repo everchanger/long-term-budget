@@ -1,8 +1,9 @@
 <template>
 	<div class="">
 		<div v-for="data in formdata" :key="data.id" class="mb-2">
-			<input-field :type="type" :dataId="data.id" />
+			<savings-field :savingsId="data.id" />
 		</div>
+		<button class="btn btn-blue" @click="">+</button>
 	</div>
 </template>
 
@@ -20,19 +21,13 @@ export default {
 			type: Number,
 			required: true,
 		},
-		type: {
-			type: String,
-			required: true,
-		},
 	},
 	computed: {
 		...mapGetters([
-			'personIncome',
+			'personSavings',
 		]),
 		formdata: function () {
-			// Switch here?
-			console.log(this.$store.state)
-			return this.personIncome(this.personId);
+			return this.personSavings(this.personId);
 		},
 	},
 }
