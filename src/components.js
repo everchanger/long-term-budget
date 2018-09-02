@@ -4,6 +4,7 @@ import Vue from 'vue'
 import navbar from './views/navbar.vue'
 import sidebar from './views/sidebar.vue'
 import wizard from './components/wizard.vue'
+import modal from './components/modal.vue'
 import budgetresult from './components/budget-result.vue'
 
 import incomeform from './components/forms/income-form.vue'
@@ -19,6 +20,7 @@ import savingsfield from './components/fields/savings-field.vue'
 Vue.component('navbar', navbar)
 Vue.component('sidebar', sidebar)
 Vue.component('wizard', wizard)
+Vue.component('modal', modal)
 Vue.component('budget-result', budgetresult)
 
 Vue.component('income-form', incomeform)

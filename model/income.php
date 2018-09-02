@@ -3,7 +3,7 @@
 namespace model;
 
 class income {
-		public function addIncome ($personId, $title, $income) {
+		public function add ($personId, $title, $income) {
 			if(!isset($title) || !isset($income) || !isset($personId)) {
 				throw new \Exception("One or more input parameters are not set", ERROR_CODE_INVALID_PARAMETERS);
 			}
@@ -22,7 +22,7 @@ class income {
 			return $this->get($id);
 		}
 
-		public function updateIncome ($id, $income) {
+		public function update ($id, $income) {
 			if(!isset($id) || !isset($income)) {
 				throw new \Exception("One or more input parameters are not set", ERROR_CODE_INVALID_PARAMETERS);
 			}
@@ -85,6 +85,25 @@ class income {
 					return [];
 				}
 				return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+			} 
+			catch (\Exception $e) {
+				throw $e;
+			}
+		}
+
+		public function delete ($id) {
+			if(!isset($id)) {
+				throw new \Exception("One or more input parameters are not set", ERROR_CODE_INVALID_PARAMETERS);
+			}
+			try {
+				$stmt = null;
+				$stmt = DB::pdo()->prepare("DELETE FROM incomes WHERE id = :id");				
+				$stmt->bindParam(":id", $id);
+				$stmt->execute();
+				if ($stmt->rowCount() <= 0){
+					throw new \Exception("Could not delete income with id: " . $id, ERROR_CODE_INVALID_PARAMETERS);
+				}
+				return $id;
 			} 
 			catch (\Exception $e) {
 				throw $e;

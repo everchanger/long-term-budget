@@ -42,5 +42,18 @@ export default {
             })
             .go();
         });
+    },
+    removeIncome (incomeId) {
+        const url = baseurl + 'income/' + incomeId;
+        return new Promise((resolve) => {
+            aja()
+            .method('DELETE')
+            .url(url)
+            .on('success', function (data){
+                console.log(data);    
+                resolve(data);
+            })
+            .go();
+        });
     }
 }

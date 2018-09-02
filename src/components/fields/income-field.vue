@@ -1,26 +1,40 @@
 <template>
-	<div>
-		<transition name="fade-fast" mode="out-in">
-			<button v-if="! editing" class="btn btn-blue" @click="editing = true;">{{ buttonLabel }}</button>
-			<div v-else class="bg-blue text-white p-2 rounded">
-				<label class="block text-sm font-bold mb-2">{{ fieldTitle }}</label>
-				<div>
-					<input class="m-aut input-text w-3/5" type="text" v-model="fieldValue" placeholder="SEK"/>
-					<button class="btn btn-blue border-white border-2 ml-2" @click="update">OK</button>
-				</div>
+	<transition name="fade-fast" mode="out-in">
+		<button v-if="! editing" class="btn btn-indigo" @click="open">{{ buttonLabel }}</button>
+		<div v-else class="bg-indigo text-white p-2 rounded">
+			<div class="block text-sm font-bold mb-4">
+				<label>{{ fieldTitle }}</label>
+				<button @click="showWarning = true" class="float-right btn btn-red mr-0 rounded-full h-8 w-8 font-bold p-1">X</button>
+				<modal v-if="showWarning" v-model="showWarning">
+					<h2 slot="header">Ta bort inkomst</h2>
+					<p slot="message">Är du säker på att du vill ta bort denna inkomst?</p>
+					<button slot="ok" @click="deleteIncome" class="btn btn-teal mr-1">Ta bort</button>
+					<button slot="cancel" @click="showWarning = false" class="btn btn-orange">Avbryt</button>
+				</modal>
 			</div>
-		</transition>
-	</div>
+			<div>
+				<input class="m-aut input-text w-2/5 float-left" type="text" v-model="fieldValue" placeholder="SEK"/>
+				<div class="w-3/5 float-left">
+					<button class="btn btn-teal ml-2 mr-1" @click="update">Spara</button>
+					<button class="btn btn-orange" @click="close">Stäng</button>
+				</div>
+				<div class="clearfix" />
+			</div>
+		</div>
+	</transition>
 </template>
 
 <script>
+import Vue from 'vue';
 import { mapGetters } from 'vuex'
+import { bus } from '../../event-bus.js';
 
 export default {
 	data: function () {
 		return {
 			editing: false,
 			newValue: null,
+			showWarning: false,
 		};
 	},
 	props: {
@@ -65,7 +79,33 @@ export default {
 			this.$store.dispatch('updateIncome', { incomeId: this.incomeId, income: this.newValue }).then(function () {
 				vm.editing = false;
 			});
-		}
-	}
+		},
+		close () {
+			this.editing = false;
+			this.newValue = null;
+		},
+		open () {
+			bus.$emit('field.income.close');
+			this.editing = true;
+		},
+		deleteIncome () {
+			const vm = this;
+			/* Need to hide the modal first since it uses fixed and the transition 
+			when setting editing is using a transform = a new anchor will be set */
+			vm.showWarning = false;
+			Vue.nextTick(function () {
+				vm.editing = false;
+				vm.$store.dispatch('deleteIncome', {incomeId: vm.incomeId}).then(function () {
+					console.log('deleted');
+				});
+			});
+		},
+	},
+	mounted () {
+		bus.$on('field.income.close', this.close);
+	},
+	destroyed () {
+		bus.$off('field.income.close');
+	},
 }
 </script>

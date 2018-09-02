@@ -1,15 +1,15 @@
 <template>
-	<div class="h-full w-1/4 float-left p-4 bg-grey-light text-grey-darker">
+	<div class="h-full w-1/4 float-left p-1 bg-grey-light text-grey-dark">
 		<h3 class="font-bold mb-2">Hushåll</h3>
 		<div v-for="person of persons" :key="person.id">
-			<router-link :to="'/collector/' + person.id" tag="button" class="btn btn-orange-inverted mb-2" @click="setActivePerson(person.id)">{{ person.name }}</router-link>
+			<router-link :to="'/collector/' + person.id" tag="button" class="btn btn-indigo mb-1 w-full" @click="setActivePerson(person.id)">{{ person.name }}</router-link>
 		</div>
-		<button class="btn btn-blue mb-2" @click="adding = true">Lägg till person</button>
-		<transition name="fade">
-			<div v-if="adding">
+		<transition name="fade-fast" mode="out-in">
+			<button v-if="! adding" class="btn btn-teal mb-2 mt-1 w-full" @click="adding = ! adding">Lägg till person</button>
+			<div v-else class="p-2">
 				<input class="input-text mb-2" placeholder="Namn" v-model="personName" />
-				<button class="btn btn-blue mr-1" @click="add">OK</button>
-				<button class="btn btn-red" @click="adding = false; personName = null">Avbryt</button>
+				<button class="btn btn-teal mr-1" @click="add">Lägg till</button>
+				<button class="btn btn-orange" @click="adding = false; personName = null">Avbryt</button>
 			</div>
 		</transition>
 	</div>

@@ -7,7 +7,7 @@
 			</div>
 		</transition>
 		<sidebar />
-		<div class="h-full w-3/4 float-left px-4">
+		<div class="h-full w-3/4 float-left px-2">
 			<router-view />
 		</div>
 	</div>
@@ -28,11 +28,12 @@ export default {
 			setTimeout(() => {
 				this.alertMessage = null;
 			}, 5000);
-		},
+		}
 	},
 	mounted() {
 		this.$store.dispatch('refreshUser');
 		bus.$on('alert', this.alert);
+		
 	}
 }
 </script>

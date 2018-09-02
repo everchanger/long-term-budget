@@ -53,6 +53,8 @@ export default new Vuex.Store({
 		updateUser (state, user) {
 			state.user = {id: user.id, alias: user.alias, email: user.email};
 
+			// Probably reset the person/income state as well before refilling?
+
 			// Normalize the user data
 			for (const person of user.persons) {
 				Vue.set(state.persons, person.id, {id: person.id, name: person.name});
@@ -69,7 +71,27 @@ export default new Vuex.Store({
 		},
 		updateIncome (state, income) {
 			Vue.set(state.income, income.id, income);
-		}
+		},
+		removeIncome (state, incomeId) {
+			// We should remove the incomeId from the income state, and from the persons state
+			Vue.set(state.income, incomeId, null);
+
+			// Find the id in the persons state
+			for (const personId in state.persons) {
+				const person = state.persons[personId];
+				const newIncome = person.income.filter(function (item) {
+					if (item === incomeId) {
+						return false;
+					}
+					return true;
+				});
+
+				if (newIncome.length === person.income.length) {
+					continue;
+				}
+				person.income = newIncome;
+			}
+		},
 	},
 	actions: {
 		addPerson ({ commit, state }, name) {
@@ -88,15 +110,21 @@ export default new Vuex.Store({
 				commit('updateUser', user);
 			});
 		},
-		addIncome({ commit }, data) {
+		addIncome ({ commit }, data) {
 			api.addIncome(data.personId, data.title, data.income).then(income => {
 				commit('addIncome', income);
 			});
 		},
-		updateIncome({ commit }, data) {
+		updateIncome ({ commit }, data) {
 			api.updateIncome(data.incomeId, data.income).then(income => {
 				commit('updateIncome', income);
 			});
 		},
+		deleteIncome ({ commit }, data) {
+			api.removeIncome(data.incomeId).then(incomeId => {
+				const id = Number(incomeId);
+				commit('removeIncome', id);
+			});
+		}
 	}
 })

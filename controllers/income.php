@@ -20,7 +20,7 @@ class income {
 		} 
 		$income = new \model\income();
 		try {
-			$newIncome = $income->addIncome($data['personId'], $data['title'], $data['income']);
+			$newIncome = $income->add($data['personId'], $data['title'], $data['income']);
 		} 
 		catch(\Exception $e) {
 			var_dump($e);
@@ -37,7 +37,7 @@ class income {
 		} 
 		$income = new \model\income();
 		try {
-			$updatedIncome = $income->updateIncome($id, $data['income']);
+			$updatedIncome = $income->update($id, $data['income']);
 		} 
 		catch(\Exception $e) {
 			var_dump($e);
@@ -45,6 +45,19 @@ class income {
 			exit;
 		}
 		echo json_encode($updatedIncome);
+	}
+
+	public function delete ($id) {
+		$income = new \model\income();
+		try {
+			$id = $income->delete($id);
+		} 
+		catch(\Exception $e) {
+			var_dump($e);
+			http_response_code(500);
+			exit;
+		}
+		echo json_encode($id);
 	}
 
 	protected function getOne ($id) {

@@ -3,7 +3,47 @@ button:focus {
 }
 
 .btn {
-	@apply font-bold py-2 px-4 mr-3 rounded no-underline shadow;
+	@apply py-2 px-4 mr-3 no-underline;
+}
+
+.btn-round {
+	@apply rounded-full;
+}
+
+.btn-indigo {
+	@apply bg-indigo text-white;
+
+	&:hover {
+		@apply bg-indigo-light;
+	}
+
+	&.active, &.router-link-exact-active {
+		@apply bg-indigo-lighter;
+	}
+}
+
+.btn-teal {
+	@apply bg-teal-dark text-white;
+
+	&:hover {
+		@apply bg-teal-light;
+	}
+
+	&:active {
+		@apply  bg-teal-lighter;
+	}
+}
+
+.btn-teal-inverted {
+	@apply bg-white text-teal border-2 border-grey-light;
+
+	&:hover {
+		@apply border-grey-dark bg-grey-light;
+	}
+
+	&:active, &.router-link-exact-active {
+		@apply bg-grey-light border-grey;
+	}
 }
 
 .btn-blue {
