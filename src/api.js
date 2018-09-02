@@ -1,34 +1,46 @@
-import Vue from 'vue'
+import aja from 'aja'
+
+const baseurl = 'http://localhost/api.php/'
 
 export default {
     users () {
         return new Promise((resolve) => {
-            Vue.http.get('users/1').then((response) => {
-                // Error handling much?
-                var obj = JSON.parse(response.bodyText);
-                resolve(obj);
-            });
+            aja()
+            .url(baseurl + 'users/1')
+            .on('success', function (data){
+                console.log(data);    
+                resolve(data);
+            })
+            .go();
         });
     },
     addIncome (personId, title, income) {
         const data = { personId: personId, title: title, income: income };
         return new Promise((resolve) => {
-            Vue.http.post('income', data, { emulateJSON: true, emulateHTTP: true }).then((response) => {
-                // Error handling much?
-                var obj = JSON.parse(response.bodyText);
-                resolve(obj);
-            });
+            aja()
+            .method('POST')
+            .data(data)
+            .url(baseurl + 'income')
+            .on('success', function (data){
+                console.log(data);    
+                resolve(data);
+            })
+            .go();
         });
     },
     updateIncome (incomeId, income) {
         const data = { income: income };
-        const url = 'income/' + incomeId;
+        const url = baseurl + 'income/' + incomeId;
         return new Promise((resolve) => {
-            Vue.http.post(url, data, { emulateJSON: true, emulateHTTP: true }).then((response) => {
-                // Error handling much?
-                var obj = JSON.parse(response.bodyText);
-                resolve(obj);
-            });
+            aja()
+            .method('POST')
+            .data(data)
+            .url(url)
+            .on('success', function (data){
+                console.log(data);    
+                resolve(data);
+            })
+            .go();
         });
     }
 }
