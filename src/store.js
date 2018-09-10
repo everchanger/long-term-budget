@@ -27,6 +27,9 @@ export default new Vuex.Store({
 		savings: {},
 	},
 	getters: {
+		userAlias: state => {
+			return state.user.alias;
+		},
 		personIncome: (state => function (personId) {
 			console.log('personId ' + personId)
 			if (! state.persons.hasOwnProperty(personId)) {
