@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions } from 'vuex';
 import { bus } from '../event-bus.js';
 
 export default {
@@ -24,7 +24,7 @@ export default {
 		return {
 			adding: false,
 			personName: null,
-		}
+		};
 	},
 	computed: {
 		persons () {
@@ -33,10 +33,10 @@ export default {
 	},
 	methods: {
 		...mapActions([
-			'addPerson'
+			'addPerson',
 		]),
 		add: function () {
-			if (! this.personName) {
+			if (!this.personName) {
 				bus.$emit('alert', 'Skriv in ett namn för att skapa en ny person!');
 				return;
 			}
@@ -44,8 +44,8 @@ export default {
 			this.personName = null;
 			setTimeout(() => {
 				this.adding = false;
-			}, 250); 
+			}, 250);
 		},
 	},
-}
+};
 </script>

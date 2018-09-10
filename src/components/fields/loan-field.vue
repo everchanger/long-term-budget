@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
 export default {
 	data: function () {
@@ -33,7 +33,7 @@ export default {
 			'income',
 		]),
 		buttonLabel () {
-			if (! this.fieldValue) {
+			if (!this.fieldValue) {
 				return this.fieldTitle;
 			}
 			return this.fieldTitle + ' - ' + this.fieldValue + ' kr';
@@ -52,7 +52,7 @@ export default {
 				// Do an vuex action to set the right data!
 				console.log(value);
 			},
-		}
-	}
-}
+		},
+	},
+};
 </script>

@@ -9,9 +9,9 @@ export default {
 	data: function () {
 		return {
 			salery: null,
-		}
+		};
 	},
 	methods: {
 	},
-}
+};
 </script>

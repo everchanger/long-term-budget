@@ -30,13 +30,13 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
 const incomeTypes = [
 	'Lön',
 	'Pension',
 	'Övrig inkomst',
-]
+];
 
 export default {
 	data: function () {
@@ -55,7 +55,7 @@ export default {
 	},
 	methods: {
 		addIncome: function () {
-			if (! this.newIncomeTitle || ! this.newIncomeValue) {
+			if (!this.newIncomeTitle || !this.newIncomeValue) {
 				this.adding = false;
 				return;
 			}
@@ -71,7 +71,7 @@ export default {
 			this.adding = false;
 		},
 		numberWithSpaces (x) {
-			const numberFormatter = new Intl.NumberFormat('sv-SE', {style: 'currency', currency: 'SEK', minimumFractionDigits: 0});
+			const numberFormatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', minimumFractionDigits: 0 });
 
 			return numberFormatter.format(x);
 		},
@@ -90,5 +90,5 @@ export default {
 			return result;
 		},
 	},
-}
+};
 </script>

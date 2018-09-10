@@ -3,12 +3,12 @@
 		<div v-for="data in formdata" :key="data.id" class="mb-2">
 			<loan-field :loanId="data.id" />
 		</div>
-		<button class="btn btn-blue" @click="">+</button>
+		<button class="btn btn-blue">+</button>
 	</div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
 export default {
 	data: function () {
@@ -30,5 +30,5 @@ export default {
 			return this.personLoans(this.personId);
 		},
 	},
-}
+};
 </script>

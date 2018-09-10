@@ -20,7 +20,7 @@ export default {
 	data: function () {
 		return {
 			alertMessage: null,
-		}
+		};
 	},
 	methods: {
 		alert: function (message) {
@@ -28,12 +28,11 @@ export default {
 			setTimeout(() => {
 				this.alertMessage = null;
 			}, 5000);
-		}
+		},
 	},
-	mounted() {
+	mounted () {
 		this.$store.dispatch('refreshUser');
 		bus.$on('alert', this.alert);
-		
-	}
-}
+	},
+};
 </script>

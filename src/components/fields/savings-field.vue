@@ -1,20 +1,20 @@
 <template>
-	<div>
-		<transition name="fade-fast" mode="out-in">
-			<button v-if="! editing" class="btn btn-blue" @click="editing = true;">{{ buttonLabel }}</button>
-			<div v-else class="bg-blue text-white p-2 rounded">
-				<label class="block text-sm font-bold mb-2">{{ fieldTitle }}</label>
-				<div>
-					<input class="m-aut input-text w-3/4" type="text" v-model="fieldValue" placeholder="SEK"/>
-					<button class="btn btn-blue border-white border-2 ml-2" @click="editing = false">OK</button>
-				</div>
-			</div>
-		</transition>
-	</div>
+   <div>
+      <transition name="fade-fast" mode="out-in">
+         <button v-if="! editing" class="btn btn-blue" @click="editing = true;">{{ buttonLabel }}</button>
+         <div v-else class="bg-blue text-white p-2 rounded">
+            <label class="block text-sm font-bold mb-2">{{ fieldTitle }}</label>
+            <div>
+               <input class="m-aut input-text w-3/4" type="text" v-model="fieldValue" placeholder="SEK"/>
+               <button class="btn btn-blue border-white border-2 ml-2" @click="editing = false">OK</button>
+            </div>
+         </div>
+      </transition>
+   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
 export default {
 	data: function () {
@@ -33,7 +33,7 @@ export default {
 			'income',
 		]),
 		buttonLabel () {
-			if (! this.fieldValue) {
+			if (!this.fieldValue) {
 				return this.fieldTitle;
 			}
 			return this.fieldTitle + ' - ' + this.fieldValue + ' kr';
@@ -52,7 +52,7 @@ export default {
 				// Do an vuex action to set the right data!
 				console.log(value);
 			},
-		}
-	}
-}
+		},
+	},
+};
 </script>

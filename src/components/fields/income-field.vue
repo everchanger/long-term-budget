@@ -26,7 +26,7 @@
 
 <script>
 import Vue from 'vue';
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 import { bus } from '../../event-bus.js';
 
 export default {
@@ -48,7 +48,7 @@ export default {
 			'income',
 		]),
 		buttonLabel () {
-			if (! this.fieldValue) {
+			if (!this.fieldValue) {
 				return this.fieldTitle;
 			}
 			return this.fieldTitle + ' - ' + this.fieldValue + ' kr';
@@ -66,7 +66,7 @@ export default {
 			set: function (value) {
 				this.newValue = value;
 			},
-		}
+		},
 	},
 	methods: {
 		update () {
@@ -90,12 +90,12 @@ export default {
 		},
 		deleteIncome () {
 			const vm = this;
-			/* Need to hide the modal first since it uses fixed and the transition 
+			/* Need to hide the modal first since it uses fixed and the transition
 			when setting editing is using a transform = a new anchor will be set */
 			vm.showWarning = false;
 			Vue.nextTick(function () {
 				vm.editing = false;
-				vm.$store.dispatch('deleteIncome', {incomeId: vm.incomeId}).then(function () {
+				vm.$store.dispatch('deleteIncome', { incomeId: vm.incomeId }).then(function () {
 					console.log('deleted');
 				});
 			});
@@ -107,5 +107,5 @@ export default {
 	destroyed () {
 		bus.$off('field.income.close');
 	},
-}
+};
 </script>

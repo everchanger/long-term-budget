@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
 export default {
 	computed: {
@@ -45,10 +45,7 @@ export default {
 	methods: {
 		monthlySum (values) {
 			return values;
-			const array1 = [1, 2, 3, 4];
-			const sum = (acc, current) => Number(acc) + Number(current.value);
-			return values.reduce(sum, 0);
-		}
+		},
 	},
-}
+};
 </script>

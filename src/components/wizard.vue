@@ -34,7 +34,7 @@ export default {
 							id: 1,
 							label: 'Annan inkomst',
 							value: null,
-						}
+						},
 					],
 				},
 				{
@@ -50,11 +50,11 @@ export default {
 							id: 1,
 							label: 'Internet',
 							value: null,
-						}
+						},
 					],
-				}
+				},
 			],
-		}
+		};
 	},
 	methods: {
 		nextstep () {
@@ -64,7 +64,7 @@ export default {
 		previousstep () {
 			this.step--;
 			this.step = Math.max(this.step, 0);
-		}
+		},
 	},
-}
+};
 </script>

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
 export default {
 	computed: {
@@ -14,5 +14,5 @@ export default {
 			'userAlias',
 		]),
 	},
-}
+};
 </script>
