@@ -67,4 +67,14 @@ describe('sidebar.vue', () => {
 
 		expect(actions.addPerson).toHaveBeenCalled();
 	});
+
+	it('tries to add a person with no name', () => {
+		const showButton = wrapper.find('#showInput');
+		showButton.trigger('click');
+
+		const addButton = wrapper.find('#add');
+		addButton.trigger('click');
+
+		expect(actions.addPerson).not.toHaveBeenCalled();
+	});
 });

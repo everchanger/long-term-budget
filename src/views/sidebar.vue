@@ -5,7 +5,7 @@
 			<router-link :to="'/collector/' + person.id" tag="button" class="btn btn-indigo mb-1 w-full" @click="setActivePerson(person.id)">{{ person.name }}</router-link>
 		</div>
 		<transition name="fade-fast" mode="out-in">
-			<button v-if="! adding" id="showInput" class="btn btn-teal mb-2 mt-1 w-full" @click="adding = ! adding; personName = 'AAA'">Lägg till person</button>
+			<button v-if="! adding" id="showInput" class="btn btn-teal mb-2 mt-1 w-full" @click="adding = ! adding;">Lägg till person</button>
 			<div v-else class="p-2">
 				<input id="personName" class="input-text mb-2" placeholder="Namn" v-model="personName" />
 				<button id="add" class="btn btn-teal mr-1" @click="add">Lägg till</button>
@@ -23,7 +23,7 @@ export default {
 	data: function () {
 		return {
 			adding: false,
-			personName: 'VVV',
+			personName: null,
 		};
 	},
 	computed: {
