@@ -31,13 +31,9 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 
 export default {
 	computed: {
-		...mapGetters([
-			'personIncome',
-		]),
 		personId () {
 			return Number(this.$route.params.id);
 		},

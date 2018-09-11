@@ -1,7 +1,7 @@
 <template>
-    <div v-if="value" ref="modal" class="fixed flex items-center justify-center pin-t pin-r h-full w-full" style="background-color: rgba(0.1, 0.1, 0.1, 0.8) !important">
+    <div v-if="value" ref="modal" id="modal" class="fixed flex items-center justify-center pin-t pin-r h-full w-full" style="background-color: rgba(0.1, 0.1, 0.1, 0.8) !important">
         <div class="relative bg-white text-grey-dark border-red-light p-3 rounded w-1/2">
-        <button @click="close" class="absolute btn btn-red mr-0 rounded-full h-8 w-8 font-bold p-1" style="top: -10px; right: -10px;">X</button>
+        <button @click="close" id="close" class="absolute btn btn-red mr-0 rounded-full h-8 w-8 font-bold p-1" style="top: -10px; right: -10px;">X</button>
             <div class="mb-2 text-grey-darker" >
                 <slot name="header"></slot>
             </div>

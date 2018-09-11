@@ -1,8 +1,8 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import '@/components';
 import Router from 'vue-router';
 
+import '@/components';
 import sidebar from '@/views/sidebar.vue';
 
 const localVue = createLocalVue();
@@ -14,6 +14,7 @@ describe('sidebar.vue', () => {
 	let getters, actions, store;
 
 	beforeEach(() => {
+		jest.useFakeTimers();
 		getters = {
 			persons: function () {
 				return {
@@ -39,6 +40,10 @@ describe('sidebar.vue', () => {
 		});
 
 		wrapper = shallowMount(sidebar, { store, localVue });
+	});
+
+	afterEach(() => {
+		jest.runAllTimers();
 	});
 
 	it('renders a list of persons', () => {

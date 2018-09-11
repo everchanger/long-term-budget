@@ -2,7 +2,7 @@
 	<div class="container mx-auto px-4 h-full mb-4">
 		<navbar />
 		<transition name="fade">
-			<div v-if="alertMessage" class="h-8 bg-red mb-3 flex justify-center items-center font-bold text-white">
+			<div v-if="alertMessage" id="alert-message" class="h-8 bg-red mb-3 flex justify-center items-center font-bold text-white">
 				<p>{{ alertMessage }}</p>
 			</div>
 		</transition>
@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
 import { bus } from './event-bus.js';
 
 export default {
@@ -23,6 +24,9 @@ export default {
 		};
 	},
 	methods: {
+		...mapActions([
+			'refreshUser',
+		]),
 		alert: function (message) {
 			this.alertMessage = message;
 			setTimeout(() => {
@@ -31,7 +35,7 @@ export default {
 		},
 	},
 	mounted () {
-		this.$store.dispatch('refreshUser');
+		this.refreshUser();
 		bus.$on('alert', this.alert);
 	},
 };
