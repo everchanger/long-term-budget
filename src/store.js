@@ -30,6 +30,9 @@ export default new Vuex.Store({
 		userAlias: state => {
 			return state.user.alias;
 		},
+		persons: state => {
+			return state.persons;
+		},
 		personIncome: (state => function (personId) {
 			console.log('personId ' + personId)
 			if (! state.persons.hasOwnProperty(personId)) {
