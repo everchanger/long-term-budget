@@ -8,7 +8,7 @@
 				<modal v-if="showWarning" v-model="showWarning">
 					<h2 slot="header">Ta bort inkomst</h2>
 					<p slot="message">Är du säker på att du vill ta bort denna inkomst?</p>
-					<button slot="ok" @click="deleteIncome" class="btn btn-teal mr-1">Ta bort</button>
+					<button slot="ok" @click="remove" class="btn btn-teal mr-1">Ta bort</button>
 					<button slot="cancel" @click="showWarning = false" class="btn btn-orange">Avbryt</button>
 				</modal>
 			</div>
@@ -26,7 +26,7 @@
 
 <script>
 import Vue from 'vue';
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import { bus } from '../../event-bus.js';
 
 export default {
@@ -54,7 +54,7 @@ export default {
 			return this.fieldTitle + ' - ' + this.fieldValue + ' kr';
 		},
 		field: function () {
-			return this.$store.state.income[this.incomeId];
+			return this.income(this.incomeId);
 		},
 		fieldTitle: function () {
 			return this.field.title;
@@ -69,6 +69,10 @@ export default {
 		},
 	},
 	methods: {
+		...mapActions([
+			'updateIncome',
+			'deleteIncome',
+		]),
 		update () {
 			if (this.newValue === null || this.newValue === this.fieldValue) {
 				this.editing = false;
@@ -76,7 +80,7 @@ export default {
 			}
 
 			const vm = this;
-			this.$store.dispatch('updateIncome', { incomeId: this.incomeId, income: this.newValue }).then(function () {
+			this.updateIncome({ incomeId: this.incomeId, income: this.newValue }).then(function () {
 				vm.editing = false;
 			});
 		},
@@ -88,14 +92,14 @@ export default {
 			bus.$emit('field.income.close');
 			this.editing = true;
 		},
-		deleteIncome () {
+		remove () {
 			const vm = this;
 			/* Need to hide the modal first since it uses fixed and the transition
 			when setting editing is using a transform = a new anchor will be set */
 			vm.showWarning = false;
 			Vue.nextTick(function () {
 				vm.editing = false;
-				vm.$store.dispatch('deleteIncome', { incomeId: vm.incomeId }).then(function () {
+				vm.deleteIncome({ incomeId: vm.incomeId }).then(function () {
 					console.log('deleted');
 				});
 			});

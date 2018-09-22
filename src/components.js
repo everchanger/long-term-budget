@@ -1,9 +1,14 @@
 import Vue from 'vue';
 
+// Font awesome component
+import '../fa.config.js';
+
 // Components
 import navbar from './views/navbar.vue';
 import sidebar from './views/sidebar.vue';
 import modal from './components/modal.vue';
+import toast from './components/toast.vue';
+
 import budgetresult from './components/budget-result.vue';
 
 import incomeform from './components/forms/income-form.vue';
@@ -19,6 +24,8 @@ import savingsfield from './components/fields/savings-field.vue';
 Vue.component('navbar', navbar);
 Vue.component('sidebar', sidebar);
 Vue.component('modal', modal);
+Vue.component('toast', toast);
+
 Vue.component('budget-result', budgetresult);
 
 Vue.component('income-form', incomeform);

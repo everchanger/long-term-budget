@@ -1,11 +1,11 @@
 <template>
 	<div class="container mx-auto px-4 h-full mb-4">
 		<navbar />
-		<transition name="fade">
-			<div v-if="alertMessage" id="alert-message" class="h-8 bg-red mb-3 flex justify-center items-center font-bold text-white">
-				<p>{{ alertMessage }}</p>
-			</div>
-		</transition>
+		<div class="fixed pin-b pin-r mb-8 mr-8 w-1/4">
+			<transition-group name="fade">
+				<toast v-for="(toast, index) in toasts" :key="index" :message="toast.message" :type="toast.type" />
+			</transition-group>
+		</div>
 		<sidebar />
 		<div class="h-full w-3/4 float-left px-2">
 			<router-view />
@@ -14,29 +14,21 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-import { bus } from './event-bus.js';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
-	data: function () {
-		return {
-			alertMessage: null,
-		};
+	computed: {
+		...mapGetters([
+			'toasts',
+		]),
 	},
 	methods: {
 		...mapActions([
 			'refreshUser',
 		]),
-		alert: function (message) {
-			this.alertMessage = message;
-			setTimeout(() => {
-				this.alertMessage = null;
-			}, 5000);
-		},
 	},
 	mounted () {
 		this.refreshUser();
-		bus.$on('alert', this.alert);
 	},
 };
 </script>

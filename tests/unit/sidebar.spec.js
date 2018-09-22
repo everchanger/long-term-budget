@@ -16,7 +16,7 @@ describe('sidebar.vue', () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
 		getters = {
-			persons: function () {
+			persons () {
 				return {
 					1: {
 						id: 1,
@@ -32,6 +32,7 @@ describe('sidebar.vue', () => {
 
 		actions = {
 			addPerson: jest.fn(),
+			addToast: jest.fn(),
 		};
 
 		store = new Vuex.Store({

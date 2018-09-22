@@ -25,14 +25,14 @@ export default new Vuex.Store({
 		expenses: {},
 		loans: {},
 		savings: {},
+		toasts: [
+			{type: 'success', message: 'ttt'}
+		],
+		toastTimeout: 5000,
 	},
 	getters: {
-		userAlias: state => {
-			return state.user.alias;
-		},
-		persons: state => {
-			return state.persons;
-		},
+		userAlias: state => state.user.alias,
+		persons: state =>  state.persons,
 		personIncome: (state => function (personId) {
 			console.log('personId ' + personId)
 			if (! state.persons.hasOwnProperty(personId)) {
@@ -51,10 +51,15 @@ export default new Vuex.Store({
 		personSavings: (state => function (personId) {
 			return [];
 		}),
+		income: (state => function (incomeId) {
+			return state.income[incomeId];
+		}),
+		toasts: state => state.toasts,
 	},
 	mutations: {
 		addPerson (state, person) {
-			state.persons.push(person);
+			Vue.set(state.persons, person.id, {id: person.id, name: person.name});
+			Vue.set(state.persons[person.id], 'income', []);
 		},
 		updateUser (state, user) {
 			state.user = {id: user.id, alias: user.alias, email: user.email};
@@ -98,11 +103,18 @@ export default new Vuex.Store({
 				person.income = newIncome;
 			}
 		},
+		addToast(state, data) {
+			state.toasts.push(data);
+		},
+		shiftToasts(state) {
+			state.toasts.shift();
+		}
 	},
 	actions: {
 		addPerson ({ commit, state }, name) {
 			// This should do a ajax request to the backend to add the person.
-			const id = state.persons[state.persons.length - 1].id + 1;
+			const currentLength = Object.keys(state.persons).length;
+			const id = state.persons[currentLength].id + 1;
 			const person = {
 				id: id,
 				name: name,
@@ -131,6 +143,15 @@ export default new Vuex.Store({
 				const id = Number(incomeId);
 				commit('removeIncome', id);
 			});
-		}
+		},
+		addToast({ state, commit }, data) {
+			if (! data.type || ! data.message) {
+				data = {type: 'error', message: 'Felaktig toast..'};
+			}
+			commit('addToast', data);
+			setTimeout(() => {
+				commit('shiftToasts');
+			}, state.toastTimeout);
+		},
 	}
 })

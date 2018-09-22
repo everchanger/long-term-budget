@@ -1,14 +1,21 @@
-.fade-enter-active, .fade-leave-active {
-	transition: opacity .35s;
- }
- .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.fade-enter-active {
+	transition: opacity 0.35s;
+}
+.fade-leave-active {
+	transition: opacity 0s;
+}
+.fade-enter, .fade-leave-to {
 	opacity: 0;
- }
+}
+.fade-move {
+	transition: transform 0.2s;
+}
 
- .pull-down-enter-active, .fade-fast-leave-active {
-	transition: all .1s;
- }
- .fade-fast-enter, .fade-fast-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.fade-fast-enter, .fade-fast-leave-to {
 	transform: translateY(20px);
 	opacity: 0;
+}
+
+.pull-down-enter-active, .fade-fast-leave-active {
+	transition: all .1s;
 }

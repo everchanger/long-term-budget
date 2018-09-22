@@ -5,7 +5,7 @@
 			<router-link :to="'/collector/' + person.id" tag="button" class="btn btn-indigo mb-1 w-full" @click="setActivePerson(person.id)">{{ person.name }}</router-link>
 		</div>
 		<transition name="fade-fast" mode="out-in">
-			<button v-if="! adding" id="showInput" class="btn btn-teal mb-2 mt-1 w-full" @click="adding = ! adding;">Lägg till person</button>
+			<button v-if="! adding" id="showInput" class="btn btn-teal mb-2 mt-1 w-full" @click="adding = true">Lägg till person</button>
 			<div v-else class="p-2">
 				<input id="personName" class="input-text mb-2" placeholder="Namn" v-model="personName" />
 				<button id="add" class="btn btn-teal mr-1" @click="add">Lägg till</button>
@@ -17,7 +17,6 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
-import { bus } from '../event-bus.js';
 
 export default {
 	data: function () {
@@ -34,17 +33,17 @@ export default {
 	methods: {
 		...mapActions([
 			'addPerson',
+			'addToast',
 		]),
 		add: function () {
 			if (!this.personName) {
-				bus.$emit('alert', 'Skriv in ett namn för att skapa en ny person!');
+				this.addToast('warning', 'Skriv in ett namn för att skapa en ny person!');
 				return;
 			}
 			this.addPerson(this.personName);
 			this.personName = null;
-			setTimeout(() => {
-				this.adding = false;
-			}, 250);
+			this.adding = false;
+			this.addToast({ type: 'success', message: 'Ny person tillagd!' });
 		},
 	},
 };
