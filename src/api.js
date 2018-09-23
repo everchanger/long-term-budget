@@ -14,13 +14,12 @@ export default {
 				.go();
 		});
 	},
-	addIncome (personId, title, income) {
-		const data = { personId: personId, title: title, income: income };
+	add (url, data) {
 		return new Promise((resolve) => {
 			aja()
 				.method('POST')
 				.data(data)
-				.url(baseurl + 'income')
+				.url(baseurl + url)
 				.on('success', function (data) {
 					console.log(data);
 					resolve(data);
@@ -28,14 +27,13 @@ export default {
 				.go();
 		});
 	},
-	updateIncome (incomeId, income) {
-		const data = { income: income };
-		const url = baseurl + 'income/' + incomeId;
+	update (url, data) {
+		const fullUrl = baseurl + url + '/' + data.id;
 		return new Promise((resolve) => {
 			aja()
 				.method('POST')
 				.data(data)
-				.url(url)
+				.url(fullUrl)
 				.on('success', function (data) {
 					console.log(data);
 					resolve(data);
@@ -43,12 +41,12 @@ export default {
 				.go();
 		});
 	},
-	removeIncome (incomeId) {
-		const url = baseurl + 'income/' + incomeId;
+	remove (url, data) {
+		const fullUrl = baseurl + url + '/' + data.id;
 		return new Promise((resolve) => {
 			aja()
 				.method('DELETE')
-				.url(url)
+				.url(fullUrl)
 				.on('success', function (data) {
 					console.log(data);
 					resolve(data);

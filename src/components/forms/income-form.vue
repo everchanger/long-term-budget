@@ -31,6 +31,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import { Income } from '../../models/Income';
 
 const incomeTypes = [
 	'Lön',
@@ -55,24 +56,24 @@ export default {
 	},
 	methods: {
 		addIncome: function () {
-			if (!this.newIncomeTitle || !this.newIncomeValue) {
+			if (! this.newIncomeTitle || ! this.newIncomeValue) {
 				this.adding = false;
 				return;
 			}
 			const vm = this;
-			this.$store.dispatch('addIncome', { personId: this.personId, title: this.newIncomeTitle, income: this.newIncomeValue }).then(function () {
+
+			Income.create(this.newIncomeValue, this.personId, this.newIncomeTitle).then(function () {
 				vm.cleanForm();
 				console.log('done!');
 			});
 		},
 		cleanForm: function () {
-			this.newIncomeTitle = null;
+			this.newIncomeTitle = incomeTypes[0];
 			this.newIncomeValue = null;
 			this.adding = false;
 		},
 		numberWithSpaces (x) {
 			const numberFormatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', minimumFractionDigits: 0 });
-
 			return numberFormatter.format(x);
 		},
 	},

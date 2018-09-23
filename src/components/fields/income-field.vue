@@ -16,7 +16,7 @@
 				<input class="m-aut input-text w-2/5 float-left" type="text" v-model="fieldValue" placeholder="SEK"/>
 				<div class="w-3/5 float-left">
 					<button class="btn btn-teal ml-2 mr-1" @click="update">Spara</button>
-					<button class="btn btn-orange" @click="close">Stäng</button>
+					<button class="btn btn-orange" @click="close">Avbryt</button>
 				</div>
 				<div class="clearfix" />
 			</div>
@@ -26,7 +26,7 @@
 
 <script>
 import Vue from 'vue';
-import { mapActions, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 import { bus } from '../../event-bus.js';
 
 export default {
@@ -48,7 +48,7 @@ export default {
 			'income',
 		]),
 		buttonLabel () {
-			if (!this.fieldValue) {
+			if (! this.fieldValue) {
 				return this.fieldTitle;
 			}
 			return this.fieldTitle + ' - ' + this.fieldValue + ' kr';
@@ -69,10 +69,6 @@ export default {
 		},
 	},
 	methods: {
-		...mapActions([
-			'updateIncome',
-			'deleteIncome',
-		]),
 		update () {
 			if (this.newValue === null || this.newValue === this.fieldValue) {
 				this.editing = false;
@@ -80,7 +76,7 @@ export default {
 			}
 
 			const vm = this;
-			this.updateIncome({ incomeId: this.incomeId, income: this.newValue }).then(function () {
+			this.field.update(this.newValue).then(function () {
 				vm.editing = false;
 			});
 		},
@@ -89,7 +85,7 @@ export default {
 			this.newValue = null;
 		},
 		open () {
-			bus.$emit('field.income.close');
+			bus.$emit('field.close');
 			this.editing = true;
 		},
 		remove () {
@@ -99,17 +95,17 @@ export default {
 			vm.showWarning = false;
 			Vue.nextTick(function () {
 				vm.editing = false;
-				vm.deleteIncome({ incomeId: vm.incomeId }).then(function () {
+				vm.field.remove().then(function () {
 					console.log('deleted');
 				});
 			});
 		},
 	},
 	mounted () {
-		bus.$on('field.income.close', this.close);
+		bus.$on('field.close', this.close);
 	},
 	destroyed () {
-		bus.$off('field.income.close');
+		bus.$off('field.close');
 	},
 };
 </script>

@@ -32,6 +32,15 @@ module.exports = {
          'single'
       ],
       'no-trailing-spaces': 'error',
+      "space-unary-ops": [
+        2, {
+          "words": true,
+          "nonwords": true,
+          "overrides": {
+            "new": false,
+            "++": true
+          }
+    }]
    },
    parserOptions: {
       parser: 'babel-eslint'
