@@ -17,42 +17,42 @@
 import { mapGetters } from 'vuex';
 
 export default {
-	data: function () {
-		return {
-			editing: false,
-		};
-	},
-	props: {
-		incomeId: {
-			type: Number,
-			required: true,
-		},
-	},
-	computed: {
-		...mapGetters([
-			'income',
-		]),
-		buttonLabel () {
-			if (!this.fieldValue) {
-				return this.fieldTitle;
-			}
-			return this.fieldTitle + ' - ' + this.fieldValue + ' kr';
-		},
-		field: function () {
-			return this.$store.state.income[this.incomeId];
-		},
-		fieldTitle: function () {
-			return this.field.title;
-		},
-		fieldValue: {
-			get: function () {
-				return this.field.income;
-			},
-			set: function (value) {
-				// Do an vuex action to set the right data!
-				console.log(value);
-			},
-		},
-	},
+    data: function () {
+        return {
+            editing: false,
+        };
+    },
+    props: {
+        incomeId: {
+            type: Number,
+            required: true,
+        },
+    },
+    computed: {
+        ...mapGetters([
+            'income',
+        ]),
+        buttonLabel () {
+            if (! this.fieldValue) {
+                return this.fieldTitle;
+            }
+            return this.fieldTitle + ' - ' + this.fieldValue + ' kr';
+        },
+        field: function () {
+            return this.$store.state.income[this.incomeId];
+        },
+        fieldTitle: function () {
+            return this.field.title;
+        },
+        fieldValue: {
+            get: function () {
+                return this.field.income;
+            },
+            set: function (value) {
+                // Do an vuex action to set the right data!
+                console.log(value);
+            },
+        },
+    },
 };
 </script>

@@ -6,12 +6,12 @@
 
 <script>
 export default {
-	data: function () {
-		return {
-			salery: null,
-		};
-	},
-	methods: {
-	},
+    data: function () {
+        return {
+            salery: null,
+        };
+    },
+    methods: {
+    },
 };
 </script>

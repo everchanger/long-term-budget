@@ -6,11 +6,11 @@ import { faTimesCircle, faTimes, faExclamationTriangle, faCommentAlt, faCheckCir
 // import { faUserCircle, faCheckCircle } from '@fortawesome/free-regular-svg-icons';
 
 library.add(
-	faTimes,
-	faTimesCircle,
-	faExclamationTriangle,
-	faCommentAlt,
-	faCheckCircle,
+    faTimes,
+    faTimesCircle,
+    faExclamationTriangle,
+    faCommentAlt,
+    faCheckCircle,
 );
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);

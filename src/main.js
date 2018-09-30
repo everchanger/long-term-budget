@@ -9,7 +9,7 @@ import './assets/css/style.scss';
 Vue.config.productionTip = false;
 
 new Vue({
-	router,
-	store,
-	render: h => h(root),
+    router,
+    store,
+    render: h => h(root),
 }).$mount('#app');

@@ -9,11 +9,11 @@
 import { mapGetters } from 'vuex';
 
 export default {
-	computed: {
-		...mapGetters([
-			'userAlias',
-		]),
-	},
+    computed: {
+        ...mapGetters([
+            'userAlias',
+        ]),
+    },
 };
 
 </script>

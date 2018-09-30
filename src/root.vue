@@ -17,18 +17,18 @@
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
-	computed: {
-		...mapGetters([
-			'toasts',
-		]),
-	},
-	methods: {
-		...mapActions([
-			'refreshUser',
-		]),
-	},
-	mounted () {
-		this.refreshUser();
-	},
+    computed: {
+        ...mapGetters([
+            'toasts',
+        ]),
+    },
+    methods: {
+        ...mapActions([
+            'refreshUser',
+        ]),
+    },
+    mounted () {
+        this.refreshUser();
+    },
 };
 </script>

@@ -33,15 +33,15 @@
 <script>
 
 export default {
-	computed: {
-		personId () {
-			return Number(this.$route.params.id);
-		},
-	},
-	methods: {
-		monthlySum (values) {
-			return values;
-		},
-	},
+    computed: {
+        personId () {
+            return Number(this.$route.params.id);
+        },
+    },
+    methods: {
+        monthlySum (values) {
+            return values;
+        },
+    },
 };
 </script>

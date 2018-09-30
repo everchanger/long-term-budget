@@ -10,41 +10,41 @@ localVue.use(Vuex);
 localVue.use(Router);
 
 describe('root.vue', () => {
-	let wrapper;
-	let actions, getters, store;
+    let wrapper;
+    let actions, getters, store;
 
-	beforeEach(() => {
-		jest.useFakeTimers();
-		actions = {
-			refreshUser: jest.fn(),
-		};
+    beforeEach(() => {
+        jest.useFakeTimers();
+        actions = {
+            refreshUser: jest.fn(),
+        };
 
-		getters = {
-			toasts () {
-				return [{
-					type: 'success',
-					message: 'Test toast',
-				}];
-			},
-			persons () {
-				return [];
-			},
-		};
+        getters = {
+            toasts () {
+                return [{
+                    type: 'success',
+                    message: 'Test toast',
+                }];
+            },
+            persons () {
+                return [];
+            },
+        };
 
-		store = new Vuex.Store({
-			actions,
-			getters,
-		});
+        store = new Vuex.Store({
+            actions,
+            getters,
+        });
 
-		wrapper = mount(root, { store, localVue, stubs: ['router-link', 'router-view'] });
-	});
+        wrapper = mount(root, { store, localVue, stubs: ['router-link', 'router-view'] });
+    });
 
-	afterEach(() => {
-		jest.runAllTimers();
-	});
+    afterEach(() => {
+        jest.runAllTimers();
+    });
 
-	it('display a toast', () => {
-		const toast = wrapper.find('.toast');
-		expect(toast.text()).toBe(getters.toasts()[0].message);
-	});
+    it('display a toast', () => {
+        const toast = wrapper.find('.toast');
+        expect(toast.text()).toBe(getters.toasts()[0].message);
+    });
 });

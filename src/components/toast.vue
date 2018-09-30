@@ -9,41 +9,41 @@
 <script>
 
 export default {
-	props: {
-		message: {
-			type: String,
-			required: true,
-		},
-		type: {
-			type: String,
-			required: false,
-			default: '',
-		},
-	},
-	computed: {
-		bgColor: function () {
-			return {
-				'bg-red': this.type === 'error',
-				'bg-orange': this.type === 'warning',
-				'bg-indigo': this.type === 'status' || this.type === '',
-				'bg-green': this.type === 'success',
-			};
-		},
-		icon: function () {
-			switch (this.type) {
-			case 'error':
-				return 'times-circle';
-			case 'warning':
-				return 'exclamation-triangle';
-			case 'success':
-				return 'check-circle';
-			case 'status':
-			case '':
-			default:
-				return 'comment-alt';
-			}
-		},
-	},
+    props: {
+        message: {
+            type: String,
+            required: true,
+        },
+        type: {
+            type: String,
+            required: false,
+            default: '',
+        },
+    },
+    computed: {
+        bgColor: function () {
+            return {
+                'bg-red': this.type === 'error',
+                'bg-orange': this.type === 'warning',
+                'bg-indigo': this.type === 'status' || this.type === '',
+                'bg-green': this.type === 'success',
+            };
+        },
+        icon: function () {
+            switch (this.type) {
+            case 'error':
+                return 'times-circle';
+            case 'warning':
+                return 'exclamation-triangle';
+            case 'success':
+                return 'check-circle';
+            case 'status':
+            case '':
+            default:
+                return 'comment-alt';
+            }
+        },
+    },
 };
 
 </script>

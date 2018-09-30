@@ -19,24 +19,24 @@
 <script>
 
 export default {
-	props: ['value'],
-	methods: {
-		close () {
-			this.$emit('input', false);
-		},
-		click (event) {
-			const srcElement = event.srcElement;
-			if (srcElement === this.$refs.modal) {
-				this.close();
-			}
-		},
-	},
-	mounted () {
-		document.addEventListener('click', this.click);
-	},
-	destroyed () {
-		document.removeEventListener('click', this.click);
-	},
+    props: ['value'],
+    methods: {
+        close () {
+            this.$emit('input', false);
+        },
+        click (event) {
+            const srcElement = event.srcElement;
+            if (srcElement === this.$refs.modal) {
+                this.close();
+            }
+        },
+    },
+    mounted () {
+        document.addEventListener('click', this.click);
+    },
+    destroyed () {
+        document.removeEventListener('click', this.click);
+    },
 };
 
 </script>

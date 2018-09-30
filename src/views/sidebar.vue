@@ -19,32 +19,32 @@
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
-	data: function () {
-		return {
-			adding: false,
-			personName: null,
-		};
-	},
-	computed: {
-		...mapGetters([
-			'persons',
-		]),
-	},
-	methods: {
-		...mapActions([
-			'addPerson',
-			'addToast',
-		]),
-		add: function () {
-			if (!this.personName) {
-				this.addToast('warning', 'Skriv in ett namn för att skapa en ny person!');
-				return;
-			}
-			this.addPerson(this.personName);
-			this.personName = null;
-			this.adding = false;
-			this.addToast({ type: 'success', message: 'Ny person tillagd!' });
-		},
-	},
+    data: function () {
+        return {
+            adding: false,
+            personName: null,
+        };
+    },
+    computed: {
+        ...mapGetters([
+            'persons',
+        ]),
+    },
+    methods: {
+        ...mapActions([
+            'addPerson',
+            'addToast',
+        ]),
+        add: function () {
+            if (! this.personName) {
+                this.addToast('warning', 'Skriv in ett namn för att skapa en ny person!');
+                return;
+            }
+            this.addPerson(this.personName);
+            this.personName = null;
+            this.adding = false;
+            this.addToast({ type: 'success', message: 'Ny person tillagd!' });
+        },
+    },
 };
 </script>

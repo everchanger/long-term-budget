@@ -12,9 +12,9 @@ module.exports = {
       'no-debugger': 'off',
       'indent': [
          'error', 
-         'tab'
+         4
       ],
-      'no-tabs': 0,
+      'no-tabs': 1,
       'semi': [
          'error', 
          'always'

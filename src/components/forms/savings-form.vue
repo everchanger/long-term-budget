@@ -11,24 +11,24 @@
 import { mapGetters } from 'vuex';
 
 export default {
-	data: function () {
-		return {
-			editing: false,
-		};
-	},
-	props: {
-		personId: {
-			type: Number,
-			required: true,
-		},
-	},
-	computed: {
-		...mapGetters([
-			'personSavings',
-		]),
-		formdata: function () {
-			return this.personSavings(this.personId);
-		},
-	},
+    data: function () {
+        return {
+            editing: false,
+        };
+    },
+    props: {
+        personId: {
+            type: Number,
+            required: true,
+        },
+    },
+    computed: {
+        ...mapGetters([
+            'personSavings',
+        ]),
+        formdata: function () {
+            return this.personSavings(this.personId);
+        },
+    },
 };
 </script>

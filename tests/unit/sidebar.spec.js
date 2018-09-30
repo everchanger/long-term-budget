@@ -10,77 +10,77 @@ localVue.use(Vuex);
 localVue.use(Router);
 
 describe('sidebar.vue', () => {
-	let wrapper;
-	let getters, actions, store;
+    let wrapper;
+    let getters, actions, store;
 
-	beforeEach(() => {
-		jest.useFakeTimers();
-		getters = {
-			persons () {
-				return {
-					1: {
-						id: 1,
-						name: 'Test Testson 1',
-					},
-					2: {
-						id: 2,
-						name: 'Test Testson 2',
-					},
-				};
-			},
-		};
+    beforeEach(() => {
+        jest.useFakeTimers();
+        getters = {
+            persons () {
+                return {
+                    1: {
+                        id: 1,
+                        name: 'Test Testson 1',
+                    },
+                    2: {
+                        id: 2,
+                        name: 'Test Testson 2',
+                    },
+                };
+            },
+        };
 
-		actions = {
-			addPerson: jest.fn(),
-			addToast: jest.fn(),
-		};
+        actions = {
+            addPerson: jest.fn(),
+            addToast: jest.fn(),
+        };
 
-		store = new Vuex.Store({
-			getters,
-			actions,
-		});
+        store = new Vuex.Store({
+            getters,
+            actions,
+        });
 
-		wrapper = shallowMount(sidebar, { store, localVue });
-	});
+        wrapper = shallowMount(sidebar, { store, localVue });
+    });
 
-	afterEach(() => {
-		jest.runAllTimers();
-	});
+    afterEach(() => {
+        jest.runAllTimers();
+    });
 
-	it('renders a list of persons', () => {
-		const persons = wrapper.findAll('.person');
-		for (let i = 0; i < persons.length; ++i) {
-			const person = persons.wrappers[i];
-			const personName = getters.persons()[i + 1].name;
-			expect(person.text()).toMatch(personName);
-		}
-	});
+    it('renders a list of persons', () => {
+        const persons = wrapper.findAll('.person');
+        for (let i = 0; i < persons.length; ++ i) {
+            const person = persons.wrappers[i];
+            const personName = getters.persons()[i + 1].name;
+            expect(person.text()).toMatch(personName);
+        }
+    });
 
-	it('adds a person to the sidebar', () => {
-		const newName = 'Test Testson 3';
+    it('adds a person to the sidebar', () => {
+        const newName = 'Test Testson 3';
 
-		const showButton = wrapper.find('#showInput');
-		showButton.trigger('click');
+        const showButton = wrapper.find('#showInput');
+        showButton.trigger('click');
 
-		const personNameInput = wrapper.find('#personName');
-		personNameInput.setValue(newName);
-		personNameInput.trigger('input');
+        const personNameInput = wrapper.find('#personName');
+        personNameInput.setValue(newName);
+        personNameInput.trigger('input');
 
-		expect(wrapper.vm.personName).toMatch(newName);
+        expect(wrapper.vm.personName).toMatch(newName);
 
-		const addButton = wrapper.find('#add');
-		addButton.trigger('click');
+        const addButton = wrapper.find('#add');
+        addButton.trigger('click');
 
-		expect(actions.addPerson).toHaveBeenCalled();
-	});
+        expect(actions.addPerson).toHaveBeenCalled();
+    });
 
-	it('tries to add a person with no name', () => {
-		const showButton = wrapper.find('#showInput');
-		showButton.trigger('click');
+    it('tries to add a person with no name', () => {
+        const showButton = wrapper.find('#showInput');
+        showButton.trigger('click');
 
-		const addButton = wrapper.find('#add');
-		addButton.trigger('click');
+        const addButton = wrapper.find('#add');
+        addButton.trigger('click');
 
-		expect(actions.addPerson).not.toHaveBeenCalled();
-	});
+        expect(actions.addPerson).not.toHaveBeenCalled();
+    });
 });
