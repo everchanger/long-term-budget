@@ -41,10 +41,18 @@ This project is a financial planning tool built with TypeScript and Nuxt 4, supp
 - **Migrations:** Migration scripts (if present) are critical for database changes—never edit schema directly.
 - **Testing:** Ensure both frontend and backend logic is covered by unit tests.
 
-## User needs
-- **Need to support multiple persons in a household:** The application should allow modeling of financial scenarios for multiple individuals living together.
-- **A user creates the household:** Users should be able to create a household and add members to it, the members are not other users just an entity in the household.
-- **A person in the application can have multiple income sources, expanses, etc:** Users should be able to model various income sources, expenses, and other financial aspects for each person in the household.
+## Data Model & Entity Relationships
+- **Users vs Persons:** 
+  - **Users** are application users with authentication data (name, email, password)
+  - **Persons** are household members with financial data (income, expenses, etc.)
+  - A User creates and owns Households, but is NOT the same as a Person in the household
+- **Household Structure:**
+  - A User creates a Household and adds Person entities to it
+  - Persons are NOT other application users, just entities within a household
+  - A Person can have multiple income sources, expenses, savings accounts, loans, etc.
+- **Financial Modeling:**
+  - Each Person has their own financial profile within the household
+  - Scenarios model the combined household finances over time
 - **Financial Scenario Modeling:** Users need to model various financial scenarios over time, including income, expenses, savings, and loans.
 - **Data Visualization:** Users require clear visualizations of their financial data and projections.
 - **User-Friendly Interface:** The application should be easy to use, with intuitive navigation and input methods.

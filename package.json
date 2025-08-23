@@ -7,15 +7,19 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "migrate": "node scripts/migrate.js"
   },
   "dependencies": {
     "@nuxt/eslint": "^1.9.0",
     "@nuxt/image": "^1.11.0",
     "@nuxt/test-utils": "^3.19.2",
     "@nuxt/ui": "^3.3.2",
+    "@types/pg": "^8.15.5",
     "eslint": "^9.34.0",
     "nuxt": "^4.0.3",
+    "pg": "^8.16.3",
+    "postgres-migrations": "^5.3.0",
     "typescript": "^5.9.2",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1"
