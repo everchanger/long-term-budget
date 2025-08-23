@@ -6,9 +6,10 @@ This project is a financial planning tool built with TypeScript and Nuxt 4, supp
 ## Architecture & Key Components
 - **Frontend:** Nuxt 4 (Vue-based), styled with Tailwind CSS.
 - **Backend:** Nuxt 4 server, PostgreSQL database.
+- **Database ORM:** Drizzle ORM for type-safe database operations and schema management.
 - **Testing:** Vitest and the Nuxt testing utilities is used for unit tests.
 - **Linting:** ESLint and Prettier are used for code quality and formatting.
-- **Database:** PostgreSQL, with migrations to keep local and production schemas in sync.
+- **Database:** PostgreSQL, with Drizzle migrations to keep local and production schemas in sync.
 - **Local Development:** Uses Docker Compose for running a local PostgreSQL instance.
 - **Seed Data:** CLI tools (expected in `cmd/` directory) for populating the database.
 
@@ -16,7 +17,11 @@ This project is a financial planning tool built with TypeScript and Nuxt 4, supp
 - **Start Local Environment:**
   - Use Docker Compose to start PostgreSQL: `docker compose up`
 - **Database Migrations:**
-  - Ensure migrations are run to sync schema. (Migration scripts should be referenced if present.)
+  - Use Drizzle: `npm run db:migrate` to apply schema changes
+  - Schema defined in TypeScript files under `db/schema/`
+- **Database Operations:**
+  - Use `npm run db:push` for development schema sync
+  - Use `npm run db:studio` to open Drizzle Studio for database inspection
 - **Seeding Data:**
   - Use CLI tools in `cmd/` (if present) to seed the database for local testing.
 - **Frontend/Backend Development:**
@@ -29,7 +34,8 @@ This project is a financial planning tool built with TypeScript and Nuxt 4, supp
 ## Project-Specific Conventions
 - **Unified Nuxt Stack:** Both frontend and backend are managed in Nuxt, so shared logic/components may exist.
 - **Tailwind for Styling:** All UI should use Tailwind CSS utility classes.
-- **Database Migration Discipline:** Always run migrations before seeding or testing against the database.
+- **Drizzle ORM:** All database operations use Drizzle for type safety and better DX.
+- **TypeScript-First Database Schema:** Schema is defined in TypeScript, migrations auto-generated.
 
 ## Integration Points
 - **PostgreSQL:** All persistent data is stored here; ensure connection details match local Docker setup.
@@ -38,8 +44,8 @@ This project is a financial planning tool built with TypeScript and Nuxt 4, supp
 ## Examples & Patterns
 - **Scenario Modeling:** Core logic should allow for flexible modeling of financial scenarios over time.
 - **Nuxt Pages/Components:** Look for reusable components and composables for financial calculations.
-- **Migrations:** Migration scripts (if present) are critical for database changes—never edit schema directly.
-- **Testing:** Ensure both frontend and backend logic is covered by unit tests.
+- **Drizzle Schema:** Schema definitions in `db/schema/` provide the single source of truth for data models.
+- **Type Safety:** Use Drizzle's inferred types throughout the application for compile-time safety.
 
 ## Data Model & Entity Relationships
 - **Users vs Persons:** 
@@ -63,7 +69,8 @@ This project is a financial planning tool built with TypeScript and Nuxt 4, supp
 - `.github/copilot-instructions.md`: This file—update as project evolves.
 - `cmd/`: CLI tools for database seeding (if/when present).
 - `docker-compose.yml`: Local database setup (if/when present).
-- `migrations/`: Database migration scripts (if/when present).
+- `db/schema/`: Drizzle schema definitions (TypeScript-first).
+- `drizzle.config.ts`: Drizzle configuration file.
 
 ---
 **If any section is unclear or incomplete, please provide feedback or point to missing files so this guide can be improved.**
