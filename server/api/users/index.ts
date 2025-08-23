@@ -1,4 +1,5 @@
 import { db, schema } from '../../../db'
+import { insertUserSchema } from '../../../db/schemas'
 import { desc } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
@@ -18,17 +19,12 @@ export default defineEventHandler(async (event) => {
     if (event.node.req.method === 'POST') {
       // Create a new user
       const body = await readBody(event)
-      const { name, email } = body
       
-      if (!name || !email) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Name and email are required'
-        })
-      }
+      // Validate the request body using the generated schema
+      const validatedData = insertUserSchema.parse(body)
       
       const [newUser] = await db.insert(schema.users)
-        .values({ name, email })
+        .values(validatedData)
         .returning({
           id: schema.users.id,
           name: schema.users.name,
@@ -36,6 +32,7 @@ export default defineEventHandler(async (event) => {
           createdAt: schema.users.createdAt,
         })
       
+      setResponseStatus(event, 201)
       return newUser
     }
     
@@ -44,7 +41,19 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Method not allowed'
     })
     
-  } catch (error) {
+  } catch (error: any) {
+    if (error.name === 'ZodError') {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Validation failed',
+        data: error.errors
+      })
+    }
+    
+    if (error.statusCode) {
+      throw error
+    }
+    
     console.error('Database error:', error)
     throw createError({
       statusCode: 500,

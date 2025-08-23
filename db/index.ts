@@ -11,7 +11,8 @@ const client = new Client({
   ssl: false,
 })
 
-await client.connect()
+// Connect to the database
+client.connect().catch(console.error)
 
 export const db = drizzle(client, { schema })
 

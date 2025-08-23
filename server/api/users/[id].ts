@@ -1,4 +1,5 @@
 import { db, schema } from '../../../db'
+import { updateUserSchema } from '../../../db/schemas'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
@@ -34,17 +35,12 @@ export default defineEventHandler(async (event) => {
     if (event.node.req.method === 'PUT') {
       // Update user
       const body = await readBody(event)
-      const { name, email } = body
       
-      if (!name || !email) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Name and email are required'
-        })
-      }
+      // Validate the request body using the generated schema
+      const validatedData = updateUserSchema.parse(body)
       
       const [updatedUser] = await db.update(schema.users)
-        .set({ name, email })
+        .set(validatedData)
         .where(eq(schema.users.id, userId))
         .returning({
           id: schema.users.id,
@@ -76,6 +72,7 @@ export default defineEventHandler(async (event) => {
         })
       }
       
+      setResponseStatus(event, 204)
       return { message: 'User deleted successfully' }
     }
     
@@ -84,7 +81,19 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Method not allowed'
     })
     
-  } catch (error) {
+  } catch (error: any) {
+    if (error.name === 'ZodError') {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Validation failed',
+        data: error.errors
+      })
+    }
+    
+    if (error.statusCode) {
+      throw error
+    }
+    
     console.error('Database error:', error)
     throw createError({
       statusCode: 500,
