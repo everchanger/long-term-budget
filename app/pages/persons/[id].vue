@@ -46,38 +46,38 @@
         <UCard>
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Monthly Income</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${{ totalMonthlyIncome }}</p>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">Monthly Income</p>
+              <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{ totalMonthlyIncome }}</p>
             </div>
-            <UIcon name="i-heroicons-banknotes" class="h-8 w-8 text-gray-400" />
+            <UIcon name="i-heroicons-banknotes" class="h-8 w-8 text-neutral-400" />
           </div>
         </UCard>
 
         <UCard>
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Total Savings</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${{ totalSavings }}</p>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">Total Savings</p>
+              <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{ totalSavings }}</p>
             </div>
-            <UIcon name="i-heroicons-building-library" class="h-8 w-8 text-gray-400" />
+            <UIcon name="i-heroicons-building-library" class="h-8 w-8 text-neutral-400" />
           </div>
         </UCard>
 
         <UCard>
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Investment Value</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${{ totalInvestments }}</p>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">Investment Value</p>
+              <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{ totalInvestments }}</p>
             </div>
-            <UIcon name="i-heroicons-chart-bar-square" class="h-8 w-8 text-gray-400" />
+            <UIcon name="i-heroicons-chart-bar-square" class="h-8 w-8 text-neutral-400" />
           </div>
         </UCard>
 
         <UCard>
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Total Debt</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${{ totalDebt }}</p>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">Total Debt</p>
+              <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{ totalDebt }}</p>
             </div>
             <UIcon name="i-heroicons-credit-card" class="h-8 w-8 text-red-500" />
           </div>
@@ -93,10 +93,10 @@
               <div v-if="item.value === 'income'">
                 <div class="flex justify-between items-center mb-6">
                   <div class="flex items-center gap-3">
-                    <UIcon name="i-heroicons-banknotes" class="h-6 w-6 text-gray-400" />
+                    <UIcon name="i-heroicons-banknotes" class="h-6 w-6 text-neutral-400" />
                     <div>
-                      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Income Sources</h3>
-                      <p class="text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s income sources</p>
+                      <h3 class="text-xl font-semibold text-neutral-900 dark:text-white">Income Sources</h3>
+                      <p class="text-neutral-600 dark:text-neutral-400">Manage {{ person.name }}'s income sources</p>
                     </div>
                   </div>
                   <UButton @click="openIncomeModal" icon="i-heroicons-plus">
@@ -108,9 +108,9 @@
                   <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 mx-auto" />
                 </div>
                 <div v-else-if="incomeSources.length === 0" class="text-center py-12">
-                  <UIcon name="i-heroicons-banknotes" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Income Sources</h4>
-                  <p class="text-gray-600 dark:text-gray-400 mb-4">Add {{ person.name }}'s first income source to get started.</p>
+                  <UIcon name="i-heroicons-banknotes" class="mx-auto h-12 w-12 text-neutral-400 mb-4" />
+                  <h4 class="text-lg font-medium text-neutral-900 dark:text-white mb-2">No Income Sources</h4>
+                  <p class="text-neutral-600 dark:text-neutral-400 mb-4">Add {{ person.name }}'s first income source to get started.</p>
                   <UButton @click="openIncomeModal" variant="soft" icon="i-heroicons-plus">
                     Add Income Source
                   </UButton>
@@ -120,13 +120,13 @@
                     <div class="flex justify-between items-start">
                       <div class="flex-1">
                         <div class="flex items-center gap-3 mb-2">
-                          <h4 class="font-semibold text-gray-900 dark:text-white">{{ income.name }}</h4>
+                          <h4 class="font-semibold text-neutral-900 dark:text-white">{{ income.name }}</h4>
                           <UBadge :color="income.isActive ? 'success' : 'error'">
                             {{ income.isActive ? 'Active' : 'Inactive' }}
                           </UBadge>
                         </div>
-                        <p class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">${{ income.amount }} {{ income.frequency }}</p>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                        <p class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-1">${{ income.amount }} {{ income.frequency }}</p>
+                        <div class="text-sm text-neutral-600 dark:text-neutral-400">
                           <p v-if="income.startDate">Started: {{ formatDate(income.startDate) }}</p>
                           <p v-if="income.endDate">Ends: {{ formatDate(income.endDate) }}</p>
                         </div>
