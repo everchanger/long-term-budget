@@ -84,146 +84,137 @@
         </UCard>
       </div>
 
-      <!-- Financial Details Cards -->
-      <div class="space-y-6">
-        <!-- Income Sources Card -->
-        <UCard>
-          <template #header>
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-3">
-                <UIcon name="i-heroicons-banknotes" class="h-6 w-6 text-green-500" />
-                <div>
-                  <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Income Sources</h3>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s income sources</p>
-                </div>
-              </div>
-              <UButton @click="openIncomeModal" icon="i-heroicons-plus" size="sm">
-                Add Income
-              </UButton>
-            </div>
-          </template>
-
-          <div v-if="incomeSourcesLoading" class="text-center py-8">
-            <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 mx-auto" />
-          </div>
-          <div v-else-if="incomeSources.length === 0" class="text-center py-8">
-            <UIcon name="i-heroicons-banknotes" class="mx-auto h-10 w-10 text-gray-400 mb-3" />
-            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Income Sources</h4>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">Add {{ person.name }}'s first income source to get started.</p>
-            <UButton @click="openIncomeModal" variant="soft" icon="i-heroicons-plus">
-              Add Income Source
-            </UButton>
-          </div>
-          <div v-else class="space-y-3">
-            <div 
-              v-for="income in incomeSources" 
-              :key="income.id"
-              class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
-            >
-              <div class="flex justify-between items-start">
-                <div class="flex-1">
-                  <div class="flex items-center gap-3 mb-2">
-                    <h4 class="font-semibold text-gray-900 dark:text-white">{{ income.name }}</h4>
-                    <UBadge :color="income.isActive ? 'success' : 'error'">
-                      {{ income.isActive ? 'Active' : 'Inactive' }}
-                    </UBadge>
+      <!-- Financial Details Tabs -->
+      <UCard>
+        <UTabs :items="financialTabs" v-model="selectedTab" class="w-full">
+          <template #content="{ item }">
+            <div class="py-6">
+              <!-- Income Sources Tab -->
+              <div v-if="item.value === 'income'">
+                <div class="flex justify-between items-center mb-6">
+                  <div class="flex items-center gap-3">
+                    <UIcon name="i-heroicons-banknotes" class="h-6 w-6 text-green-500" />
+                    <div>
+                      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Income Sources</h3>
+                      <p class="text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s income sources</p>
+                    </div>
                   </div>
-                  <p class="text-lg font-medium text-green-600 mb-1">${{ income.amount }} {{ income.frequency }}</p>
-                  <div class="text-sm text-gray-600 dark:text-gray-400">
-                    <p v-if="income.startDate">Started: {{ formatDate(income.startDate) }}</p>
-                    <p v-if="income.endDate">Ends: {{ formatDate(income.endDate) }}</p>
+                  <UButton @click="openIncomeModal" icon="i-heroicons-plus">
+                    Add Income Source
+                  </UButton>
+                </div>
+
+                <div v-if="incomeSourcesLoading" class="text-center py-8">
+                  <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 mx-auto" />
+                </div>
+                <div v-else-if="incomeSources.length === 0" class="text-center py-12">
+                  <UIcon name="i-heroicons-banknotes" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Income Sources</h4>
+                  <p class="text-gray-600 dark:text-gray-400 mb-4">Add {{ person.name }}'s first income source to get started.</p>
+                  <UButton @click="openIncomeModal" variant="soft" icon="i-heroicons-plus">
+                    Add Income Source
+                  </UButton>
+                </div>
+                <div v-else class="space-y-4">
+                  <UCard v-for="income in incomeSources" :key="income.id">
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                          <h4 class="font-semibold text-gray-900 dark:text-white">{{ income.name }}</h4>
+                          <UBadge :color="income.isActive ? 'success' : 'error'">
+                            {{ income.isActive ? 'Active' : 'Inactive' }}
+                          </UBadge>
+                        </div>
+                        <p class="text-lg font-medium text-green-600 mb-1">${{ income.amount }} {{ income.frequency }}</p>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                          <p v-if="income.startDate">Started: {{ formatDate(income.startDate) }}</p>
+                          <p v-if="income.endDate">Ends: {{ formatDate(income.endDate) }}</p>
+                        </div>
+                      </div>
+                      <div class="flex gap-2">
+                        <UButton @click="editIncome(income)" size="sm" variant="ghost" icon="i-heroicons-pencil" />
+                        <UButton @click="deleteIncome(income)" size="sm" variant="ghost" color="error" icon="i-heroicons-trash" />
+                      </div>
+                    </div>
+                  </UCard>
+                </div>
+              </div>
+
+              <!-- Loans & Debts Tab -->
+              <div v-else-if="item.value === 'loans'">
+                <div class="flex justify-between items-center mb-6">
+                  <div class="flex items-center gap-3">
+                    <UIcon name="i-heroicons-credit-card" class="h-6 w-6 text-red-500" />
+                    <div>
+                      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Loans & Debts</h3>
+                      <p class="text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s loans and debts</p>
+                    </div>
                   </div>
+                  <UButton @click="openLoanModal" icon="i-heroicons-plus">
+                    Add Loan
+                  </UButton>
                 </div>
-                <div class="flex gap-2">
-                  <UButton @click="editIncome(income)" size="sm" variant="ghost" icon="i-heroicons-pencil" />
-                  <UButton @click="deleteIncome(income)" size="sm" variant="ghost" color="error" icon="i-heroicons-trash" />
+                <div class="text-center py-12">
+                  <UIcon name="i-heroicons-credit-card" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Loans Yet</h4>
+                  <p class="text-gray-600 dark:text-gray-400 mb-4">Add loans and debts to track payments and balances.</p>
+                  <UButton @click="openLoanModal" variant="soft" icon="i-heroicons-plus">
+                    Add Loan
+                  </UButton>
                 </div>
               </div>
-            </div>
-          </div>
-        </UCard>
 
-        <!-- Loans & Debts Card -->
-        <UCard>
-          <template #header>
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-3">
-                <UIcon name="i-heroicons-credit-card" class="h-6 w-6 text-red-500" />
-                <div>
-                  <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Loans & Debts</h3>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s loans and debts</p>
+              <!-- Savings Accounts Tab -->
+              <div v-else-if="item.value === 'savings'">
+                <div class="flex justify-between items-center mb-6">
+                  <div class="flex items-center gap-3">
+                    <UIcon name="i-heroicons-building-library" class="h-6 w-6 text-blue-500" />
+                    <div>
+                      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Savings Accounts</h3>
+                      <p class="text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s savings accounts</p>
+                    </div>
+                  </div>
+                  <UButton @click="openSavingsModal" icon="i-heroicons-plus">
+                    Add Savings Account
+                  </UButton>
+                </div>
+                <div class="text-center py-12">
+                  <UIcon name="i-heroicons-building-library" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Savings Accounts Yet</h4>
+                  <p class="text-gray-600 dark:text-gray-400 mb-4">Add savings accounts to track balances and interest.</p>
+                  <UButton @click="openSavingsModal" variant="soft" icon="i-heroicons-plus">
+                    Add Savings Account
+                  </UButton>
                 </div>
               </div>
-              <UButton @click="openLoanModal" icon="i-heroicons-plus" size="sm">
-                Add Loan
-              </UButton>
+
+              <!-- Investment Accounts Tab -->
+              <div v-else-if="item.value === 'investments'">
+                <div class="flex justify-between items-center mb-6">
+                  <div class="flex items-center gap-3">
+                    <UIcon name="i-heroicons-chart-bar-square" class="h-6 w-6 text-purple-500" />
+                    <div>
+                      <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Investment Accounts</h3>
+                      <p class="text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s investment portfolios</p>
+                    </div>
+                  </div>
+                  <UButton @click="openInvestmentModal" icon="i-heroicons-plus">
+                    Add Investment Account
+                  </UButton>
+                </div>
+                <div class="text-center py-12">
+                  <UIcon name="i-heroicons-chart-bar-square" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Investment Accounts Yet</h4>
+                  <p class="text-gray-600 dark:text-gray-400 mb-4">Add investment accounts to track portfolio performance.</p>
+                  <UButton @click="openInvestmentModal" variant="soft" icon="i-heroicons-plus">
+                    Add Investment Account
+                  </UButton>
+                </div>
+              </div>
             </div>
           </template>
-
-          <div class="text-center py-8">
-            <UIcon name="i-heroicons-credit-card" class="mx-auto h-10 w-10 text-gray-400 mb-3" />
-            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Loans Yet</h4>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">Add loans and debts to track payments and balances.</p>
-            <UButton @click="openLoanModal" variant="soft" icon="i-heroicons-plus">
-              Add Loan
-            </UButton>
-          </div>
-        </UCard>
-
-        <!-- Savings Accounts Card -->
-        <UCard>
-          <template #header>
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-3">
-                <UIcon name="i-heroicons-building-library" class="h-6 w-6 text-blue-500" />
-                <div>
-                  <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Savings Accounts</h3>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s savings accounts</p>
-                </div>
-              </div>
-              <UButton @click="openSavingsModal" icon="i-heroicons-plus" size="sm">
-                Add Account
-              </UButton>
-            </div>
-          </template>
-
-          <div class="text-center py-8">
-            <UIcon name="i-heroicons-building-library" class="mx-auto h-10 w-10 text-gray-400 mb-3" />
-            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Savings Accounts Yet</h4>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">Add savings accounts to track balances and interest.</p>
-            <UButton @click="openSavingsModal" variant="soft" icon="i-heroicons-plus">
-              Add Savings Account
-            </UButton>
-          </div>
-        </UCard>
-
-        <!-- Investment Accounts Card -->
-        <UCard>
-          <template #header>
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-3">
-                <UIcon name="i-heroicons-chart-bar-square" class="h-6 w-6 text-purple-500" />
-                <div>
-                  <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Investment Accounts</h3>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s investment portfolios</p>
-                </div>
-              </div>
-              <UButton @click="openInvestmentModal" icon="i-heroicons-plus" size="sm">
-                Add Account
-              </UButton>
-            </div>
-          </template>
-
-          <div class="text-center py-8">
-            <UIcon name="i-heroicons-chart-bar-square" class="mx-auto h-10 w-10 text-gray-400 mb-3" />
-            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Investment Accounts Yet</h4>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">Add investment accounts to track portfolio performance.</p>
-            <UButton @click="openInvestmentModal" variant="soft" icon="i-heroicons-plus">
-              Add Investment Account
-            </UButton>
-          </div>
-        </UCard>
-      </div>
+        </UTabs>
+      </UCard>
     </div>
 
     <!-- Income Source Modal -->
@@ -328,6 +319,17 @@ const personId = route.params.id as string
 
 // Person data
 const { data: person, pending: personLoading } = await useFetch<Person>(`/api/persons/${personId}`)
+
+// Financial tabs
+
+const financialTabs = [
+  { value: 'income', label: 'Income Sources', icon: 'i-heroicons-banknotes' },
+  { value: 'loans', label: 'Loans & Debts', icon: 'i-heroicons-credit-card' },
+  { value: 'savings', label: 'Savings', icon: 'i-heroicons-building-library' },
+  { value: 'investments', label: 'Investments', icon: 'i-heroicons-chart-bar-square' }
+]
+
+const selectedTab = ref(financialTabs[0]?.value)
 
 // Income sources
 const { data: incomeSources, pending: incomeSourcesLoading, refresh: refreshIncomeSources } = await useFetch<IncomeSource[]>('/api/income-sources', {
