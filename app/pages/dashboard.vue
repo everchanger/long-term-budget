@@ -20,7 +20,7 @@
           <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
             All Users ({{ users?.length || 0 }})
           </h2>
-          <UButton v-if="users && users.length > 0" @click="refresh()" color="gray" variant="soft"
+          <UButton v-if="users && users.length > 0" @click="refresh()" variant="soft"
             icon="i-heroicons-arrow-path" size="sm">
             Refresh
           </UButton>
@@ -42,10 +42,10 @@
       <!-- Users Table -->
       <ClientOnly>
         <div v-if="!pending && !error">
-          <UTable v-if="users && users.length > 0" :rows="users" :columns="userColumns" class="w-full">
+          <UTable v-if="users && users.length > 0" :data="users" class="w-full">
             <template #actions-data="{ row }">
               <UDropdownMenu :items="getUserActions(row)">
-                <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
+                <UButton variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
               </UDropdownMenu>
             </template>
 
@@ -73,7 +73,7 @@
       <template #header>
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-medium">Add New User</h3>
-          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark" @click="isModalOpen = false" />
+          <UButton variant="ghost" icon="i-heroicons-x-mark" @click="isModalOpen = false" />
         </div>
       </template>
 
@@ -90,7 +90,7 @@
               required />
           </div>
           <div class="flex justify-end space-x-3 pt-4">
-            <UButton color="gray" variant="soft" @click="isModalOpen = false">
+            <UButton variant="soft" @click="isModalOpen = false">
               Cancel
             </UButton>
             <UButton type="submit" :loading="isCreating">
@@ -103,14 +103,15 @@
 
     <!-- Edit User Modal -->
     <UModal v-model="isEditModalOpen">
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-medium">Edit User</h3>
-            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark" @click="isEditModalOpen = false" />
-          </div>
-        </template>
 
+      <template #header>
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-medium">Edit User</h3>
+          <UButton variant="ghost" icon="i-heroicons-x-mark" @click="isEditModalOpen = false" />
+        </div>
+      </template>
+
+      <template #body>
         <UForm :schema="editUserSchema" :state="editingUser" @submit="updateUser" class="space-y-4">
           <div class="space-y-2">
             <label for="edit-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name *</label>
@@ -124,7 +125,7 @@
           </div>
 
           <div class="flex justify-end space-x-3 pt-4">
-            <UButton color="gray" variant="soft" @click="isEditModalOpen = false">
+            <UButton variant="soft" @click="isEditModalOpen = false">
               Cancel
             </UButton>
             <UButton type="submit" :loading="isUpdating">
@@ -132,7 +133,7 @@
             </UButton>
           </div>
         </UForm>
-      </UCard>
+      </template>
     </UModal>
   </div>
 </template>
@@ -170,34 +171,6 @@ const editingUser = ref({
 // Schema for form validation
 const userSchema = insertUserSchema.omit({ createdAt: true })
 const editUserSchema = updateUserSchema
-
-// Table columns
-const userColumns = [
-  {
-    key: 'id',
-    label: 'ID',
-    sortable: true
-  },
-  {
-    key: 'name',
-    label: 'Name',
-    sortable: true
-  },
-  {
-    key: 'email',
-    label: 'Email',
-    sortable: true
-  },
-  {
-    key: 'createdAt',
-    label: 'Created',
-    sortable: true
-  },
-  {
-    key: 'actions',
-    label: 'Actions'
-  }
-]
 
 // Fetch users
 const { data: users, pending, error, refresh } = await useFetch<User[]>('/api/users')

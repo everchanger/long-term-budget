@@ -48,14 +48,12 @@
           <div class="flex items-center space-x-4">
             <!-- Theme toggle -->
             <UButton
-              color="gray"
               variant="ghost"
               icon="i-heroicons-sun"
               class="dark:hidden"
               @click="$colorMode.preference = 'dark'"
             />
             <UButton
-              color="gray"
               variant="ghost"
               icon="i-heroicons-moon"
               class="hidden dark:block"
@@ -64,7 +62,6 @@
 
             <!-- Mobile menu button -->
             <UButton
-              color="gray"
               variant="ghost"
               icon="i-heroicons-bars-3"
               class="md:hidden"
