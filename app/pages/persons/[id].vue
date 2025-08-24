@@ -47,9 +47,9 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400">Monthly Income</p>
-              <p class="text-2xl font-bold text-green-600">${{ totalMonthlyIncome }}</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${{ totalMonthlyIncome }}</p>
             </div>
-            <UIcon name="i-heroicons-banknotes" class="h-8 w-8 text-green-500" />
+            <UIcon name="i-heroicons-banknotes" class="h-8 w-8 text-gray-400" />
           </div>
         </UCard>
 
@@ -57,9 +57,9 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400">Total Savings</p>
-              <p class="text-2xl font-bold text-blue-600">${{ totalSavings }}</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${{ totalSavings }}</p>
             </div>
-            <UIcon name="i-heroicons-building-library" class="h-8 w-8 text-blue-500" />
+            <UIcon name="i-heroicons-building-library" class="h-8 w-8 text-gray-400" />
           </div>
         </UCard>
 
@@ -67,9 +67,9 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400">Investment Value</p>
-              <p class="text-2xl font-bold text-purple-600">${{ totalInvestments }}</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${{ totalInvestments }}</p>
             </div>
-            <UIcon name="i-heroicons-chart-bar-square" class="h-8 w-8 text-purple-500" />
+            <UIcon name="i-heroicons-chart-bar-square" class="h-8 w-8 text-gray-400" />
           </div>
         </UCard>
 
@@ -77,7 +77,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600 dark:text-gray-400">Total Debt</p>
-              <p class="text-2xl font-bold text-red-600">${{ totalDebt }}</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${{ totalDebt }}</p>
             </div>
             <UIcon name="i-heroicons-credit-card" class="h-8 w-8 text-red-500" />
           </div>
@@ -93,7 +93,7 @@
               <div v-if="item.value === 'income'">
                 <div class="flex justify-between items-center mb-6">
                   <div class="flex items-center gap-3">
-                    <UIcon name="i-heroicons-banknotes" class="h-6 w-6 text-green-500" />
+                    <UIcon name="i-heroicons-banknotes" class="h-6 w-6 text-gray-400" />
                     <div>
                       <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Income Sources</h3>
                       <p class="text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s income sources</p>
@@ -125,7 +125,7 @@
                             {{ income.isActive ? 'Active' : 'Inactive' }}
                           </UBadge>
                         </div>
-                        <p class="text-lg font-medium text-green-600 mb-1">${{ income.amount }} {{ income.frequency }}</p>
+                        <p class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">${{ income.amount }} {{ income.frequency }}</p>
                         <div class="text-sm text-gray-600 dark:text-gray-400">
                           <p v-if="income.startDate">Started: {{ formatDate(income.startDate) }}</p>
                           <p v-if="income.endDate">Ends: {{ formatDate(income.endDate) }}</p>
@@ -144,7 +144,7 @@
               <div v-else-if="item.value === 'loans'">
                 <div class="flex justify-between items-center mb-6">
                   <div class="flex items-center gap-3">
-                    <UIcon name="i-heroicons-credit-card" class="h-6 w-6 text-red-500" />
+                    <UIcon name="i-heroicons-credit-card" class="h-6 w-6 text-gray-400" />
                     <div>
                       <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Loans & Debts</h3>
                       <p class="text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s loans and debts</p>
@@ -168,7 +168,7 @@
               <div v-else-if="item.value === 'savings'">
                 <div class="flex justify-between items-center mb-6">
                   <div class="flex items-center gap-3">
-                    <UIcon name="i-heroicons-building-library" class="h-6 w-6 text-blue-500" />
+                    <UIcon name="i-heroicons-building-library" class="h-6 w-6 text-gray-400" />
                     <div>
                       <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Savings Accounts</h3>
                       <p class="text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s savings accounts</p>
@@ -192,7 +192,7 @@
               <div v-else-if="item.value === 'investments'">
                 <div class="flex justify-between items-center mb-6">
                   <div class="flex items-center gap-3">
-                    <UIcon name="i-heroicons-chart-bar-square" class="h-6 w-6 text-purple-500" />
+                    <UIcon name="i-heroicons-chart-bar-square" class="h-6 w-6 text-gray-400" />
                     <div>
                       <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Investment Accounts</h3>
                       <p class="text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s investment portfolios</p>

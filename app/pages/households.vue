@@ -113,50 +113,50 @@
             
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               <!-- Monthly Income -->
-              <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+              <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                 <div class="flex items-center justify-between">
                   <div>
-                    <p class="text-sm font-medium text-green-800 dark:text-green-200">Monthly Income</p>
-                    <p class="text-2xl font-bold text-green-600 dark:text-green-400">${{ financialSummary.totalMonthlyIncome.toLocaleString() }}</p>
-                    <p class="text-xs text-green-600 dark:text-green-400">${{ financialSummary.totalAnnualIncome.toLocaleString() }} annually</p>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Monthly Income</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${{ financialSummary.totalMonthlyIncome.toLocaleString() }}</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">${{ financialSummary.totalAnnualIncome.toLocaleString() }} annually</p>
                   </div>
-                  <UIcon name="i-heroicons-banknotes" class="h-8 w-8 text-green-500" />
+                  <UIcon name="i-heroicons-banknotes" class="h-8 w-8 text-gray-400" />
                 </div>
               </div>
 
               <!-- Total Savings -->
-              <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+              <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                 <div class="flex items-center justify-between">
                   <div>
-                    <p class="text-sm font-medium text-blue-800 dark:text-blue-200">Total Savings</p>
-                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">${{ financialSummary.totalSavings.toLocaleString() }}</p>
-                    <p class="text-xs text-blue-600 dark:text-blue-400">{{ financialSummary.savingsAccountsCount }} accounts</p>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Total Savings</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${{ financialSummary.totalSavings.toLocaleString() }}</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">{{ financialSummary.savingsAccountsCount }} accounts</p>
                   </div>
-                  <UIcon name="i-heroicons-building-library" class="h-8 w-8 text-blue-500" />
+                  <UIcon name="i-heroicons-building-library" class="h-8 w-8 text-gray-400" />
                 </div>
               </div>
 
               <!-- Total Investments -->
-              <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+              <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                 <div class="flex items-center justify-between">
                   <div>
-                    <p class="text-sm font-medium text-purple-800 dark:text-purple-200">Investments</p>
-                    <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">${{ financialSummary.totalInvestments.toLocaleString() }}</p>
-                    <p class="text-xs text-purple-600 dark:text-purple-400">{{ financialSummary.investmentAccountsCount }} accounts</p>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Investments</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${{ financialSummary.totalInvestments.toLocaleString() }}</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">{{ financialSummary.investmentAccountsCount }} accounts</p>
                   </div>
-                  <UIcon name="i-heroicons-chart-bar-square" class="h-8 w-8 text-purple-500" />
+                  <UIcon name="i-heroicons-chart-bar-square" class="h-8 w-8 text-gray-400" />
                 </div>
               </div>
 
               <!-- Total Debt -->
-              <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+              <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                 <div class="flex items-center justify-between">
                   <div>
-                    <p class="text-sm font-medium text-red-800 dark:text-red-200">Total Debt</p>
-                    <p class="text-2xl font-bold text-red-600 dark:text-red-400">${{ financialSummary.totalDebt.toLocaleString() }}</p>
-                    <p class="text-xs text-red-600 dark:text-red-400">{{ financialSummary.loansCount }} loans</p>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Total Debt</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">${{ financialSummary.totalDebt.toLocaleString() }}</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">{{ financialSummary.loansCount }} loans</p>
                   </div>
-                  <UIcon name="i-heroicons-credit-card" class="h-8 w-8 text-red-500" />
+                  <UIcon name="i-heroicons-credit-card" class="h-8 w-8 text-gray-400" />
                 </div>
               </div>
             </div>
@@ -168,7 +168,7 @@
                   <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Estimated Net Worth</p>
                   <p class="text-sm text-gray-600 dark:text-gray-400">(Savings + Investments - Debt)</p>
                 </div>
-                <p class="text-2xl font-bold" :class="netWorth >= 0 ? 'text-green-600' : 'text-red-600'">
+                <p class="text-2xl font-bold" :class="netWorth >= 0 ? 'text-primary-600 dark:text-primary-400' : 'text-red-600 dark:text-red-400'">
                   ${{ netWorth.toLocaleString() }}
                 </p>
               </div>
