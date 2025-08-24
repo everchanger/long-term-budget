@@ -103,6 +103,78 @@
               </UButton>
             </div>
           </div>
+
+          <!-- Financial Summary Section -->
+          <div v-if="financialSummary && householdMembers.length > 0" class="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div class="mb-4">
+              <p class="text-sm font-medium text-gray-900 dark:text-white">Household Financial Overview</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">Combined finances for all household members</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <!-- Monthly Income -->
+              <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-green-800 dark:text-green-200">Monthly Income</p>
+                    <p class="text-2xl font-bold text-green-600 dark:text-green-400">${{ financialSummary.totalMonthlyIncome.toLocaleString() }}</p>
+                    <p class="text-xs text-green-600 dark:text-green-400">${{ financialSummary.totalAnnualIncome.toLocaleString() }} annually</p>
+                  </div>
+                  <UIcon name="i-heroicons-banknotes" class="h-8 w-8 text-green-500" />
+                </div>
+              </div>
+
+              <!-- Total Savings -->
+              <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-blue-800 dark:text-blue-200">Total Savings</p>
+                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">${{ financialSummary.totalSavings.toLocaleString() }}</p>
+                    <p class="text-xs text-blue-600 dark:text-blue-400">{{ financialSummary.savingsAccountsCount }} accounts</p>
+                  </div>
+                  <UIcon name="i-heroicons-building-library" class="h-8 w-8 text-blue-500" />
+                </div>
+              </div>
+
+              <!-- Total Investments -->
+              <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-purple-800 dark:text-purple-200">Investments</p>
+                    <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">${{ financialSummary.totalInvestments.toLocaleString() }}</p>
+                    <p class="text-xs text-purple-600 dark:text-purple-400">{{ financialSummary.investmentAccountsCount }} accounts</p>
+                  </div>
+                  <UIcon name="i-heroicons-chart-bar-square" class="h-8 w-8 text-purple-500" />
+                </div>
+              </div>
+
+              <!-- Total Debt -->
+              <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-medium text-red-800 dark:text-red-200">Total Debt</p>
+                    <p class="text-2xl font-bold text-red-600 dark:text-red-400">${{ financialSummary.totalDebt.toLocaleString() }}</p>
+                    <p class="text-xs text-red-600 dark:text-red-400">{{ financialSummary.loansCount }} loans</p>
+                  </div>
+                  <UIcon name="i-heroicons-credit-card" class="h-8 w-8 text-red-500" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Net Worth Summary -->
+            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Estimated Net Worth</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">(Savings + Investments - Debt)</p>
+                </div>
+                <p class="text-2xl font-bold" :class="netWorth >= 0 ? 'text-green-600' : 'text-red-600'">
+                  ${{ netWorth.toLocaleString() }}
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
               <div>
@@ -327,6 +399,19 @@ interface Person {
   householdId: number
 }
 
+interface FinancialSummary {
+  totalMonthlyIncome: number
+  totalAnnualIncome: number
+  totalSavings: number
+  totalInvestments: number
+  totalDebt: number
+  memberCount: number
+  incomeSourcesCount: number
+  loansCount: number
+  savingsAccountsCount: number
+  investmentAccountsCount: number
+}
+
 // Reactive state
 const isModalOpen = ref(false)
 const isDeleteModalOpen = ref(false)
@@ -350,13 +435,6 @@ const financialTabs = [
   { key: 'savings', label: 'Savings', icon: 'i-heroicons-building-library' },
   { key: 'broker', label: 'Investments', icon: 'i-heroicons-chart-bar-square' }
 ]
-
-// Income sources state
-const isIncomeModalOpen = ref(false)
-const { data: incomeSources, pending: incomeSourcesLoading, refresh: refreshIncomeSources } = useFetch<IncomeSource[]>('/api/income-sources', {
-  server: false,
-  default: () => []
-})
 
 // Form state
 const formState = reactive({
@@ -389,6 +467,29 @@ const householdMembers = computed(() => {
 
 const householdMembersCount = computed(() => householdMembers.value.length)
 
+// Fetch financial summary for the household - using watchEffect to handle reactivity properly
+const financialSummary = ref<FinancialSummary | null>(null)
+const refreshFinancialSummary = async () => {
+  if (userHousehold.value) {
+    try {
+      const data = await $fetch<FinancialSummary>(`/api/households/${userHousehold.value.id}/financial-summary`)
+      financialSummary.value = data
+    } catch (error) {
+      console.error('Failed to fetch financial summary:', error)
+      financialSummary.value = null
+    }
+  } else {
+    financialSummary.value = null
+  }
+}
+
+// Watch for changes in userHousehold and refresh financial summary
+watchEffect(() => {
+  if (userHousehold.value) {
+    refreshFinancialSummary()
+  }
+})
+
 const householdMembersText = computed(() => {
   const count = householdMembersCount.value
   if (count === 1) {
@@ -404,6 +505,11 @@ const isFormValid = computed(() => {
 
 const isPersonFormValid = computed(() => {
   return personFormState.name.trim() !== ''
+})
+
+const netWorth = computed(() => {
+  if (!financialSummary.value) return 0
+  return financialSummary.value.totalSavings + financialSummary.value.totalInvestments - financialSummary.value.totalDebt
 })
 
 // Methods
@@ -632,20 +738,6 @@ async function confirmPersonDelete() {
   }
 }
 
-// Financial management functions
-function openIncomeModal() {
-  isIncomeModalOpen.value = true
-}
-
-function closeIncomeModal() {
-  isIncomeModalOpen.value = false
-}
-
-function handleIncomeSubmit() {
-  // TODO: Implement income submission
-  closeIncomeModal()
-}
-
 function openLoanModal() {
   // TODO: Implement loan modal
 }
@@ -656,13 +748,5 @@ function openSavingsModal() {
 
 function openBrokerModal() {
   // TODO: Implement broker modal
-}
-
-function editIncome(income: IncomeSource) {
-  // TODO: Implement income editing
-}
-
-function deleteIncome(income: IncomeSource) {
-  // TODO: Implement income deletion
 }
 </script>
