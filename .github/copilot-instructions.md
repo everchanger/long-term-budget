@@ -4,7 +4,7 @@
 This project is a financial planning tool built with TypeScript and Nuxt 4, supporting both frontend and backend logic. It models scenarios over months or years, comparing the impact of income, spending, savings, and loans (e.g., paying off a car loan vs. investing in stocks).
 
 ## Architecture & Key Components
-- **Frontend:** Nuxt 4 (Vue-based), styled with Tailwind CSS.
+- **Frontend:** Nuxt 4 (Vue-based), Nuxt UI 3.X components, styled with Tailwind CSS.
 - **Backend:** Nuxt 4 server, PostgreSQL database.
 - **Database ORM:** Drizzle ORM for type-safe database operations and schema management.
 - **Testing:** Vitest and the Nuxt testing utilities is used for unit tests.
@@ -33,6 +33,7 @@ This project is a financial planning tool built with TypeScript and Nuxt 4, supp
 
 ## Project-Specific Conventions
 - **Unified Nuxt Stack:** Both frontend and backend are managed in Nuxt, so shared logic/components may exist.
+- **Nuxt UI Components:** Prefer using Nuxt UI 3.X components for consistency.
 - **Tailwind for Styling:** All UI should use Tailwind CSS utility classes.
 - **Drizzle ORM:** All database operations use Drizzle for type safety and better DX.
 - **TypeScript-First Database Schema:** Schema is defined in TypeScript, migrations auto-generated.
