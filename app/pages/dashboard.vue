@@ -20,19 +20,13 @@
           <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
             All Users ({{ users?.length || 0 }})
           </h2>
-          <UButton 
-            v-if="users && users.length > 0"
-            @click="refresh()" 
-            color="gray" 
-            variant="soft" 
-            icon="i-heroicons-arrow-path"
-            size="sm"
-          >
+          <UButton v-if="users && users.length > 0" @click="refresh()" color="gray" variant="soft"
+            icon="i-heroicons-arrow-path" size="sm">
             Refresh
           </UButton>
         </div>
       </template>
-      
+
       <!-- Loading State -->
       <div v-if="pending" class="flex justify-center py-12">
         <div class="text-center">
@@ -42,24 +36,13 @@
       </div>
 
       <!-- Error State -->
-      <UAlert
-        v-else-if="error"
-        icon="i-heroicons-exclamation-triangle"
-        color="red"
-        variant="subtle"
-        title="Error loading users"
-        :description="error.message"
-      />
+      <UAlert v-else-if="error" icon="i-heroicons-exclamation-triangle" color="red" variant="subtle"
+        title="Error loading users" :description="error.message" />
 
       <!-- Users Table -->
       <ClientOnly>
         <div v-if="!pending && !error">
-          <UTable 
-            v-if="users && users.length > 0"
-            :rows="users" 
-            :columns="userColumns"
-            class="w-full"
-          >
+          <UTable v-if="users && users.length > 0" :rows="users" :columns="userColumns" class="w-full">
             <template #actions-data="{ row }">
               <UDropdownMenu :items="getUserActions(row)">
                 <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
@@ -86,41 +69,27 @@
     </UCard>
 
     <!-- Add User Modal -->
-    <UModal v-model="isModalOpen">
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h3 class="text-lg font-medium">Add New User</h3>
-            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark" @click="isModalOpen = false" />
-          </div>
-        </template>
+    <UModal v-model:open="isModalOpen">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-medium">Add New User</h3>
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark" @click="isModalOpen = false" />
+        </div>
+      </template>
 
-        <UForm 
-          :schema="userSchema" 
-          :state="newUser" 
-          @submit="createUser"
-          class="space-y-4"
-        >
+      <template #body>
+        <UForm :schema="userSchema" :state="newUser" @submit="createUser" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-            <UInput 
-              v-model="newUser.name" 
-              placeholder="Enter user name"
-              icon="i-heroicons-user"
-              required
-            />
+            <UInput v-model="newUser.name" placeholder="Enter user name" icon="i-heroicons-user" required />
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-            <UInput 
-              v-model="newUser.email" 
-              type="email"
-              placeholder="Enter email address"
-              icon="i-heroicons-envelope"
-              required
-            />
-          </div>          <div class="flex justify-end space-x-3 pt-4">
+            <UInput v-model="newUser.email" type="email" placeholder="Enter email address" icon="i-heroicons-envelope"
+              required />
+          </div>
+          <div class="flex justify-end space-x-3 pt-4">
             <UButton color="gray" variant="soft" @click="isModalOpen = false">
               Cancel
             </UButton>
@@ -129,7 +98,7 @@
             </UButton>
           </div>
         </UForm>
-      </UCard>
+      </template>
     </UModal>
 
     <!-- Edit User Modal -->
@@ -142,31 +111,16 @@
           </div>
         </template>
 
-        <UForm 
-          :schema="editUserSchema" 
-          :state="editingUser" 
-          @submit="updateUser"
-          class="space-y-4"
-        >
+        <UForm :schema="editUserSchema" :state="editingUser" @submit="updateUser" class="space-y-4">
           <div class="space-y-2">
             <label for="edit-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name *</label>
-            <UInput 
-              id="edit-name"
-              v-model="editingUser.name" 
-              placeholder="Enter user name"
-              icon="i-heroicons-user"
-            />
+            <UInput id="edit-name" v-model="editingUser.name" placeholder="Enter user name" icon="i-heroicons-user" />
           </div>
 
           <div class="space-y-2">
             <label for="edit-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email *</label>
-            <UInput 
-              id="edit-email"
-              v-model="editingUser.email" 
-              type="email"
-              placeholder="Enter email address"
-              icon="i-heroicons-envelope"
-            />
+            <UInput id="edit-email" v-model="editingUser.email" type="email" placeholder="Enter email address"
+              icon="i-heroicons-envelope" />
           </div>
 
           <div class="flex justify-end space-x-3 pt-4">
@@ -193,6 +147,8 @@ type User = SelectUser
 definePageMeta({
   title: 'Dashboard'
 })
+
+const toast = useToast();
 
 // State
 const isModalOpen = ref(false)
@@ -264,7 +220,7 @@ const getUserActions = (user: User) => [
 const createUser = async () => {
   try {
     isCreating.value = true
-    
+
     await $fetch('/api/users', {
       method: 'POST',
       body: newUser.value
@@ -273,21 +229,21 @@ const createUser = async () => {
     // Reset form and close modal
     newUser.value = { name: '', email: '' }
     isModalOpen.value = false
-    
+
     // Refresh the users list
     await refresh()
-    
+
     // Show success toast
-    $toast.add({
+    toast.add({
       title: 'Success',
       description: 'User created successfully',
-      color: 'green'
+      color: 'success'
     })
   } catch (error: any) {
-    $toast.add({
+    toast.add({
       title: 'Error',
       description: error.message || 'Failed to create user',
-      color: 'red'
+      color: 'warning'
     })
   } finally {
     isCreating.value = false
@@ -306,7 +262,7 @@ const editUser = (user: User) => {
 const updateUser = async () => {
   try {
     isUpdating.value = true
-    
+
     await $fetch(`/api/users/${editingUser.value.id}`, {
       method: 'PUT',
       body: {
@@ -316,21 +272,21 @@ const updateUser = async () => {
     })
 
     isEditModalOpen.value = false
-    
+
     // Refresh the users list
     await refresh()
-    
+
     // Show success toast
-    $toast.add({
+    toast.add({
       title: 'Success',
       description: 'User updated successfully',
-      color: 'green'
+      color: 'success'
     })
   } catch (error: any) {
-    $toast.add({
+    toast.add({
       title: 'Error',
       description: error.message || 'Failed to update user',
-      color: 'red'
+      color: 'warning'
     })
   } finally {
     isUpdating.value = false
@@ -342,21 +298,21 @@ const deleteUser = async (user: User) => {
     await $fetch(`/api/users/${user.id}`, {
       method: 'DELETE'
     })
-    
+
     // Refresh the users list
     await refresh()
-    
+
     // Show success toast
-    $toast.add({
+    toast.add({
       title: 'Success',
       description: `User "${user.name}" deleted successfully`,
-      color: 'green'
+      color: 'success'
     })
   } catch (error: any) {
-    $toast.add({
+    toast.add({
       title: 'Error',
       description: error.message || 'Failed to delete user',
-      color: 'red'
+      color: 'warning'
     })
   }
 }
