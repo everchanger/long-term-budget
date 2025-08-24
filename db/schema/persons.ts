@@ -5,6 +5,7 @@ import { incomeSources } from './income-sources'
 import { expenses } from './expenses'
 import { savingsAccounts } from './savings-accounts'
 import { loans } from './loans'
+import { brokerAccounts } from './broker-accounts'
 
 export const persons = pgTable('persons', {
   id: serial('id').primaryKey(),
@@ -23,4 +24,5 @@ export const personsRelations = relations(persons, ({ one, many }) => ({
   expenses: many(expenses),
   savingsAccounts: many(savingsAccounts),
   loans: many(loans),
+  brokerAccounts: many(brokerAccounts),
 }))

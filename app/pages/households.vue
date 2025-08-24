@@ -64,18 +64,31 @@
                   </p>
                 </div>
                 <div class="flex space-x-2">
-                  <button 
+                  <UButton 
+                    :to="`/persons/${member.id}`"
+                    size="sm" 
+                    variant="soft" 
+                    icon="i-heroicons-eye"
+                  >
+                    View Details
+                  </UButton>
+                  <UButton 
                     @click="openEditPersonModal(member)"
-                    class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 text-sm"
+                    size="sm"
+                    variant="ghost" 
+                    icon="i-heroicons-pencil"
                   >
                     Edit
-                  </button>
-                  <button 
+                  </UButton>
+                  <UButton 
                     @click="openDeletePersonModal(member)"
-                    class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm"
+                    size="sm"
+                    variant="ghost" 
+                    color="error" 
+                    icon="i-heroicons-trash"
                   >
                     Delete
-                  </button>
+                  </UButton>
                 </div>
               </div>
             </div>
@@ -90,7 +103,6 @@
               </UButton>
             </div>
           </div>
-
           <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center">
               <div>
@@ -329,6 +341,22 @@ const isPersonSubmitting = ref(false)
 const isDeletingPerson = ref(false)
 const editingPerson = ref<Person | null>(null)
 const personToDelete = ref<Person | null>(null)
+
+// Financial management state
+const selectedFinancialTab = ref(0)
+const financialTabs = [
+  { key: 'income', label: 'Income', icon: 'i-heroicons-banknotes' },
+  { key: 'loans', label: 'Loans & Debts', icon: 'i-heroicons-credit-card' },
+  { key: 'savings', label: 'Savings', icon: 'i-heroicons-building-library' },
+  { key: 'broker', label: 'Investments', icon: 'i-heroicons-chart-bar-square' }
+]
+
+// Income sources state
+const isIncomeModalOpen = ref(false)
+const { data: incomeSources, pending: incomeSourcesLoading, refresh: refreshIncomeSources } = useFetch<IncomeSource[]>('/api/income-sources', {
+  server: false,
+  default: () => []
+})
 
 // Form state
 const formState = reactive({
@@ -602,5 +630,39 @@ async function confirmPersonDelete() {
   } finally {
     isDeletingPerson.value = false
   }
+}
+
+// Financial management functions
+function openIncomeModal() {
+  isIncomeModalOpen.value = true
+}
+
+function closeIncomeModal() {
+  isIncomeModalOpen.value = false
+}
+
+function handleIncomeSubmit() {
+  // TODO: Implement income submission
+  closeIncomeModal()
+}
+
+function openLoanModal() {
+  // TODO: Implement loan modal
+}
+
+function openSavingsModal() {
+  // TODO: Implement savings modal
+}
+
+function openBrokerModal() {
+  // TODO: Implement broker modal
+}
+
+function editIncome(income: IncomeSource) {
+  // TODO: Implement income editing
+}
+
+function deleteIncome(income: IncomeSource) {
+  // TODO: Implement income deletion
 }
 </script>
