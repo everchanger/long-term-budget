@@ -176,13 +176,15 @@
           </div>
 
           <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
-            <UCard class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors cursor-pointer" @click="navigateTo('/scenarios')">
-              <div class="text-center p-4">
-                <UIcon name="i-heroicons-chart-pie" class="mx-auto h-8 w-8 text-neutral-600 dark:text-neutral-400 mb-3" />
-                <p class="text-base font-medium text-neutral-900 dark:text-white mb-2">Financial Scenarios</p>
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">Model different financial strategies and see their long-term impact</p>
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-sm font-medium text-neutral-900 dark:text-white">Financial Planning</p>
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">Manage budgets and scenarios</p>
               </div>
-            </UCard>
+              <UButton to="/scenarios" variant="soft" icon="i-heroicons-chart-bar">
+                View Scenarios
+              </UButton>
+            </div>
           </div>
         </div>
       </UCard>
@@ -485,31 +487,6 @@ const refreshFinancialSummary = async () => {
 watchEffect(() => {
   if (userHousehold.value) {
     refreshFinancialSummary()
-  }
-})
-
-// Scenarios management
-const scenarios = ref<any[]>([])
-
-// Fetch scenarios for the household
-const refreshScenarios = async () => {
-  if (userHousehold.value) {
-    try {
-      const data = await $fetch(`/api/scenarios?householdId=${userHousehold.value.id}`)
-      scenarios.value = Array.isArray(data) ? data : []
-    } catch (error) {
-      console.error('Failed to fetch scenarios:', error)
-      scenarios.value = []
-    }
-  } else {
-    scenarios.value = []
-  }
-}
-
-// Watch for changes in userHousehold and refresh scenarios
-watchEffect(() => {
-  if (userHousehold.value) {
-    refreshScenarios()
   }
 })
 
