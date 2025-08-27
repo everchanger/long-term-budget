@@ -15,6 +15,13 @@
       "when": 1756304453650,
       "tag": "0001_careless_odin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1756306546958,
+      "tag": "0002_next_tombstone",
+      "breakpoints": true
     }
   ]
 }

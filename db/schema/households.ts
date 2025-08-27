@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, timestamp, integer } from 'drizzle-orm/pg-core'
+import { pgTable, serial, varchar, timestamp, text } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 import { users } from './users'
 import { persons } from './persons'
@@ -7,7 +7,7 @@ import { scenarios } from './scenarios'
 export const households = pgTable('households', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
-  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
