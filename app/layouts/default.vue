@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
     <!-- Navigation Header -->
     <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -117,15 +117,15 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <main class="flex-1 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <slot />
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
+    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
       <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-          <p>&copy; 2025 Long-Term Budget Planner. Built with Nuxt 4 & Drizzle ORM.</p>
+          <p>&copy; 2025 Long-Term Budget Planner</p>
           <div class="flex space-x-4">
             <a href="#" class="hover:text-gray-900 dark:hover:text-white transition-colors">Privacy</a>
             <a href="#" class="hover:text-gray-900 dark:hover:text-white transition-colors">Terms</a>

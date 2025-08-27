@@ -30,39 +30,21 @@
             <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Name *
             </label>
-            <UInput 
-              id="name"
-              v-model="name" 
-              type="text" 
-              placeholder="Enter your full name" 
-              required 
-            />
+            <UInput id="name" v-model="name" type="text" placeholder="Enter your full name" required />
           </div>
 
           <div>
             <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Email *
             </label>
-            <UInput 
-              id="email"
-              v-model="email" 
-              type="email" 
-              placeholder="Enter your email" 
-              required 
-            />
+            <UInput id="email" v-model="email" type="email" placeholder="Enter your email" required />
           </div>
 
           <div>
             <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Password *
             </label>
-            <UInput 
-              id="password"
-              v-model="password" 
-              type="password" 
-              placeholder="Enter your password" 
-              required 
-            />
+            <UInput id="password" v-model="password" type="password" placeholder="Enter your password" required />
           </div>
 
 
@@ -74,12 +56,8 @@
         <template #footer>
           <div class="text-center text-sm text-gray-500 dark:text-gray-400">
             {{ isSignUp ? 'Already have an account?' : "Don't have an account?" }}
-            <UButton 
-              :label="isSignUp ? 'Sign in here' : 'Sign up here'" 
-              variant="link" 
-              class="p-0"
-              @click="isSignUp = !isSignUp" 
-            />
+            <UButton :label="isSignUp ? 'Sign in here' : 'Sign up here'" variant="link" class="p-0"
+              @click="isSignUp = !isSignUp" />
           </div>
         </template>
       </UCard>

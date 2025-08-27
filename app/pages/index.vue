@@ -24,39 +24,53 @@
 
     <!-- Features Grid -->
     <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-      <UCard class="text-center">
+      <!-- Household Economics Card -->
+      <UCard class="text-center border-0 bg-gray-50 dark:bg-gray-800/50">
         <template #header>
-          <UIcon name="i-heroicons-users" class="text-3xl text-neutral-600 dark:text-neutral-400 mx-auto mb-4" />
-          <h3 class="text-xl font-semibold text-neutral-900 dark:text-white">
-            Household Management
+          <div class="bg-gray-100 dark:bg-gray-700 w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+            <UIcon name="i-heroicons-home" class="text-2xl text-gray-600 dark:text-gray-300" />
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+            Household Economics
           </h3>
         </template>
-        <p class="text-neutral-600 dark:text-neutral-300">
-          Manage multiple household members and their individual financial profiles.
+        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+          Model your household's complete financial picture including income, expenses, savings, and loans across all
+          family
+          members.
         </p>
       </UCard>
 
-      <UCard class="text-center">
+      <!-- Scenario Planning Card -->
+      <UCard class="text-center border-0 bg-gray-50 dark:bg-gray-800/50">
         <template #header>
-          <UIcon name="i-heroicons-banknotes" class="text-3xl text-neutral-600 dark:text-neutral-400 mx-auto mb-4" />
-          <h3 class="text-xl font-semibold text-neutral-900 dark:text-white">
-            Scenario Modeling
+          <div class="bg-gray-100 dark:bg-gray-700 w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+            <UIcon name="i-heroicons-chart-bar-square" class="text-2xl text-gray-600 dark:text-gray-300" />
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+            Scenario Planning
           </h3>
         </template>
-        <p class="text-neutral-600 dark:text-neutral-300">
-          Compare different financial scenarios and see the long-term impact of your decisions.
+        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+          Compare "what-if" scenarios like paying off debt early vs. investing, or buying vs. renting decisions over
+          months
+          and years.
         </p>
       </UCard>
 
-      <UCard class="text-center">
+      <!-- Long-Term Projections Card -->
+      <UCard class="text-center border-0 bg-gray-50 dark:bg-gray-800/50">
         <template #header>
-          <UIcon name="i-heroicons-chart-pie" class="text-3xl text-neutral-600 dark:text-neutral-400 mx-auto mb-4" />
-          <h3 class="text-xl font-semibold text-neutral-900 dark:text-white">
-            Detailed Analytics
+          <div class="bg-gray-100 dark:bg-gray-700 w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+            <UIcon name="i-heroicons-presentation-chart-line" class="text-2xl text-gray-600 dark:text-gray-300" />
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+            Long-Term Projections
           </h3>
         </template>
-        <p class="text-neutral-600 dark:text-neutral-300">
-          Get insights into your spending patterns and financial health over time.
+        <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+          Visualize your financial trajectory over time and understand the long-term impact of today's financial
+          decisions.
         </p>
       </UCard>
     </div>
@@ -72,14 +86,14 @@ definePageMeta({
 // Check authentication status and redirect accordingly
 onMounted(async () => {
   // Only run on client side
-  if (process.client) {
+  if (import.meta.client) {
     try {
       const { getSession } = useAuth()
       const session = await getSession()
       if (session.data) {
         await navigateTo('/dashboard')
       }
-    } catch (error) {
+    } catch {
       // User is not authenticated, stay on landing page
       console.log('User not authenticated')
     }
