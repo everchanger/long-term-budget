@@ -1,118 +1,153 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
-      <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          {{ isLogin ? 'Sign in to your account' : 'Create your account' }}
+      <div class="text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+          {{ isSignUp ? 'Create your account' : 'Sign in to your account' }}
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
-          {{ isLogin ? "Don't have an account?" : "Already have an account?" }}
-          <button class="font-medium text-indigo-600 hover:text-indigo-500" @click="toggleMode">
-            {{ isLogin ? 'Sign up' : 'Sign in' }}
-          </button>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          {{ isSignUp ? 'Join us today' : 'Welcome back' }}
         </p>
       </div>
 
-      <form class="mt-8 space-y-6" @submit.prevent="handleSubmit">
-        <div class="space-y-4">
-          <div v-if="!isLogin">
-            <label for="name" class="block text-sm font-medium text-gray-700">
-              Full Name
+      <UCard class="w-full">
+        <template #header>
+          <div class="flex justify-center space-x-1">
+            <UButton :variant="!isSignUp ? 'solid' : 'ghost'" class="flex-1" @click="isSignUp = false">
+              Sign In
+            </UButton>
+            <UButton :variant="isSignUp ? 'solid' : 'ghost'" class="flex-1" @click="isSignUp = true">
+              Sign Up
+            </UButton>
+          </div>
+        </template>
+
+        <form class="space-y-6" @submit.prevent="handleSubmit">
+          <UAlert v-if="error" :title="error" color="error" variant="soft"
+            :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'red', variant: 'link', padded: false }"
+            @close="error = ''" />
+          <div v-if="isSignUp">
+            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Name *
             </label>
-            <UInput id="name" v-model="form.name" type="text" required placeholder="Enter your full name"
-              class="mt-1" />
+            <UInput 
+              id="name"
+              v-model="name" 
+              type="text" 
+              placeholder="Enter your full name" 
+              required 
+            />
           </div>
 
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">
-              Email address
+            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email *
             </label>
-            <UInput id="email" v-model="form.email" type="email" required placeholder="Enter your email" class="mt-1" />
+            <UInput 
+              id="email"
+              v-model="email" 
+              type="email" 
+              placeholder="Enter your email" 
+              required 
+            />
           </div>
 
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">
-              Password
+            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Password *
             </label>
-            <UInput id="password" v-model="form.password" type="password" required placeholder="Enter your password"
-              class="mt-1" />
+            <UInput 
+              id="password"
+              v-model="password" 
+              type="password" 
+              placeholder="Enter your password" 
+              required 
+            />
           </div>
-        </div>
 
-        <div v-if="error" class="text-red-600 text-sm">
-          {{ error }}
-        </div>
 
-        <div>
-          <UButton type="submit" :loading="loading" block size="lg" class="w-full">
-            {{ isLogin ? 'Sign in' : 'Create account' }}
+          <UButton type="submit" :loading="loading" :disabled="loading" block size="lg">
+            {{ isSignUp ? 'Create Account' : 'Sign In' }}
           </UButton>
-        </div>
-      </form>
+        </form>
+
+        <template #footer>
+          <div class="text-center text-sm text-gray-500 dark:text-gray-400">
+            {{ isSignUp ? 'Already have an account?' : "Don't have an account?" }}
+            <UButton 
+              :label="isSignUp ? 'Sign in here' : 'Sign up here'" 
+              variant="link" 
+              class="p-0"
+              @click="isSignUp = !isSignUp" 
+            />
+          </div>
+        </template>
+      </UCard>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+// Set the page layout to use the default layout for consistent styling
 definePageMeta({
-  layout: false,
+  layout: 'default'
 })
 
-const router = useRouter()
-const { signUp, signIn } = useAuth()
+const { signIn, signUp } = useAuth()
 
-const isLogin = ref(true)
+const email = ref('')
+const password = ref('')
+const name = ref('')
+const isSignUp = ref(false)
 const loading = ref(false)
 const error = ref('')
 
-const form = reactive({
-  name: '',
-  email: '',
-  password: '',
-})
-
-const toggleMode = () => {
-  isLogin.value = !isLogin.value
-  error.value = ''
-  form.name = ''
-  form.email = ''
-  form.password = ''
-}
-
 const handleSubmit = async () => {
+  if (loading.value) return
+
+  loading.value = true
+  error.value = ''
+
   try {
-    loading.value = true
-    error.value = ''
-
-    if (isLogin.value) {
-      // Sign in
-      const { error: errorResponse } = await signIn.email({
-        email: form.email,
-        password: form.password,
+    if (isSignUp.value) {
+      await signUp.email({
+        email: email.value,
+        password: password.value,
+        name: name.value,
+      }, {
+        onRequest: () => {
+          console.log('SignUp request')
+        },
+        onSuccess: () => {
+          console.log('SignUp success')
+          navigateTo('/dashboard')
+        },
+        onError: (ctx: { error: { message?: string } }) => {
+          console.error('SignUp error:', ctx)
+          error.value = ctx.error.message || 'Failed to create account'
+        }
       })
-      if (errorResponse) {
-        error.value = errorResponse.message || 'Failed to sign in'
-        return
-      }
     } else {
-      // Sign up
-      const { error: responseError } = await signUp.email({
-        email: form.email,
-        password: form.password,
-        name: form.name,
+      await signIn.email({
+        email: email.value,
+        password: password.value,
+      }, {
+        onRequest: () => {
+          console.log('SignIn request')
+        },
+        onSuccess: () => {
+          console.log('SignIn success')
+          navigateTo('/dashboard')
+        },
+        onError: (ctx: { error: { message?: string } }) => {
+          console.error('SignIn error:', ctx)
+          error.value = ctx.error.message || 'Failed to sign in'
+        }
       })
-
-      if (responseError) {
-        error.value = responseError.message || 'Failed to create account'
-        return
-      }
     }
-
-    // Redirect to dashboard on success
-    await router.push('/dashboard')
   } catch (err: unknown) {
-    error.value = (err as any).data?.message || 'An unexpected error occurred'
     console.error('Auth error:', err)
+    error.value = err instanceof Error ? err.message : 'An error occurred'
   } finally {
     loading.value = false
   }
