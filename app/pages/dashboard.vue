@@ -8,9 +8,14 @@
           Manage application users and their accounts
         </p>
       </div>
-      <UButton @click="isModalOpen = true" icon="i-heroicons-plus" size="lg">
-        Add User
-      </UButton>
+      <div class="flex items-center gap-4">
+        <UButton @click="handleSignOut" color="gray" icon="i-heroicons-arrow-right-on-rectangle">
+          Sign Out
+        </UButton>
+        <UButton @click="isModalOpen = true" icon="i-heroicons-plus" size="lg">
+          Add User
+        </UButton>
+      </div>
     </div>
 
     <!-- Users List -->
@@ -20,8 +25,8 @@
           <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
             All Users ({{ users?.length || 0 }})
           </h2>
-          <UButton v-if="users && users.length > 0" @click="refresh()" variant="soft"
-            icon="i-heroicons-arrow-path" size="sm">
+          <UButton v-if="users && users.length > 0" @click="refresh()" variant="soft" icon="i-heroicons-arrow-path"
+            size="sm">
             Refresh
           </UButton>
         </div>
@@ -146,10 +151,12 @@ type User = SelectUser
 
 // Page meta
 definePageMeta({
-  title: 'Dashboard'
+  title: 'Dashboard',
+  middleware: 'auth'
 })
 
 const toast = useToast();
+const { signOut } = useAuth()
 
 // State
 const isModalOpen = ref(false)
@@ -298,5 +305,14 @@ const formatDate = (dateString: string) => {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+const handleSignOut = async () => {
+  try {
+    await signOut()
+    await navigateTo('/auth')
+  } catch (error) {
+    console.error('Sign out error:', error)
+  }
 }
 </script>

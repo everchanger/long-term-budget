@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  title: 'Financial Scenarios'
+  title: 'Financial Scenarios',
+  middleware: 'auth'
 })
 </script>

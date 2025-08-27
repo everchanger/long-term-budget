@@ -7,27 +7,17 @@
         Long-Term Budget Planner
       </h1>
       <p class="text-xl text-neutral-600 dark:text-neutral-300 mb-8 leading-relaxed">
-        Take control of your financial future with our comprehensive planning tool. 
+        Take control of your financial future with our comprehensive planning tool.
         Model scenarios, track expenses, and make informed decisions about your money.
       </p>
-      
+
       <div class="flex justify-center space-x-4">
-        <UButton 
-          to="/dashboard" 
-          size="lg"
-          icon="i-heroicons-chart-bar"
-          class="px-8 py-3"
-        >
-          Go to Dashboard
+        <UButton to="/auth" size="lg" icon="i-heroicons-chart-bar" class="px-8 py-3">
+          Get Started
         </UButton>
-        <UButton 
-          color="neutral" 
-          variant="soft" 
-          size="lg"
-          icon="i-heroicons-information-circle"
-          class="px-8 py-3"
-        >
-          Learn More
+        <UButton to="/auth" color="neutral" variant="soft" size="lg" icon="i-heroicons-arrow-right-on-rectangle"
+          class="px-8 py-3">
+          Sign In
         </UButton>
       </div>
     </div>
@@ -77,5 +67,22 @@
 // Page meta
 definePageMeta({
   title: 'Long-Term Budget Planner'
+})
+
+// Check authentication status and redirect accordingly
+onMounted(async () => {
+  // Only run on client side
+  if (process.client) {
+    try {
+      const { getSession } = useAuth()
+      const session = await getSession()
+      if (session.data) {
+        await navigateTo('/dashboard')
+      }
+    } catch (error) {
+      // User is not authenticated, stay on landing page
+      console.log('User not authenticated')
+    }
+  }
 })
 </script>

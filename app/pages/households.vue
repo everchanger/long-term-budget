@@ -6,12 +6,7 @@
         <h1 class="text-2xl font-bold text-neutral-900 dark:text-white">Household Management</h1>
         <p class="text-neutral-600 dark:text-neutral-400">Create and manage your household</p>
       </div>
-      <UButton 
-        v-if="!userHousehold" 
-        @click="openCreateModal" 
-        color="primary" 
-        icon="i-heroicons-plus"
-      >
+      <UButton v-if="!userHousehold" @click="openCreateModal" color="primary" icon="i-heroicons-plus">
         Create Household
       </UButton>
     </div>
@@ -38,7 +33,7 @@
             <p class="text-sm text-neutral-600 dark:text-neutral-400">Created</p>
             <p class="font-medium">{{ new Date(userHousehold.createdAt).toLocaleDateString() }}</p>
           </div>
-          
+
           <div>
             <p class="text-sm text-neutral-600 dark:text-neutral-400">Members</p>
             <p class="font-medium">{{ householdMembersText }}</p>
@@ -52,11 +47,8 @@
               </UButton>
             </div>
             <div class="space-y-2">
-              <div 
-                v-for="member in householdMembers" 
-                :key="member.id"
-                class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800 rounded-md"
-              >
+              <div v-for="member in householdMembers" :key="member.id"
+                class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800 rounded-md">
                 <div>
                   <p class="font-medium">{{ member.name }}</p>
                   <p class="text-sm text-neutral-600 dark:text-neutral-400">
@@ -64,29 +56,14 @@
                   </p>
                 </div>
                 <div class="flex space-x-2">
-                  <UButton 
-                    :to="`/persons/${member.id}`"
-                    size="sm" 
-                    variant="soft" 
-                    icon="i-heroicons-eye"
-                  >
+                  <UButton :to="`/persons/${member.id}`" size="sm" variant="soft" icon="i-heroicons-eye">
                     View Details
                   </UButton>
-                  <UButton 
-                    @click="openEditPersonModal(member)"
-                    size="sm"
-                    variant="ghost" 
-                    icon="i-heroicons-pencil"
-                  >
+                  <UButton @click="openEditPersonModal(member)" size="sm" variant="ghost" icon="i-heroicons-pencil">
                     Edit
                   </UButton>
-                  <UButton 
-                    @click="openDeletePersonModal(member)"
-                    size="sm"
-                    variant="ghost" 
-                    color="error" 
-                    icon="i-heroicons-trash"
-                  >
+                  <UButton @click="openDeletePersonModal(member)" size="sm" variant="ghost" color="error"
+                    icon="i-heroicons-trash">
                     Delete
                   </UButton>
                 </div>
@@ -105,20 +82,23 @@
           </div>
 
           <!-- Financial Summary Section -->
-          <div v-if="financialSummary && householdMembers.length > 0" class="pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div v-if="financialSummary && householdMembers.length > 0"
+            class="pt-4 border-t border-gray-200 dark:border-gray-700">
             <div class="mb-4">
               <p class="text-sm font-medium text-neutral-900 dark:text-white">Household Financial Overview</p>
               <p class="text-sm text-neutral-600 dark:text-neutral-400">Combined finances for all household members</p>
             </div>
-            
+
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               <!-- Monthly Income -->
               <div class="bg-neutral-50 dark:bg-neutral-800 p-4 rounded-lg">
                 <div class="flex items-center justify-between">
                   <div>
                     <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Monthly Income</p>
-                    <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{ financialSummary.totalMonthlyIncome.toLocaleString() }}</p>
-                    <p class="text-xs text-neutral-600 dark:text-neutral-400">${{ financialSummary.totalAnnualIncome.toLocaleString() }} annually</p>
+                    <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{
+                      financialSummary.totalMonthlyIncome.toLocaleString() }}</p>
+                    <p class="text-xs text-neutral-600 dark:text-neutral-400">${{
+                      financialSummary.totalAnnualIncome.toLocaleString() }} annually</p>
                   </div>
                   <UIcon name="i-heroicons-banknotes" class="h-8 w-8 text-neutral-400" />
                 </div>
@@ -129,8 +109,11 @@
                 <div class="flex items-center justify-between">
                   <div>
                     <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Total Savings</p>
-                    <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{ financialSummary.totalSavings.toLocaleString() }}</p>
-                    <p class="text-xs text-neutral-600 dark:text-neutral-400">{{ financialSummary.savingsAccountsCount }} accounts</p>
+                    <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{
+                      financialSummary.totalSavings.toLocaleString() }}</p>
+                    <p class="text-xs text-neutral-600 dark:text-neutral-400">{{ financialSummary.savingsAccountsCount
+                      }}
+                      accounts</p>
                   </div>
                   <UIcon name="i-heroicons-building-library" class="h-8 w-8 text-neutral-400" />
                 </div>
@@ -141,8 +124,11 @@
                 <div class="flex items-center justify-between">
                   <div>
                     <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Investments</p>
-                    <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{ financialSummary.totalInvestments.toLocaleString() }}</p>
-                    <p class="text-xs text-neutral-600 dark:text-neutral-400">{{ financialSummary.investmentAccountsCount }} accounts</p>
+                    <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{
+                      financialSummary.totalInvestments.toLocaleString() }}</p>
+                    <p class="text-xs text-neutral-600 dark:text-neutral-400">{{
+                      financialSummary.investmentAccountsCount }}
+                      accounts</p>
                   </div>
                   <UIcon name="i-heroicons-chart-bar-square" class="h-8 w-8 text-neutral-400" />
                 </div>
@@ -153,8 +139,10 @@
                 <div class="flex items-center justify-between">
                   <div>
                     <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Total Debt</p>
-                    <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{ financialSummary.totalDebt.toLocaleString() }}</p>
-                    <p class="text-xs text-neutral-600 dark:text-neutral-400">{{ financialSummary.loansCount }} loans</p>
+                    <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{
+                      financialSummary.totalDebt.toLocaleString() }}</p>
+                    <p class="text-xs text-neutral-600 dark:text-neutral-400">{{ financialSummary.loansCount }} loans
+                    </p>
                   </div>
                   <UIcon name="i-heroicons-credit-card" class="h-8 w-8 text-neutral-400" />
                 </div>
@@ -168,7 +156,8 @@
                   <p class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Estimated Net Worth</p>
                   <p class="text-sm text-neutral-600 dark:text-neutral-400">(Savings + Investments - Debt)</p>
                 </div>
-                <p class="text-2xl font-bold" :class="netWorth >= 0 ? 'text-primary-600 dark:text-primary-400' : 'text-red-600 dark:text-red-400'">
+                <p class="text-2xl font-bold"
+                  :class="netWorth >= 0 ? 'text-primary-600 dark:text-primary-400' : 'text-red-600 dark:text-red-400'">
                   ${{ netWorth.toLocaleString() }}
                 </p>
               </div>
@@ -197,7 +186,8 @@
           <UIcon name="i-heroicons-home" class="mx-auto h-16 w-16 text-gray-400" />
           <h3 class="text-lg font-medium text-gray-900 dark:text-white">No Household Found</h3>
           <p class="text-gray-600 dark:text-gray-400">
-            Create your household to start managing your financial planning. You can only have one household per account.
+            Create your household to start managing your financial planning. You can only have one household per
+            account.
           </p>
           <UButton @click="openCreateModal" color="primary" icon="i-heroicons-plus">
             Create Your Household
@@ -220,22 +210,18 @@
             <label for="household-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Household Name *
             </label>
-            <input
-              id="household-name"
-              v-model="formState.name"
-              type="text"
-              placeholder="Enter household name (e.g., 'The Smith Family')"
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
+            <input id="household-name" v-model="formState.name" type="text"
+              placeholder="Enter household name (e.g., 'The Smith Family')" required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" />
           </div>
-          
+
           <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md">
             <div class="flex">
               <UIcon name="i-heroicons-information-circle" class="text-blue-400 mr-2 mt-0.5" />
               <div class="text-sm text-blue-700 dark:text-blue-300">
                 <p class="font-medium">Note:</p>
-                <p>You can only have one household per account. After creating your household, you can add family members and manage your financial planning together.</p>
+                <p>You can only have one household per account. After creating your household, you can add family
+                  members and manage your financial planning together.</p>
               </div>
             </div>
           </div>
@@ -245,11 +231,7 @@
       <template #footer>
         <div class="flex justify-end gap-3">
           <UButton variant="ghost" @click="closeModal">Cancel</UButton>
-          <UButton 
-            @click="handleSubmit" 
-            :loading="isSubmitting"
-            :disabled="!isFormValid"
-          >
+          <UButton @click="handleSubmit" :loading="isSubmitting" :disabled="!isFormValid">
             {{ editingHousehold ? 'Update' : 'Create' }} Household
           </UButton>
         </div>
@@ -270,29 +252,18 @@
             <label for="person-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Name *
             </label>
-            <input
-              id="person-name"
-              v-model="personFormState.name"
-              type="text"
-              placeholder="Enter person's name"
+            <input id="person-name" v-model="personFormState.name" type="text" placeholder="Enter person's name"
               required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" />
           </div>
 
           <div>
             <label for="person-age" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Age
             </label>
-            <input
-              id="person-age"
-              v-model="personFormState.age"
-              type="number"
-              placeholder="Enter age (optional)"
-              min="0"
-              max="120"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
+            <input id="person-age" v-model="personFormState.age" type="number" placeholder="Enter age (optional)"
+              min="0" max="120"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" />
           </div>
         </div>
       </template>
@@ -300,11 +271,7 @@
       <template #footer>
         <div class="flex justify-end gap-3">
           <UButton variant="ghost" @click="closePersonModal">Cancel</UButton>
-          <UButton 
-            @click="handlePersonSubmit" 
-            :loading="isPersonSubmitting"
-            :disabled="!isPersonFormValid"
-          >
+          <UButton @click="handlePersonSubmit" :loading="isPersonSubmitting" :disabled="!isPersonFormValid">
             {{ editingPerson ? 'Update' : 'Add' }} Member
           </UButton>
         </div>
@@ -325,7 +292,8 @@
               <UIcon name="i-heroicons-exclamation-triangle" class="text-red-400 mr-2 mt-0.5" />
               <div class="text-sm text-red-700 dark:text-red-300">
                 <p class="font-medium">Warning:</p>
-                <p>This action cannot be undone. All household members, financial data, and scenarios will be permanently deleted.</p>
+                <p>This action cannot be undone. All household members, financial data, and scenarios will be
+                  permanently deleted.</p>
               </div>
             </div>
           </div>
@@ -335,11 +303,7 @@
       <template #footer>
         <div class="flex justify-end gap-3">
           <UButton variant="ghost" @click="closeDeleteModal">Cancel</UButton>
-          <UButton 
-            color="error" 
-            @click="confirmDelete"
-            :loading="isDeleting"
-          >
+          <UButton color="error" @click="confirmDelete" :loading="isDeleting">
             Delete Household
           </UButton>
         </div>
@@ -364,11 +328,7 @@
       <template #footer>
         <div class="flex justify-end gap-3">
           <UButton variant="ghost" @click="closeDeletePersonModal">Cancel</UButton>
-          <UButton 
-            color="error" 
-            @click="confirmPersonDelete"
-            :loading="isDeletingPerson"
-          >
+          <UButton color="error" @click="confirmPersonDelete" :loading="isDeletingPerson">
             Delete Member
           </UButton>
         </div>
@@ -380,7 +340,8 @@
 <script setup lang="ts">
 // Page metadata
 definePageMeta({
-  title: 'Households'
+  title: 'Households',
+  middleware: 'auth'
 })
 
 // Types
@@ -548,7 +509,7 @@ async function handleSubmit() {
   if (!isFormValid.value) return
 
   isSubmitting.value = true
-  
+
   try {
     const payload = {
       name: formState.name.trim(),
@@ -571,7 +532,7 @@ async function handleSubmit() {
 
     await refresh()
     closeModal()
-    
+
     // Show success notification
     const toast = useToast()
     toast.add({
@@ -595,7 +556,7 @@ async function confirmDelete() {
   if (!userHousehold.value) return
 
   isDeleting.value = true
-  
+
   try {
     await $fetch(`/api/households/${userHousehold.value.id}`, {
       method: 'DELETE'
@@ -603,7 +564,7 @@ async function confirmDelete() {
 
     await refresh()
     closeDeleteModal()
-    
+
     // Show success notification
     const toast = useToast()
     toast.add({
@@ -662,7 +623,7 @@ async function handlePersonSubmit() {
   if (!isPersonFormValid.value || !userHousehold.value) return
 
   isPersonSubmitting.value = true
-  
+
   try {
     const payload = {
       name: personFormState.name.trim(),
@@ -686,7 +647,7 @@ async function handlePersonSubmit() {
 
     await refreshPersons()
     closePersonModal()
-    
+
     // Show success notification
     const toast = useToast()
     toast.add({
@@ -710,7 +671,7 @@ async function confirmPersonDelete() {
   if (!personToDelete.value) return
 
   isDeletingPerson.value = true
-  
+
   try {
     await $fetch(`/api/persons/${personToDelete.value.id}`, {
       method: 'DELETE'
@@ -718,7 +679,7 @@ async function confirmPersonDelete() {
 
     await refreshPersons()
     closeDeletePersonModal()
-    
+
     // Show success notification
     const toast = useToast()
     toast.add({
