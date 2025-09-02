@@ -29,12 +29,12 @@
             </UButton>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ person.name }}</h1>
             <p class="text-gray-600 dark:text-gray-400">
-              {{ person.age ? `Age: ${person.age}` : 'Age not specified' }} • 
+              {{ person.age ? `Age: ${person.age}` : 'Age not specified' }} •
               {{ person.householdName || 'Household member' }}
             </p>
           </div>
           <div class="flex gap-2">
-            <UButton @click="openEditPersonModal" variant="soft" icon="i-heroicons-pencil">
+            <UButton variant="soft" icon="i-heroicons-pencil" @click="openEditPersonModal">
               Edit Person
             </UButton>
           </div>
@@ -79,14 +79,14 @@
               <p class="text-sm text-neutral-600 dark:text-neutral-400">Total Debt</p>
               <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">${{ totalDebt }}</p>
             </div>
-            <UIcon name="i-heroicons-credit-card" class="h-8 w-8 text-red-500" />
+            <UIcon name="i-heroicons-credit-card" class="h-8 w-8 text-neutral-400" />
           </div>
         </UCard>
       </div>
 
       <!-- Financial Details Tabs -->
       <UCard>
-        <UTabs :items="financialTabs" v-model="selectedTab" class="w-full">
+        <UTabs v-model="selectedTab" :items="financialTabs" class="w-full">
           <template #content="{ item }">
             <div class="py-6">
               <!-- Income Sources Tab -->
@@ -99,7 +99,7 @@
                       <p class="text-neutral-600 dark:text-neutral-400">Manage {{ person.name }}'s income sources</p>
                     </div>
                   </div>
-                  <UButton @click="openIncomeModal" icon="i-heroicons-plus">
+                  <UButton icon="i-heroicons-plus" @click="openIncomeModal">
                     Add Income Source
                   </UButton>
                 </div>
@@ -110,8 +110,9 @@
                 <div v-else-if="incomeSources.length === 0" class="text-center py-12">
                   <UIcon name="i-heroicons-banknotes" class="mx-auto h-12 w-12 text-neutral-400 mb-4" />
                   <h4 class="text-lg font-medium text-neutral-900 dark:text-white mb-2">No Income Sources</h4>
-                  <p class="text-neutral-600 dark:text-neutral-400 mb-4">Add {{ person.name }}'s first income source to get started.</p>
-                  <UButton @click="openIncomeModal" variant="soft" icon="i-heroicons-plus">
+                  <p class="text-neutral-600 dark:text-neutral-400 mb-4">Add {{ person.name }}'s first income source to
+                    get started.</p>
+                  <UButton variant="soft" icon="i-heroicons-plus" @click="openIncomeModal">
                     Add Income Source
                   </UButton>
                 </div>
@@ -125,15 +126,17 @@
                             {{ income.isActive ? 'Active' : 'Inactive' }}
                           </UBadge>
                         </div>
-                        <p class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-1">${{ income.amount }} {{ income.frequency }}</p>
+                        <p class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-1">${{ income.amount }}
+                          {{ income.frequency }}</p>
                         <div class="text-sm text-neutral-600 dark:text-neutral-400">
                           <p v-if="income.startDate">Started: {{ formatDate(income.startDate) }}</p>
                           <p v-if="income.endDate">Ends: {{ formatDate(income.endDate) }}</p>
                         </div>
                       </div>
                       <div class="flex gap-2">
-                        <UButton @click="editIncome(income)" size="sm" variant="ghost" icon="i-heroicons-pencil" />
-                        <UButton @click="deleteIncome(income)" size="sm" variant="ghost" color="error" icon="i-heroicons-trash" />
+                        <UButton size="sm" variant="ghost" icon="i-heroicons-pencil" @click="editIncome(income)" />
+                        <UButton size="sm" variant="ghost" color="error" icon="i-heroicons-trash"
+                          @click="deleteIncome(income)" />
                       </div>
                     </div>
                   </UCard>
@@ -150,15 +153,16 @@
                       <p class="text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s loans and debts</p>
                     </div>
                   </div>
-                  <UButton @click="openLoanModal" icon="i-heroicons-plus">
+                  <UButton icon="i-heroicons-plus" @click="openLoanModal">
                     Add Loan
                   </UButton>
                 </div>
                 <div class="text-center py-12">
                   <UIcon name="i-heroicons-credit-card" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Loans Yet</h4>
-                  <p class="text-gray-600 dark:text-gray-400 mb-4">Add loans and debts to track payments and balances.</p>
-                  <UButton @click="openLoanModal" variant="soft" icon="i-heroicons-plus">
+                  <p class="text-gray-600 dark:text-gray-400 mb-4">Add loans and debts to track payments and balances.
+                  </p>
+                  <UButton variant="soft" icon="i-heroicons-plus" @click="openLoanModal">
                     Add Loan
                   </UButton>
                 </div>
@@ -174,15 +178,16 @@
                       <p class="text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s savings accounts</p>
                     </div>
                   </div>
-                  <UButton @click="openSavingsModal" icon="i-heroicons-plus">
+                  <UButton icon="i-heroicons-plus" @click="openSavingsModal">
                     Add Savings Account
                   </UButton>
                 </div>
                 <div class="text-center py-12">
                   <UIcon name="i-heroicons-building-library" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Savings Accounts Yet</h4>
-                  <p class="text-gray-600 dark:text-gray-400 mb-4">Add savings accounts to track balances and interest.</p>
-                  <UButton @click="openSavingsModal" variant="soft" icon="i-heroicons-plus">
+                  <p class="text-gray-600 dark:text-gray-400 mb-4">Add savings accounts to track balances and interest.
+                  </p>
+                  <UButton variant="soft" icon="i-heroicons-plus" @click="openSavingsModal">
                     Add Savings Account
                   </UButton>
                 </div>
@@ -198,15 +203,16 @@
                       <p class="text-gray-600 dark:text-gray-400">Manage {{ person.name }}'s investment portfolios</p>
                     </div>
                   </div>
-                  <UButton @click="openInvestmentModal" icon="i-heroicons-plus">
+                  <UButton icon="i-heroicons-plus" @click="openInvestmentModal">
                     Add Investment Account
                   </UButton>
                 </div>
                 <div class="text-center py-12">
                   <UIcon name="i-heroicons-chart-bar-square" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Investment Accounts Yet</h4>
-                  <p class="text-gray-600 dark:text-gray-400 mb-4">Add investment accounts to track portfolio performance.</p>
-                  <UButton @click="openInvestmentModal" variant="soft" icon="i-heroicons-plus">
+                  <p class="text-gray-600 dark:text-gray-400 mb-4">Add investment accounts to track portfolio
+                    performance.</p>
+                  <UButton variant="soft" icon="i-heroicons-plus" @click="openInvestmentModal">
                     Add Investment Account
                   </UButton>
                 </div>
@@ -231,42 +237,26 @@
             <label for="income-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Name *
             </label>
-            <input
-              id="income-name"
-              v-model="incomeFormState.name"
-              type="text"
-              placeholder="e.g., Salary, Freelance, etc."
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
+            <input id="income-name" v-model="incomeFormState.name" type="text"
+              placeholder="e.g., Salary, Freelance, etc." required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
           </div>
 
           <div>
             <label for="income-amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Amount *
             </label>
-            <input
-              id="income-amount"
-              v-model="incomeFormState.amount"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
+            <input id="income-amount" v-model="incomeFormState.amount" type="number" step="0.01" min="0"
+              placeholder="0.00" required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
           </div>
 
           <div>
             <label for="income-frequency" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Frequency *
             </label>
-            <select
-              id="income-frequency"
-              v-model="incomeFormState.frequency"
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            >
+            <select id="income-frequency" v-model="incomeFormState.frequency" required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
               <option value="">Select frequency</option>
               <option value="monthly">Monthly</option>
               <option value="yearly">Yearly</option>
@@ -280,11 +270,7 @@
       <template #footer>
         <div class="flex justify-end gap-3">
           <UButton variant="ghost" @click="closeIncomeModal">Cancel</UButton>
-          <UButton 
-            @click="handleIncomeSubmit" 
-            :loading="isIncomeSubmitting"
-            :disabled="!isIncomeFormValid"
-          >
+          <UButton :loading="isIncomeSubmitting" :disabled="!isIncomeFormValid" @click="handleIncomeSubmit">
             {{ editingIncomeSource ? 'Update' : 'Add' }}
           </UButton>
         </div>
@@ -370,10 +356,10 @@ const totalInvestments = computed(() => '0.00') // TODO: Implement when investme
 const totalDebt = computed(() => '0.00') // TODO: Implement when loans API is ready
 
 const isIncomeFormValid = computed(() => {
-  return incomeFormState.name.trim() !== '' && 
-         incomeFormState.amount !== '' && 
-         parseFloat(incomeFormState.amount) > 0 &&
-         incomeFormState.frequency !== ''
+  return incomeFormState.name.trim() !== '' &&
+    incomeFormState.amount !== '' &&
+    parseFloat(incomeFormState.amount) > 0 &&
+    incomeFormState.frequency !== ''
 })
 
 // Functions
@@ -406,7 +392,7 @@ async function handleIncomeSubmit() {
   if (!isIncomeFormValid.value) return
 
   isIncomeSubmitting.value = true
-  
+
   try {
     const payload = {
       name: incomeFormState.name.trim(),
@@ -432,7 +418,7 @@ async function handleIncomeSubmit() {
 
     await refreshIncomeSources()
     closeIncomeModal()
-    
+
     // Show success notification
     const toast = useToast()
     toast.add({
@@ -459,7 +445,7 @@ async function deleteIncome(income: IncomeSource) {
     })
 
     await refreshIncomeSources()
-    
+
     const toast = useToast()
     toast.add({
       title: 'Income source deleted',

@@ -1,64 +1,51 @@
-import { db, schema } from '../../../db'
-import { desc, eq } from 'drizzle-orm'
+import { db } from "../../../db";
+import { households, users } from "../../../db/schema";
+import { eq } from "drizzle-orm";
+import { auth } from "../../utils/auth";
 
 export default defineEventHandler(async (event) => {
   try {
-    if (event.node.req.method === 'GET') {
-      // Get all households with owner info
-      const households = await db.select({
-        id: schema.households.id,
-        name: schema.households.name,
-        userId: schema.households.userId,
-        createdAt: schema.households.createdAt,
-        ownerName: schema.users.name,
-      }).from(schema.households)
-        .leftJoin(schema.users, eq(schema.households.userId, schema.users.id))
-        .orderBy(desc(schema.households.createdAt))
-      
-      return households
+    // Only allow GET requests
+    assertMethod(event, "GET");
+
+    // Get session from Better Auth
+    const session = await auth.api.getSession({
+      headers: event.headers,
+    });
+
+    if (!session?.user?.id) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: "Unauthorized",
+        message: "You must be logged in to view households",
+      });
     }
-    
-    if (event.node.req.method === 'POST') {
-      // Create a new household
-      const body = await readBody(event)
-      const { name, user_id } = body
-      
-      if (!name || !user_id) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'Name and user_id are required'
-        })
-      }
-      
-      // Verify user exists
-      const [userExists] = await db.select({ id: schema.users.id })
-        .from(schema.users)
-        .where(eq(schema.users.id, user_id))
-      
-      if (!userExists) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: 'User not found'
-        })
-      }
-      
-      const [newHousehold] = await db.insert(schema.households)
-        .values({ name, userId: user_id })
-        .returning()
-      
-      return newHousehold
-    }
-    
-    throw createError({
-      statusCode: 405,
-      statusMessage: 'Method not allowed'
-    })
-    
+
+    // Get households for the authenticated user
+    const userHouseholds = await db
+      .select({
+        id: households.id,
+        name: households.name,
+        userId: households.userId,
+        createdAt: households.createdAt,
+        ownerName: users.name,
+      })
+      .from(households)
+      .innerJoin(users, eq(households.userId, users.id))
+      .where(eq(households.userId, session.user.id));
+
+    return userHouseholds;
   } catch (error) {
-    console.error('Database error:', error)
+    // If it's already an H3 error, re-throw it
+    if (error && typeof error === "object" && "statusCode" in error) {
+      throw error;
+    }
+
+    // Otherwise, wrap it as an internal server error
     throw createError({
       statusCode: 500,
-      statusMessage: 'Database operation failed'
-    })
+      statusMessage: "Internal server error",
+      message: "An unexpected error occurred",
+    });
   }
-})
+});
