@@ -82,21 +82,4 @@
 definePageMeta({
   title: 'Long-Term Budget Planner'
 })
-
-// Check authentication status and redirect accordingly
-onMounted(async () => {
-  // Only run on client side
-  if (import.meta.client) {
-    try {
-      const { getSession } = useAuth()
-      const session = await getSession()
-      if (session.data) {
-        await navigateTo('/dashboard')
-      }
-    } catch {
-      // User is not authenticated, stay on landing page
-      console.log('User not authenticated')
-    }
-  }
-})
 </script>

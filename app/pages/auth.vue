@@ -1,16 +1,17 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
+  <div class="py-12">
+    <div class="max-w-md w-full mx-auto space-y-8 px-4">
+      <!-- Header -->
       <div class="text-center">
         <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
           {{ isSignUp ? 'Create your account' : 'Sign in to your account' }}
         </h2>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          {{ isSignUp ? 'Join us today' : 'Welcome back' }}
+        <p class="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed">
+          {{ isSignUp ? 'Join us today to start your financial journey' : 'Welcome back to your financial journey' }}
         </p>
       </div>
 
-      <UCard class="w-full">
+      <UCard class="border-0 bg-gray-50 dark:bg-gray-800/50 w-full">
         <template #header>
           <div class="flex justify-center space-x-1">
             <UButton :variant="!isSignUp ? 'solid' : 'ghost'" class="flex-1" @click="isSignUp = false">
@@ -26,29 +27,26 @@
           <UAlert v-if="error" :title="error" color="error" variant="soft"
             :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'red', variant: 'link', padded: false }"
             @close="error = ''" />
-          <div v-if="isSignUp">
-            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Name *
-            </label>
-            <UInput id="name" v-model="name" type="text" placeholder="Enter your full name" required />
-          </div>
 
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Email *
-            </label>
-            <UInput id="email" v-model="email" type="email" placeholder="Enter your email" required />
-          </div>
+          <!-- Name field -->
+          <UFormField v-if="isSignUp" label="Name" name="name" required>
+            <UInput id="name" v-model="name" type="text" placeholder="Enter your full name" icon="i-heroicons-user"
+              required />
+          </UFormField>
 
-          <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Password *
-            </label>
-            <UInput id="password" v-model="password" type="password" placeholder="Enter your password" required />
-          </div>
+          <UFormField label="Email" name="email" required>
+            <UInput id="email" v-model="email" type="email" placeholder="Enter your email" icon="i-heroicons-envelope"
+              required />
+          </UFormField>
+
+          <UFormField label="Password" name="password" required>
+            <UInput id="password" v-model="password" type="password" placeholder="Enter your password"
+              icon="i-heroicons-lock-closed" required />
+          </UFormField>
 
 
-          <UButton type="submit" :loading="loading" :disabled="loading" block size="lg">
+          <UButton type="submit" :loading="loading" :disabled="loading" block size="lg"
+            :icon="isSignUp ? 'i-heroicons-user-plus' : 'i-heroicons-arrow-right-on-rectangle'">
             {{ isSignUp ? 'Create Account' : 'Sign In' }}
           </UButton>
         </form>
@@ -71,7 +69,7 @@ definePageMeta({
   layout: 'default'
 })
 
-const { signIn, signUp } = useAuth()
+const { signIn, signUp, getSession } = useAuth()
 
 const email = ref('')
 const password = ref('')
@@ -79,6 +77,20 @@ const name = ref('')
 const isSignUp = ref(false)
 const loading = ref(false)
 const error = ref('')
+
+// Check if user is already authenticated and redirect to homepage
+onMounted(async () => {
+  try {
+    const sessionData = await getSession()
+    if (sessionData.data) {
+      // User is already signed in, redirect to homepage
+      await navigateTo('/')
+    }
+  } catch (error) {
+    // If there's an error getting session, let them stay on auth page
+    console.log('Session check failed:', error)
+  }
+})
 
 const handleSubmit = async () => {
   if (loading.value) return
@@ -98,7 +110,7 @@ const handleSubmit = async () => {
         },
         onSuccess: () => {
           console.log('SignUp success')
-          navigateTo('/dashboard')
+          navigateTo('/')
         },
         onError: (ctx: { error: { message?: string } }) => {
           console.error('SignUp error:', ctx)
@@ -115,7 +127,7 @@ const handleSubmit = async () => {
         },
         onSuccess: () => {
           console.log('SignIn success')
-          navigateTo('/dashboard')
+          navigateTo('/')
         },
         onError: (ctx: { error: { message?: string } }) => {
           console.error('SignIn error:', ctx)
