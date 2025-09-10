@@ -1,8 +1,5 @@
-import { db } from "../../../db";
-import { brokerAccounts } from "../../../db/schema";
-import { eq } from "drizzle-orm";
-import { auth } from "../../utils/auth";
-import { verifyPersonAccess } from "../../utils/authorization";
+import { auth } from "@s/utils/auth";
+import { verifyPersonAccess } from "@s/utils/authorization";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -26,11 +23,13 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    const db = useDrizzle();
+
     // First get the broker account to check which person it belongs to
     const existingAccount = await db
       .select()
-      .from(brokerAccounts)
-      .where(eq(brokerAccounts.id, parseInt(accountId)))
+      .from(tables.brokerAccounts)
+      .where(eq(tables.brokerAccounts.id, parseInt(accountId)))
       .limit(1);
 
     if (existingAccount.length === 0) {
@@ -68,14 +67,14 @@ export default defineEventHandler(async (event) => {
       }
 
       const result = await db
-        .update(brokerAccounts)
+        .update(tables.brokerAccounts)
         .set({
           name,
           brokerName,
           accountType,
           currentValue: currentValue.toString(),
         })
-        .where(eq(brokerAccounts.id, parseInt(accountId)))
+        .where(eq(tables.brokerAccounts.id, parseInt(accountId)))
         .returning();
 
       if (result.length === 0) {
@@ -90,8 +89,8 @@ export default defineEventHandler(async (event) => {
 
     if (method === "DELETE") {
       const result = await db
-        .delete(brokerAccounts)
-        .where(eq(brokerAccounts.id, parseInt(accountId)))
+        .delete(tables.brokerAccounts)
+        .where(eq(tables.brokerAccounts.id, parseInt(accountId)))
         .returning();
 
       if (result.length === 0) {

@@ -1,37 +1,40 @@
-import { eq, sql } from 'drizzle-orm'
-import { z } from 'zod'
-import { db, schema } from '../../../../db'
+import { z } from "zod";
 
 const paramsSchema = z.object({
-  id: z.string().transform(Number)
-})
+  id: z.string().transform(Number),
+});
 
 export default defineEventHandler(async (event) => {
   try {
     // Validate params
-    const { id: householdId } = await getValidatedRouterParams(event, paramsSchema.parse)
+    const { id: householdId } = await getValidatedRouterParams(
+      event,
+      paramsSchema.parse
+    );
+
+    const db = useDrizzle();
 
     // Check if household exists
     const household = await db
       .select()
-      .from(schema.households)
-      .where(eq(schema.households.id, householdId))
-      .limit(1)
+      .from(tables.households)
+      .where(eq(tables.households.id, householdId))
+      .limit(1);
 
     if (!household.length) {
       throw createError({
         statusCode: 404,
-        statusMessage: 'Household not found'
-      })
+        statusMessage: "Household not found",
+      });
     }
 
     // Get all persons in the household
     const householdPersons = await db
       .select()
-      .from(schema.persons)
-      .where(eq(schema.persons.householdId, householdId))
+      .from(tables.persons)
+      .where(eq(tables.persons.householdId, householdId));
 
-    const personIds = householdPersons.map((p: any) => p.id)
+    const personIds = householdPersons.map((p) => p.id);
 
     if (personIds.length === 0) {
       return {
@@ -44,101 +47,125 @@ export default defineEventHandler(async (event) => {
         incomeSourcesCount: 0,
         loansCount: 0,
         savingsAccountsCount: 0,
-        investmentAccountsCount: 0
-      }
+        investmentAccountsCount: 0,
+      };
     }
 
     // Calculate total monthly income from active income sources
     const incomeResult = await db
       .select({
-        amount: schema.incomeSources.amount,
-        frequency: schema.incomeSources.frequency
+        amount: tables.incomeSources.amount,
+        frequency: tables.incomeSources.frequency,
       })
-      .from(schema.incomeSources)
+      .from(tables.incomeSources)
       .where(
-        sql`${schema.incomeSources.personId} IN (${sql.join(personIds, sql`, `)}) AND ${schema.incomeSources.isActive} = true`
-      )
+        sql`${tables.incomeSources.personId} IN (${sql.join(
+          personIds,
+          sql`, `
+        )}) AND ${tables.incomeSources.isActive} = true`
+      );
 
-    let totalMonthlyIncome = 0
-    let incomeSourcesCount = 0
+    let totalMonthlyIncome = 0;
+    let incomeSourcesCount = 0;
 
     for (const income of incomeResult) {
-      incomeSourcesCount++
-      const amount = parseFloat(income.amount)
-      
+      incomeSourcesCount++;
+      const amount = parseFloat(income.amount);
+
       switch (income.frequency) {
-        case 'monthly':
-          totalMonthlyIncome += amount
-          break
-        case 'yearly':
-          totalMonthlyIncome += amount / 12
-          break
-        case 'weekly':
-          totalMonthlyIncome += amount * 4.33
-          break
-        case 'bi-weekly':
-          totalMonthlyIncome += amount * 2.17
-          break
+        case "monthly":
+          totalMonthlyIncome += amount;
+          break;
+        case "yearly":
+          totalMonthlyIncome += amount / 12;
+          break;
+        case "weekly":
+          totalMonthlyIncome += amount * 4.33;
+          break;
+        case "bi-weekly":
+          totalMonthlyIncome += amount * 2.17;
+          break;
       }
     }
 
     // Calculate total debt from loans
     const loansResult = await db
       .select({
-        currentBalance: schema.loans.currentBalance
+        currentBalance: tables.loans.currentBalance,
       })
-      .from(schema.loans)
+      .from(tables.loans)
       .where(
-        sql`${schema.loans.personId} IN (${sql.join(personIds, sql`, `)})`
-      )
+        sql`${tables.loans.personId} IN (${sql.join(personIds, sql`, `)})`
+      );
 
-    const totalDebt = loansResult.reduce((sum: number, loan: any) => {
-      return sum + parseFloat(loan.currentBalance || '0')
-    }, 0)
+    const totalDebt = loansResult.reduce((sum: number, loan) => {
+      return sum + parseFloat(loan.currentBalance || "0");
+    }, 0);
 
     // Calculate total savings
     const savingsResult = await db
       .select({
-        currentBalance: schema.savingsAccounts.currentBalance
+        currentBalance: tables.savingsAccounts.currentBalance,
       })
-      .from(schema.savingsAccounts)
+      .from(tables.savingsAccounts)
       .where(
-        sql`${schema.savingsAccounts.personId} IN (${sql.join(personIds, sql`, `)})`
-      )
+        sql`${tables.savingsAccounts.personId} IN (${sql.join(
+          personIds,
+          sql`, `
+        )})`
+      );
 
-    const totalSavings = savingsResult.reduce((sum: number, savings: any) => {
-      return sum + parseFloat(savings.currentBalance || '0')
-    }, 0)
+    const totalSavings = savingsResult.reduce((sum: number, savings) => {
+      return sum + parseFloat(savings.currentBalance || "0");
+    }, 0);
 
     // Calculate total investments
     const investmentsResult = await db
       .select({
-        currentValue: schema.brokerAccounts.currentValue
+        currentValue: tables.brokerAccounts.currentValue,
       })
-      .from(schema.brokerAccounts)
+      .from(tables.brokerAccounts)
       .where(
-        sql`${schema.brokerAccounts.personId} IN (${sql.join(personIds, sql`, `)})`
-      )
+        sql`${tables.brokerAccounts.personId} IN (${sql.join(
+          personIds,
+          sql`, `
+        )})`
+      );
 
-    const totalInvestments = investmentsResult.reduce((sum: number, investment: any) => {
-      return sum + parseFloat(investment.currentValue || '0')
-    }, 0)
+    const totalInvestments = investmentsResult.reduce(
+      (sum: number, investment) => {
+        return sum + parseFloat(investment.currentValue || "0");
+      },
+      0
+    );
 
     // Count various account types
     const loansCount = await db
       .select({ count: sql<number>`count(*)` })
-      .from(schema.loans)
-      .where(sql`${schema.loans.personId} IN (${sql.join(personIds, sql`, `)})`)
+      .from(tables.loans)
+      .where(
+        sql`${tables.loans.personId} IN (${sql.join(personIds, sql`, `)})`
+      );
 
     const savingsAccountsCount = await db
       .select({ count: sql<number>`count(*)` })
-      .from(schema.savingsAccounts)
-      .where(sql`${schema.savingsAccounts.personId} IN (${sql.join(personIds, sql`, `)})`)
+      .from(tables.savingsAccounts)
+      .where(
+        sql`${tables.savingsAccounts.personId} IN (${sql.join(
+          personIds,
+          sql`, `
+        )})`
+      );
 
     const investmentAccountsCount = await db
       .select({ count: sql<number>`count(*)` })
-      .from(schema.brokerAccounts)
-      .where(sql`${schema.brokerAccounts.personId} IN (${sql.join(personIds, sql`, `)})`)
+      .from(tables.brokerAccounts)
+      .where(
+        sql`${tables.brokerAccounts.personId} IN (${sql.join(
+          personIds,
+          sql`, `
+        )})`
+      );
 
     return {
       totalMonthlyIncome: Math.round(totalMonthlyIncome * 100) / 100,
@@ -150,14 +177,13 @@ export default defineEventHandler(async (event) => {
       incomeSourcesCount,
       loansCount: loansCount[0]?.count || 0,
       savingsAccountsCount: savingsAccountsCount[0]?.count || 0,
-      investmentAccountsCount: investmentAccountsCount[0]?.count || 0
-    }
-
+      investmentAccountsCount: investmentAccountsCount[0]?.count || 0,
+    };
   } catch (error) {
-    console.error('Error fetching household financial summary:', error)
+    console.error("Error fetching household financial summary:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to fetch household financial summary'
-    })
+      statusMessage: "Failed to fetch household financial summary",
+    });
   }
-})
+});

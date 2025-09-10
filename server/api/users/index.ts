@@ -45,16 +45,21 @@ export default defineEventHandler(async (event) => {
       statusCode: 405,
       statusMessage: "Method not allowed",
     });
-  } catch (error: any) {
-    if (error.name === "ZodError") {
+  } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "name" in error &&
+      error.name === "ZodError"
+    ) {
       throw createError({
         statusCode: 400,
         statusMessage: "Validation failed",
-        data: error.errors,
+        data: "errors" in error ? error.errors : undefined,
       });
     }
 
-    if (error.statusCode) {
+    if (error && typeof error === "object" && "statusCode" in error) {
       throw error;
     }
 

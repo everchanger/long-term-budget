@@ -1,9 +1,3 @@
-import { db } from "../../db";
-import { persons, households } from "../../db/schema";
-import { eq, and } from "drizzle-orm";
-import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import type * as schema from "../../db/schema";
-
 export interface AuthorizedPerson {
   id: number;
   name: string;
@@ -16,20 +10,28 @@ export interface AuthorizedPerson {
  */
 export async function verifyPersonAccess(
   personId: number,
-  userId: string,
-  dbInstance: NodePgDatabase<typeof schema> = db
+  userId: string
 ): Promise<AuthorizedPerson | null> {
   try {
-    const result = await dbInstance
+    const db = useDrizzle();
+    const result = await db
       .select({
-        id: persons.id,
-        name: persons.name,
-        householdId: persons.householdId,
-        userId: households.userId,
+        id: tables.persons.id,
+        name: tables.persons.name,
+        householdId: tables.persons.householdId,
+        userId: tables.households.userId,
       })
-      .from(persons)
-      .innerJoin(households, eq(persons.householdId, households.id))
-      .where(and(eq(persons.id, personId), eq(households.userId, userId)))
+      .from(tables.persons)
+      .innerJoin(
+        tables.households,
+        eq(tables.persons.householdId, tables.households.id)
+      )
+      .where(
+        and(
+          eq(tables.persons.id, personId),
+          eq(tables.households.userId, userId)
+        )
+      )
       .limit(1);
 
     if (result.length === 0) {
@@ -47,21 +49,24 @@ export async function verifyPersonAccess(
  * Get all persons that belong to the authenticated user's households
  */
 export async function getUserPersons(
-  userId: string,
-  dbInstance: NodePgDatabase<typeof schema> = db
+  userId: string
 ): Promise<AuthorizedPerson[]> {
   try {
-    const result = await dbInstance
+    const db = useDrizzle();
+    const result = await db
       .select({
-        id: persons.id,
-        name: persons.name,
-        householdId: persons.householdId,
-        userId: households.userId,
+        id: tables.persons.id,
+        name: tables.persons.name,
+        householdId: tables.persons.householdId,
+        userId: tables.households.userId,
       })
-      .from(persons)
-      .innerJoin(households, eq(persons.householdId, households.id))
-      .where(eq(households.userId, userId))
-      .orderBy(persons.name);
+      .from(tables.persons)
+      .innerJoin(
+        tables.households,
+        eq(tables.persons.householdId, tables.households.id)
+      )
+      .where(eq(tables.households.userId, userId))
+      .orderBy(tables.persons.name);
 
     return result as AuthorizedPerson[];
   } catch (error) {
@@ -69,3 +74,8 @@ export async function getUserPersons(
     return [];
   }
 }
+
+export default {
+  verifyPersonAccess,
+  getUserPersons,
+};

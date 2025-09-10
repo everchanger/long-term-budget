@@ -1,8 +1,5 @@
-import { db } from "../../../db";
-import { loans } from "../../../db/schema";
-import { eq } from "drizzle-orm";
-import { auth } from "../../utils/auth";
-import { verifyPersonAccess } from "../../utils/authorization";
+import { auth } from "@s/utils/auth";
+import { verifyPersonAccess } from "@s/utils/authorization";
 
 export default defineEventHandler(async (event) => {
   // Get session from Better Auth
@@ -25,11 +22,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const db = useDrizzle();
+
   // First get the loan to check which person it belongs to
   const existingLoan = await db
     .select()
-    .from(loans)
-    .where(eq(loans.id, parseInt(loanId)))
+    .from(tables.loans)
+    .where(eq(tables.loans.id, parseInt(loanId)))
     .limit(1);
 
   if (existingLoan.length === 0) {
@@ -81,9 +80,8 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-      // TODO: Add authorization check to ensure loan belongs to user's household
       const result = await db
-        .update(loans)
+        .update(tables.loans)
         .set({
           name,
           originalAmount: originalAmount.toString(),
@@ -94,7 +92,7 @@ export default defineEventHandler(async (event) => {
           startDate: startDate ? new Date(startDate) : new Date(),
           endDate: endDate ? new Date(endDate) : null,
         })
-        .where(eq(loans.id, parseInt(loanId)))
+        .where(eq(tables.loans.id, parseInt(loanId)))
         .returning();
 
       if (result.length === 0) {
@@ -118,8 +116,8 @@ export default defineEventHandler(async (event) => {
     try {
       // TODO: Add authorization check to ensure loan belongs to user's household
       const result = await db
-        .delete(loans)
-        .where(eq(loans.id, parseInt(loanId)))
+        .delete(tables.loans)
+        .where(eq(tables.loans.id, parseInt(loanId)))
         .returning();
 
       if (result.length === 0) {

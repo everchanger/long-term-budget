@@ -1,8 +1,5 @@
-import { db } from "../../../db";
-import { brokerAccounts } from "../../../db/schema";
-import { eq, inArray } from "drizzle-orm";
-import { auth } from "../../utils/auth";
-import { verifyPersonAccess, getUserPersons } from "../../utils/authorization";
+import { auth } from "@s/utils/auth";
+import { verifyPersonAccess, getUserPersons } from "@s/utils/authorization";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -39,10 +36,12 @@ export default defineEventHandler(async (event) => {
           });
         }
 
+        const db = useDrizzle();
+
         const result = await db
           .select()
-          .from(brokerAccounts)
-          .where(eq(brokerAccounts.personId, parseInt(personId)));
+          .from(tables.brokerAccounts)
+          .where(eq(tables.brokerAccounts.personId, parseInt(personId)));
 
         return result;
       } else {
@@ -53,14 +52,15 @@ export default defineEventHandler(async (event) => {
           return [];
         }
 
+        const db = useDrizzle();
         const personIds = userPersons.map((p) => p.id);
         const result = await db
           .select()
-          .from(brokerAccounts)
+          .from(tables.brokerAccounts)
           .where(
             personIds.length === 1
-              ? eq(brokerAccounts.personId, personIds[0])
-              : inArray(brokerAccounts.personId, personIds)
+              ? eq(tables.brokerAccounts.personId, personIds[0])
+              : inArray(tables.brokerAccounts.personId, personIds)
           );
 
         return result;
@@ -92,8 +92,10 @@ export default defineEventHandler(async (event) => {
         });
       }
 
+      const db = useDrizzle();
+
       const result = await db
-        .insert(brokerAccounts)
+        .insert(tables.brokerAccounts)
         .values({
           name,
           brokerName,

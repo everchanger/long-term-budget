@@ -1,7 +1,4 @@
-import { db } from "../../../db";
-import { households, users } from "../../../db/schema";
-import { eq } from "drizzle-orm";
-import { auth } from "../../utils/auth";
+import { auth } from "@s/utils/auth";
 
 export default defineEventHandler(async (event) => {
   try {
@@ -21,18 +18,20 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    const db = useDrizzle();
+
     // Get households for the authenticated user
     const userHouseholds = await db
       .select({
-        id: households.id,
-        name: households.name,
-        userId: households.userId,
-        createdAt: households.createdAt,
-        ownerName: users.name,
+        id: tables.households.id,
+        name: tables.households.name,
+        userId: tables.households.userId,
+        createdAt: tables.households.createdAt,
+        ownerName: tables.users.name,
       })
-      .from(households)
-      .innerJoin(users, eq(households.userId, users.id))
-      .where(eq(households.userId, session.user.id));
+      .from(tables.households)
+      .innerJoin(tables.users, eq(tables.households.userId, tables.users.id))
+      .where(eq(tables.households.userId, session.user.id));
 
     return userHouseholds;
   } catch (error) {

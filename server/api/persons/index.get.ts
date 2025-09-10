@@ -1,47 +1,69 @@
-import { db, schema } from '../../../db'
-import { eq } from 'drizzle-orm'
+import { auth } from "@s/utils/auth";
+import { getUserPersons } from "@s/utils/authorization";
 
 export default defineEventHandler(async (event) => {
-  try {
-    // Get query parameters
-    const query = getQuery(event)
-    const householdId = query.householdId ? Number(query.householdId) : null
+  // Get session from Better Auth
+  const session = await auth.api.getSession({
+    headers: event.headers,
+  });
 
-    // If householdId is provided, filter by it
+  if (!session?.user?.id) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    });
+  }
+
+  try {
+    const db = useDrizzle();
+
+    // Get query parameters
+    const query = getQuery(event);
+    const householdId = query.householdId ? Number(query.householdId) : null;
+
+    // If householdId is provided, filter by it but ensure user has access
     if (householdId) {
+      // Verify household belongs to user
+      const [householdAccess] = await db
+        .select({ id: tables.households.id })
+        .from(tables.households)
+        .where(
+          and(
+            eq(tables.households.id, householdId),
+            eq(tables.households.userId, session.user.id)
+          )
+        );
+
+      if (!householdAccess) {
+        throw createError({
+          statusCode: 403,
+          statusMessage: "Access denied: Household does not belong to you",
+        });
+      }
+
       const householdPersons = await db
         .select({
-          id: schema.persons.id,
-          name: schema.persons.name,
-          age: schema.persons.age,
-          householdId: schema.persons.householdId,
-          createdAt: schema.persons.createdAt,
+          id: tables.persons.id,
+          name: tables.persons.name,
+          age: tables.persons.age,
+          householdId: tables.persons.householdId,
+          createdAt: tables.persons.createdAt,
         })
-        .from(schema.persons)
-        .where(eq(schema.persons.householdId, householdId))
-        .orderBy(schema.persons.createdAt)
+        .from(tables.persons)
+        .where(eq(tables.persons.householdId, householdId))
+        .orderBy(tables.persons.createdAt);
 
-      return householdPersons
+      return householdPersons;
     }
 
-    // Otherwise return all persons (this might need user filtering in the future)
-    const allPersons = await db
-      .select({
-        id: schema.persons.id,
-        name: schema.persons.name,
-        age: schema.persons.age,
-        householdId: schema.persons.householdId,
-        createdAt: schema.persons.createdAt,
-      })
-      .from(schema.persons)
-      .orderBy(schema.persons.createdAt)
-
-    return allPersons
+    // Otherwise return all persons that belong to the user's households
+    const userPersons = await getUserPersons(session.user.id);
+    return userPersons;
   } catch (error) {
-    console.error('Error fetching persons:', error)
+    console.error("Error fetching persons:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to fetch persons'
-    })
+      statusMessage: "Failed to fetch persons",
+    });
   }
-})
+});

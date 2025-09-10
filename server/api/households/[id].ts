@@ -1,6 +1,4 @@
-import { db, schema } from "../../../db";
-import { eq, and } from "drizzle-orm";
-import { auth } from "../../utils/auth";
+import { auth } from "@s/utils/auth";
 
 export default defineEventHandler(async (event) => {
   const householdId = parseInt(getRouterParam(event, "id") || "0");
@@ -24,23 +22,25 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const db = useDrizzle();
+
   try {
     if (event.node.req.method === "GET") {
       // Get specific household with owner info - only if it belongs to the current user
       const [household] = await db
         .select({
-          id: schema.households.id,
-          name: schema.households.name,
-          userId: schema.households.userId,
-          createdAt: schema.households.createdAt,
-          ownerName: schema.users.name,
+          id: tables.households.id,
+          name: tables.households.name,
+          userId: tables.households.userId,
+          createdAt: tables.households.createdAt,
+          ownerName: tables.users.name,
         })
-        .from(schema.households)
-        .leftJoin(schema.users, eq(schema.households.userId, schema.users.id))
+        .from(tables.households)
+        .leftJoin(tables.users, eq(tables.households.userId, tables.users.id))
         .where(
           and(
-            eq(schema.households.id, householdId),
-            eq(schema.households.userId, session.user.id)
+            eq(tables.households.id, householdId),
+            eq(tables.households.userId, session.user.id)
           )
         );
 
@@ -54,9 +54,9 @@ export default defineEventHandler(async (event) => {
       // Get persons in this household
       const persons = await db
         .select()
-        .from(schema.persons)
-        .where(eq(schema.persons.householdId, householdId))
-        .orderBy(schema.persons.createdAt);
+        .from(tables.persons)
+        .where(eq(tables.persons.householdId, householdId))
+        .orderBy(tables.persons.createdAt);
 
       return {
         ...household,
@@ -77,12 +77,12 @@ export default defineEventHandler(async (event) => {
       }
 
       const [updatedHousehold] = await db
-        .update(schema.households)
+        .update(tables.households)
         .set({ name })
         .where(
           and(
-            eq(schema.households.id, householdId),
-            eq(schema.households.userId, session.user.id)
+            eq(tables.households.id, householdId),
+            eq(tables.households.userId, session.user.id)
           )
         )
         .returning();

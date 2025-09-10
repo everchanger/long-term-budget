@@ -1,8 +1,5 @@
-import { db } from "../../../db";
-import { loans } from "../../../db/schema";
-import { eq } from "drizzle-orm";
-import { auth } from "../../utils/auth";
-import { verifyPersonAccess } from "../../utils/authorization";
+import { auth } from "@s/utils/auth";
+import { verifyPersonAccess } from "@s/utils/authorization";
 
 export default defineEventHandler(async (event) => {
   // Get session from Better Auth
@@ -45,10 +42,12 @@ export default defineEventHandler(async (event) => {
         });
       }
 
+      const db = useDrizzle();
+
       const result = await db
         .select()
-        .from(loans)
-        .where(eq(loans.personId, parseInt(personId)));
+        .from(tables.loans)
+        .where(eq(tables.loans.personId, parseInt(personId)));
 
       return result;
     } catch (error) {
@@ -106,8 +105,10 @@ export default defineEventHandler(async (event) => {
         });
       }
 
+      const db = useDrizzle();
+
       const result = await db
-        .insert(loans)
+        .insert(tables.loans)
         .values({
           name,
           originalAmount: originalAmount.toString(),
