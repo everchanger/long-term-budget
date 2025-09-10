@@ -8,6 +8,9 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "test": "npm run test:db:setup && vitest run",
+    "test:db:setup": "node scripts/test-db-setup.js",
+    "test:db:teardown": "node scripts/test-db-teardown.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -33,6 +36,8 @@
     "zod": "^4.1.0"
   },
   "devDependencies": {
-    "@iconify-json/heroicons": "^1.2.2"
+    "@iconify-json/heroicons": "^1.2.2",
+    "dotenv": "^17.2.2",
+    "vitest": "^3.2.4"
   }
 }

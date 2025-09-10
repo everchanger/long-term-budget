@@ -157,7 +157,11 @@
                     Add Loan
                   </UButton>
                 </div>
-                <div class="text-center py-12">
+
+                <div v-if="loansLoading" class="text-center py-8">
+                  <UIcon name="i-heroicons-arrow-path" class="animate-spin h-6 w-6 mx-auto" />
+                </div>
+                <div v-else-if="loans.length === 0" class="text-center py-12">
                   <UIcon name="i-heroicons-credit-card" class="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Loans Yet</h4>
                   <p class="text-gray-600 dark:text-gray-400 mb-4">Add loans and debts to track payments and balances.
@@ -165,6 +169,31 @@
                   <UButton variant="soft" icon="i-heroicons-plus" @click="openLoanModal">
                     Add Loan
                   </UButton>
+                </div>
+                <div v-else class="space-y-4">
+                  <UCard v-for="loan in loans" :key="loan.id">
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                          <h4 class="font-semibold text-neutral-900 dark:text-white">{{ loan.name }}</h4>
+                          <UBadge v-if="loan.loanType" color="neutral">{{ loan.loanType }}</UBadge>
+                        </div>
+                        <p class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-1">
+                          ${{ parseFloat(loan.currentBalance).toLocaleString() }} balance
+                        </p>
+                        <div class="text-sm text-neutral-600 dark:text-neutral-400">
+                          <p v-if="loan.interestRate">Interest Rate: {{ parseFloat(loan.interestRate).toFixed(2) }}%</p>
+                          <p v-if="loan.monthlyPayment">Monthly Payment: ${{
+                            parseFloat(loan.monthlyPayment).toLocaleString() }}</p>
+                        </div>
+                      </div>
+                      <div class="flex gap-2">
+                        <UButton size="sm" variant="ghost" icon="i-heroicons-pencil" @click="editLoan(loan)" />
+                        <UButton size="sm" variant="ghost" color="error" icon="i-heroicons-trash"
+                          @click="deleteLoan(loan)" />
+                      </div>
+                    </div>
+                  </UCard>
                 </div>
               </div>
 
@@ -276,6 +305,157 @@
         </div>
       </template>
     </UModal>
+
+    <!-- Loan Modal -->
+    <UModal v-model:open="isLoanModalOpen">
+      <template #header>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          Add Loan/Debt
+        </h3>
+      </template>
+
+      <template #body>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
+            <input v-model="loanFormState.name" type="text" placeholder="e.g., Mortgage, Credit Card, etc." required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Outstanding Amount *</label>
+            <input v-model="loanFormState.amount" type="number" step="0.01" min="0" placeholder="0.00" required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Interest Rate (%)</label>
+            <input v-model="loanFormState.interestRate" type="number" step="0.01" min="0" placeholder="5.00"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monthly Payment</label>
+            <input v-model="loanFormState.monthlyPayment" type="number" step="0.01" min="0" placeholder="0.00"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Loan Type</label>
+            <select v-model="loanFormState.loanType"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+              <option value="">Select type</option>
+              <option value="mortgage">Mortgage</option>
+              <option value="personal">Personal Loan</option>
+              <option value="credit-card">Credit Card</option>
+              <option value="auto">Auto Loan</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton variant="ghost" @click="closeLoanModal">Cancel</UButton>
+          <UButton :loading="isLoanSubmitting" @click="handleLoanSubmit">
+            {{ editingLoan ? 'Update' : 'Add' }} Loan
+          </UButton>
+        </div>
+      </template>
+    </UModal>
+
+    <!-- Savings Modal -->
+    <UModal v-model:open="isSavingsModalOpen">
+      <template #header>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          Add Savings Account
+        </h3>
+      </template>
+
+      <template #body>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Account Name *</label>
+            <input v-model="savingsFormState.name" type="text" placeholder="e.g., Emergency Fund, Vacation Fund, etc."
+              required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Balance *</label>
+            <input v-model="savingsFormState.balance" type="number" step="0.01" min="0" placeholder="0.00" required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Interest Rate (%)</label>
+            <input v-model="savingsFormState.interestRate" type="number" step="0.01" min="0" placeholder="2.50"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Account Type</label>
+            <select v-model="savingsFormState.accountType"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+              <option value="">Select type</option>
+              <option value="high-yield">High Yield Savings</option>
+              <option value="regular">Regular Savings</option>
+              <option value="money-market">Money Market</option>
+              <option value="cd">Certificate of Deposit</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <p class="text-sm text-gray-500">This feature is coming soon! For now, this will just close the modal.</p>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton variant="ghost" @click="closeSavingsModal">Cancel</UButton>
+          <UButton @click="closeSavingsModal">Add (Coming Soon)</UButton>
+        </div>
+      </template>
+    </UModal>
+
+    <!-- Investment Modal -->
+    <UModal v-model:open="isInvestmentModalOpen">
+      <template #header>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          Add Investment Account
+        </h3>
+      </template>
+
+      <template #body>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Account Name *</label>
+            <input v-model="investmentFormState.name" type="text" placeholder="e.g., 401k, Roth IRA, Brokerage, etc."
+              required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Value *</label>
+            <input v-model="investmentFormState.currentValue" type="number" step="0.01" min="0" placeholder="0.00"
+              required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Account Type</label>
+            <select v-model="investmentFormState.accountType"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+              <option value="">Select type</option>
+              <option value="401k">401(k)</option>
+              <option value="roth-ira">Roth IRA</option>
+              <option value="traditional-ira">Traditional IRA</option>
+              <option value="brokerage">Brokerage Account</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <p class="text-sm text-gray-500">This feature is coming soon! For now, this will just close the modal.</p>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <UButton variant="ghost" @click="closeInvestmentModal">Cancel</UButton>
+          <UButton @click="closeInvestmentModal">Add (Coming Soon)</UButton>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -323,6 +503,24 @@ const { data: incomeSources, pending: incomeSourcesLoading, refresh: refreshInco
   default: () => []
 })
 
+// Loans
+const { data: loans, pending: loansLoading, refresh: refreshLoans } = await useFetch<any[]>('/api/loans', {
+  query: { personId },
+  default: () => []
+})
+
+// Savings accounts
+const { data: savingsAccounts, pending: savingsLoading, refresh: refreshSavings } = await useFetch<any[]>('/api/savings-accounts', {
+  query: { personId },
+  default: () => []
+})
+
+// Broker accounts (investments)
+const { data: brokerAccounts, pending: investmentsLoading, refresh: refreshInvestments } = await useFetch<any[]>('/api/broker-accounts', {
+  query: { personId },
+  default: () => []
+})
+
 // Income form state
 const isIncomeModalOpen = ref(false)
 const isIncomeSubmitting = ref(false)
@@ -331,6 +529,39 @@ const incomeFormState = reactive({
   name: '',
   amount: '',
   frequency: ''
+})
+
+// Loans form state
+const isLoanModalOpen = ref(false)
+const isLoanSubmitting = ref(false)
+const editingLoan = ref<any>(null)
+const loanFormState = reactive({
+  name: '',
+  amount: '',
+  interestRate: '',
+  monthlyPayment: '',
+  loanType: ''
+})
+
+// Savings form state
+const isSavingsModalOpen = ref(false)
+const isSavingsSubmitting = ref(false)
+const editingSavings = ref<any>(null)
+const savingsFormState = reactive({
+  name: '',
+  balance: '',
+  interestRate: '',
+  accountType: ''
+})
+
+// Investments form state
+const isInvestmentModalOpen = ref(false)
+const isInvestmentSubmitting = ref(false)
+const editingInvestment = ref<any>(null)
+const investmentFormState = reactive({
+  name: '',
+  currentValue: '',
+  accountType: ''
 })
 
 // Computed values
@@ -351,9 +582,26 @@ const totalMonthlyIncome = computed(() => {
     .toFixed(2)
 })
 
-const totalSavings = computed(() => '0.00') // TODO: Implement when savings API is ready
-const totalInvestments = computed(() => '0.00') // TODO: Implement when investments API is ready
-const totalDebt = computed(() => '0.00') // TODO: Implement when loans API is ready
+const totalSavings = computed(() => {
+  if (!savingsAccounts.value) return '0.00'
+  return savingsAccounts.value
+    .reduce((total, account) => total + parseFloat(account.currentBalance || 0), 0)
+    .toFixed(2)
+})
+
+const totalInvestments = computed(() => {
+  if (!brokerAccounts.value) return '0.00'
+  return brokerAccounts.value
+    .reduce((total, account) => total + parseFloat(account.currentValue || 0), 0)
+    .toFixed(2)
+})
+
+const totalDebt = computed(() => {
+  if (!loans.value) return '0.00'
+  return loans.value
+    .reduce((total, loan) => total + parseFloat(loan.currentBalance || 0), 0)
+    .toFixed(2)
+})
 
 const isIncomeFormValid = computed(() => {
   return incomeFormState.name.trim() !== '' &&
@@ -468,15 +716,124 @@ function openEditPersonModal() {
 }
 
 function openLoanModal() {
-  // TODO: Implement loan modal
+  editingLoan.value = null
+  loanFormState.name = ''
+  loanFormState.amount = ''
+  loanFormState.interestRate = ''
+  loanFormState.monthlyPayment = ''
+  loanFormState.loanType = ''
+  isLoanModalOpen.value = true
+}
+
+function closeLoanModal() {
+  isLoanModalOpen.value = false
+  editingLoan.value = null
+}
+
+async function handleLoanSubmit() {
+  if (!loanFormState.name || !loanFormState.amount) return
+
+  isLoanSubmitting.value = true
+
+  try {
+    const payload = {
+      name: loanFormState.name.trim(),
+      originalAmount: parseFloat(loanFormState.amount),
+      currentBalance: parseFloat(loanFormState.amount),
+      interestRate: parseFloat(loanFormState.interestRate) || 0,
+      monthlyPayment: parseFloat(loanFormState.monthlyPayment) || 0,
+      loanType: loanFormState.loanType,
+      personId: parseInt(personId),
+    }
+
+    if (editingLoan.value) {
+      await $fetch(`/api/loans/${editingLoan.value.id}`, {
+        method: 'PUT',
+        body: payload
+      })
+    } else {
+      await $fetch('/api/loans', {
+        method: 'POST',
+        body: payload
+      })
+    }
+
+    await refreshLoans()
+    closeLoanModal()
+
+    const toast = useToast()
+    toast.add({
+      title: editingLoan.value ? 'Loan updated' : 'Loan added',
+      description: `${loanFormState.name} has been ${editingLoan.value ? 'updated' : 'added'} successfully.`,
+      color: 'success'
+    })
+  } catch (error: unknown) {
+    const toast = useToast()
+    toast.add({
+      title: 'Error',
+      description: error instanceof Error ? error.message : 'An error occurred',
+      color: 'error'
+    })
+  } finally {
+    isLoanSubmitting.value = false
+  }
 }
 
 function openSavingsModal() {
-  // TODO: Implement savings modal
+  editingSavings.value = null
+  savingsFormState.name = ''
+  savingsFormState.balance = ''
+  savingsFormState.interestRate = ''
+  savingsFormState.accountType = ''
+  isSavingsModalOpen.value = true
+}
+
+function closeSavingsModal() {
+  isSavingsModalOpen.value = false
+  editingSavings.value = null
 }
 
 function openInvestmentModal() {
-  // TODO: Implement investment modal
+  editingInvestment.value = null
+  investmentFormState.name = ''
+  investmentFormState.currentValue = ''
+  investmentFormState.accountType = ''
+  isInvestmentModalOpen.value = true
+}
+
+function closeInvestmentModal() {
+  isInvestmentModalOpen.value = false
+  editingInvestment.value = null
+}
+
+// CRUD functions for loans
+function editLoan(loan: any) {
+  editingLoan.value = loan
+  loanFormState.name = loan.name
+  loanFormState.amount = loan.currentBalance
+  loanFormState.interestRate = loan.interestRate
+  loanFormState.loanType = loan.loanType
+  isLoanModalOpen.value = true
+}
+
+async function deleteLoan(loan: any) {
+  try {
+    await $fetch(`/api/loans/${loan.id}`, { method: 'DELETE' })
+    refreshLoans()
+    const toast = useToast()
+    toast.add({
+      title: 'Loan deleted',
+      description: `${loan.name} has been removed.`,
+      color: 'success'
+    })
+  } catch (error) {
+    const toast = useToast()
+    toast.add({
+      title: 'Error',
+      description: 'Failed to delete loan',
+      color: 'error'
+    })
+  }
 }
 
 // SEO

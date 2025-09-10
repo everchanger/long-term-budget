@@ -1,103 +1,107 @@
-import { db, schema } from '../../../db'
-import { updateUserSchema } from '../../../db/schemas'
-import { eq } from 'drizzle-orm'
+import { updateUserSchema } from "@s/database/validation-schemas";
 
 export default defineEventHandler(async (event) => {
-  const userId = parseInt(getRouterParam(event, 'id') || '0')
-  
+  const userId = getRouterParam(event, "id");
+
   if (!userId) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid user ID'
-    })
+      statusMessage: "Invalid user ID",
+    });
   }
-  
+
+  const db = useDrizzle();
+
   try {
-    if (event.node.req.method === 'GET') {
+    if (event.node.req.method === "GET") {
       // Get specific user
-      const [user] = await db.select({
-        id: schema.users.id,
-        name: schema.users.name,
-        email: schema.users.email,
-        createdAt: schema.users.createdAt,
-      }).from(schema.users).where(eq(schema.users.id, userId))
-      
+      const [user] = await db
+        .select({
+          id: tables.users.id,
+          name: tables.users.name,
+          email: tables.users.email,
+          createdAt: tables.users.createdAt,
+        })
+        .from(tables.users)
+        .where(eq(tables.users.id, userId));
+
       if (!user) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'User not found'
-        })
+          statusMessage: "User not found",
+        });
       }
-      
-      return user
+
+      return user;
     }
-    
-    if (event.node.req.method === 'PUT') {
+
+    if (event.node.req.method === "PUT") {
       // Update user
-      const body = await readBody(event)
-      
+      const body = await readBody(event);
+
       // Validate the request body using the generated schema
-      const validatedData = updateUserSchema.parse(body)
-      
-      const [updatedUser] = await db.update(schema.users)
+      const validatedData = updateUserSchema.parse(body);
+
+      const [updatedUser] = await db
+        .update(tables.users)
         .set(validatedData)
-        .where(eq(schema.users.id, userId))
+        .where(eq(tables.users.id, userId))
         .returning({
-          id: schema.users.id,
-          name: schema.users.name,
-          email: schema.users.email,
-          createdAt: schema.users.createdAt,
-        })
-      
+          id: tables.users.id,
+          name: tables.users.name,
+          email: tables.users.email,
+          createdAt: tables.users.createdAt,
+        });
+
       if (!updatedUser) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'User not found'
-        })
+          statusMessage: "User not found",
+        });
       }
-      
-      return updatedUser
+
+      return updatedUser;
     }
-    
-    if (event.node.req.method === 'DELETE') {
+
+    if (event.node.req.method === "DELETE") {
       // Delete user
-      const [deletedUser] = await db.delete(schema.users)
-        .where(eq(schema.users.id, userId))
-        .returning({ id: schema.users.id })
-      
+      const [deletedUser] = await db
+        .delete(tables.users)
+        .where(eq(tables.users.id, userId))
+        .returning({ id: tables.users.id });
+
       if (!deletedUser) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'User not found'
-        })
+          statusMessage: "User not found",
+        });
       }
-      
-      setResponseStatus(event, 204)
-      return { message: 'User deleted successfully' }
+
+      setResponseStatus(event, 204);
+      return { message: "User deleted successfully" };
     }
-    
+
     throw createError({
       statusCode: 405,
-      statusMessage: 'Method not allowed'
-    })
-    
+      statusMessage: "Method not allowed",
+    });
   } catch (error: any) {
-    if (error.name === 'ZodError') {
+    if (error.name === "ZodError") {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Validation failed',
-        data: error.errors
-      })
+        statusMessage: "Validation failed",
+        data: error.errors,
+      });
     }
-    
+
     if (error.statusCode) {
-      throw error
+      throw error;
     }
-    
-    console.error('Database error:', error)
+
+    console.error("Database error:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: 'Database operation failed'
-    })
+      statusMessage: "Database operation failed",
+    });
   }
-})
+});
