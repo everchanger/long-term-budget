@@ -8,7 +8,7 @@ import {
   verifications,
   households,
 } from "~~/database/schema";
-import { db } from "~~/server/utils/drizzle";
+import { db } from "@s/utils/drizzle";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {

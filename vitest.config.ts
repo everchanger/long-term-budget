@@ -1,11 +1,36 @@
 import { defineConfig } from "vitest/config";
+import { defineVitestProject } from "@nuxt/test-utils/config";
+
+import { resolve } from "path";
+
+const r = (p: string) => resolve(__dirname, p);
 
 export default defineConfig({
   test: {
-    environment: "node",
-    testTimeout: 10000, // 10 seconds for regular tests
-    setupFiles: ["./tests/setup.ts"],
-    // Only exclude specific problematic files, not entire directories
-    exclude: ["**/node_modules/**", "**/dist/**", "**/*.integration.test.ts"],
+    projects: [
+      {
+        resolve: {
+          alias: {
+            "~~": r("."),
+            "~~/": r("./"),
+            "@@": r("."),
+            "@@/": r("./"),
+            "@s": "/server",
+          },
+        },
+        test: {
+          name: "unit",
+          include: ["tests/{e2e,unit}/**/*.{test,spec}.ts"],
+          environment: "node",
+        },
+      },
+      await defineVitestProject({
+        test: {
+          name: "nuxt",
+          include: ["tests/nuxt/**/*.{test,spec}.ts"],
+          environment: "nuxt",
+        },
+      }),
+    ],
   },
 });

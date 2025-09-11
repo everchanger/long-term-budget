@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@nuxt/test-utils",
     "@nuxt/ui",
+    "@nuxt/test-utils/module",
   ],
   runtimeConfig: {
     dbHost: "",
