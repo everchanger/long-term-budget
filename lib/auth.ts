@@ -8,9 +8,7 @@ import {
   verifications,
   households,
 } from "~~/database/schema";
-import { useDrizzle } from "~~/server/utils/drizzle";
-
-const db = useDrizzle();
+import { db } from "~~/server/utils/drizzle";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -32,10 +30,8 @@ export const auth = betterAuth({
   },
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
-      console.log("After hook triggered for path:", ctx.path);
       // Check if this is a successful sign-up
       if (ctx.path.startsWith("/sign-up")) {
-        console.log("After sign-up hook triggered");
         const newSession = ctx.context.newSession;
         if (newSession && newSession.user) {
           try {
