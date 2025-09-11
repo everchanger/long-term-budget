@@ -8,6 +8,7 @@ import {
   verifications,
   households,
 } from "~~/database/schema";
+import { useDrizzle } from "~~/server/utils/drizzle";
 
 const db = useDrizzle();
 
@@ -21,8 +22,6 @@ export const auth = betterAuth({
       verification: verifications,
     },
   }),
-  // baseURL: app.baseURL,
-  // basePath: "/api/auth",
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // Set to true in production

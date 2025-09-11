@@ -1,5 +1,5 @@
 import { eq, inArray } from "drizzle-orm";
-import { auth } from "../../utils/auth";
+import { auth } from "~~/lib/auth";
 import { verifyPersonAccess, getUserPersons } from "../../utils/authorization";
 
 export default defineEventHandler(async (event) => {

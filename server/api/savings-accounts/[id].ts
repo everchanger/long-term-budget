@@ -1,4 +1,4 @@
-import { auth } from "@s/utils/auth";
+import { auth } from "~~/lib/auth";
 import { verifyPersonAccess } from "@s/utils/authorization";
 
 export default defineEventHandler(async (event) => {
