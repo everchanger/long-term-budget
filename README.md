@@ -61,7 +61,7 @@ The project uses Drizzle ORM for database operations. Available database scripts
 
 ### Development Workflow
 
-1. Make changes to your schema files in `db/schema/`
+1. Make changes to your schema files in `database/schema/`
 2. For development: Run `npm run db:push` to sync changes immediately
 3. For production: Run `npm run db:generate` to create migrations, then `npm run db:migrate`
 4. Use `npm run db:studio` to inspect your database visually

@@ -9,10 +9,10 @@
         </p>
       </div>
       <div class="flex items-center gap-4">
-        <UButton @click="handleSignOut" color="gray" icon="i-heroicons-arrow-right-on-rectangle">
+        <UButton color="gray" icon="i-heroicons-arrow-right-on-rectangle" @click="handleSignOut">
           Sign Out
         </UButton>
-        <UButton @click="isModalOpen = true" icon="i-heroicons-plus" size="lg">
+        <UButton icon="i-heroicons-plus" size="lg" @click="isModalOpen = true">
           Add User
         </UButton>
       </div>
@@ -25,8 +25,8 @@
           <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
             All Users ({{ users?.length || 0 }})
           </h2>
-          <UButton v-if="users && users.length > 0" @click="refresh()" variant="soft" icon="i-heroicons-arrow-path"
-            size="sm">
+          <UButton v-if="users && users.length > 0" variant="soft" icon="i-heroicons-arrow-path" size="sm"
+            @click="refresh()">
             Refresh
           </UButton>
         </div>
@@ -35,7 +35,7 @@
       <!-- Loading State -->
       <div v-if="pending" class="flex justify-center py-12">
         <div class="text-center">
-          <div class="i-heroicons-arrow-path animate-spin text-3xl text-blue-600 mb-4"></div>
+          <div class="i-heroicons-arrow-path animate-spin text-3xl text-blue-600 mb-4" />
           <p class="text-gray-500 dark:text-gray-400">Loading users...</p>
         </div>
       </div>
@@ -62,10 +62,10 @@
           </UTable>
 
           <div v-else class="text-center py-12">
-            <div class="i-heroicons-users text-6xl text-gray-400 mb-4 mx-auto"></div>
+            <div class="i-heroicons-users text-6xl text-gray-400 mb-4 mx-auto" />
             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No users yet</h3>
             <p class="text-gray-500 dark:text-gray-400 mb-6">Get started by adding your first user to the system.</p>
-            <UButton @click="isModalOpen = true" icon="i-heroicons-plus">
+            <UButton icon="i-heroicons-plus" @click="isModalOpen = true">
               Add First User
             </UButton>
           </div>
@@ -83,7 +83,7 @@
       </template>
 
       <template #body>
-        <UForm :schema="userSchema" :state="newUser" @submit="createUser" class="space-y-4">
+        <UForm :schema="userSchema" :state="newUser" class="space-y-4" @submit="createUser">
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
             <UInput v-model="newUser.name" placeholder="Enter user name" icon="i-heroicons-user" required />
@@ -117,7 +117,7 @@
       </template>
 
       <template #body>
-        <UForm :schema="editUserSchema" :state="editingUser" @submit="updateUser" class="space-y-4">
+        <UForm :schema="editUserSchema" :state="editingUser" class="space-y-4" @submit="updateUser">
           <div class="space-y-2">
             <label for="edit-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name *</label>
             <UInput id="edit-name" v-model="editingUser.name" placeholder="Enter user name" icon="i-heroicons-user" />
@@ -144,7 +144,7 @@
 </template>
 
 <script setup lang="ts">
-import { insertUserSchema, updateUserSchema, type SelectUser } from '../../db/schemas'
+import { insertUserSchema, updateUserSchema, type SelectUser } from '~~/database/validation-schemas'
 
 // Types
 type User = SelectUser

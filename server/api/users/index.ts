@@ -1,4 +1,4 @@
-import { insertUserSchema } from "@s/database/validation-schemas";
+import { insertUserSchema } from "~~/database/validation-schemas";
 import { desc } from "drizzle-orm";
 
 export default defineEventHandler(async (event) => {

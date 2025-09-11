@@ -79,7 +79,7 @@ This project is a financial planning tool built with TypeScript and Nuxt 4, supp
 - `.github/copilot-instructions.md`: This file—update as project evolves.
 - `cmd/`: CLI tools for database seeding (if/when present).
 - `docker-compose.yml`: Local database setup (if/when present).
-- `db/schema/`: Drizzle schema definitions (TypeScript-first).
+- `database/schema/`: Drizzle schema definitions (TypeScript-first).
 - `drizzle.config.ts`: Drizzle configuration file.
 
 ---

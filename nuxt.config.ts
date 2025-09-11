@@ -15,11 +15,11 @@ export default defineNuxtConfig({
     "@nuxt/ui",
   ],
   runtimeConfig: {
-    dbHost: process.env.DB_HOST || "localhost",
-    dbPort: process.env.DB_PORT || "5432",
-    dbUser: process.env.DB_USER || "budgetuser",
-    dbPassword: process.env.DB_PASSWORD || "budgetpass",
-    dbName: process.env.DB_NAME || "budgetdb",
-    dbSsl: process.env.DB_SSL === "true" || false,
+    dbHost: "",
+    dbPort: "",
+    dbUser: "",
+    dbPassword: "",
+    dbName: "",
+    dbSsl: false,
   },
 });

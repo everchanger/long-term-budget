@@ -1,9 +1,7 @@
-import { createAuthClient } from "better-auth/client";
+import { createAuthClient } from "better-auth/vue";
 
 // Create auth client instance
-const client = createAuthClient({
-  baseURL: process.client ? window.location.origin : "http://localhost:3000",
-});
+const client = createAuthClient();
 
 // Export composable function as default export
 export default function useAuth() {

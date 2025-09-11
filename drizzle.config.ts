@@ -1,15 +1,15 @@
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  schema: "./server/database/schema/*",
-  out: "./server/migrations",
+  schema: "./database/schema/*",
+  out: "./migrations",
   dialect: "postgresql",
   dbCredentials: {
-    host: process.env.DB_HOST || "localhost",
-    port: parseInt(process.env.DB_PORT || "5432"),
-    user: process.env.DB_USER || "budgetuser",
-    password: process.env.DB_PASSWORD || "budgetpass",
-    database: process.env.DB_NAME || "budgetdb",
-    ssl: false,
+    host: process.env.NUXT_DB_HOST || "localhost",
+    port: parseInt(process.env.NUXT_DB_PORT || "5432"),
+    user: process.env.NUXT_DB_USER || "budgetuser",
+    password: process.env.NUXT_DB_PASSWORD || "budgetpass",
+    database: process.env.NUXT_DB_NAME || "budgetdb",
+    ssl: process.env.NUXT_DB_SSL === "true" ? true : false,
   },
 });

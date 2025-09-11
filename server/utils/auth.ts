@@ -1,14 +1,15 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createAuthMiddleware } from "better-auth/api";
-import { db } from "../../db";
 import {
   users,
   sessions,
   accounts,
   verifications,
   households,
-} from "../../db/schema";
+} from "~~/database/schema";
+
+const db = useDrizzle();
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -20,11 +21,8 @@ export const auth = betterAuth({
       verification: verifications,
     },
   }),
-  baseURL:
-    process.env.NODE_ENV === "production"
-      ? process.env.AUTH_BASE_URL
-      : "http://localhost:3000",
-  basePath: "/api/auth",
+  // baseURL: app.baseURL,
+  // basePath: "/api/auth",
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // Set to true in production
@@ -35,11 +33,17 @@ export const auth = betterAuth({
   },
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
+      console.log("After hook triggered for path:", ctx.path);
       // Check if this is a successful sign-up
       if (ctx.path.startsWith("/sign-up")) {
+        console.log("After sign-up hook triggered");
         const newSession = ctx.context.newSession;
         if (newSession && newSession.user) {
           try {
+            console.log(
+              "Creating default household for user:",
+              newSession.user.id
+            );
             // Create a default household for the new user
             await db.insert(households).values({
               name: `${newSession.user.name}'s Household`,

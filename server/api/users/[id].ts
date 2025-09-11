@@ -1,4 +1,4 @@
-import { updateUserSchema } from "@s/database/validation-schemas";
+import { updateUserSchema } from "~~/database/validation-schemas";
 
 export default defineEventHandler(async (event) => {
   const userId = getRouterParam(event, "id");
