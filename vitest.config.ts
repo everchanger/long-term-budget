@@ -15,7 +15,7 @@ export default defineConfig({
             "~~/": r("./"),
             "@@": r("."),
             "@@/": r("./"),
-            "@s": "/server",
+            "@s": r("./server"),
           },
         },
         test: {
@@ -25,6 +25,15 @@ export default defineConfig({
         },
       },
       await defineVitestProject({
+        resolve: {
+          alias: {
+            "~~": r("."),
+            "~~/": r("./"),
+            "@@": r("."),
+            "@@/": r("./"),
+            "@s": r("./server"),
+          },
+        },
         test: {
           name: "nuxt",
           include: ["tests/nuxt/**/*.{test,spec}.ts"],
@@ -32,5 +41,14 @@ export default defineConfig({
         },
       }),
     ],
+  },
+  resolve: {
+    alias: {
+      "~~": r("."),
+      "~~/": r("./"),
+      "@@": r("."),
+      "@@/": r("./"),
+      "@s": r("./server"),
+    },
   },
 });

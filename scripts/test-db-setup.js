@@ -42,12 +42,15 @@ async function setupTestDatabase() {
   // Run migrations on the test database
   try {
     console.log('🔄 Running migrations on test database...');
-    process.env.DB_NAME = TEST_DB_NAME;
     execSync('npm run db:push', { 
       stdio: 'inherit',
       env: { 
         ...process.env, 
-        DB_NAME: TEST_DB_NAME 
+        NUXT_DB_NAME: TEST_DB_NAME,
+        NUXT_DB_HOST: process.env.DB_HOST || 'localhost',
+        NUXT_DB_PORT: process.env.DB_PORT || '5432',
+        NUXT_DB_USER: process.env.DB_USER || 'budgetuser',
+        NUXT_DB_PASSWORD: process.env.DB_PASSWORD || 'budgetpass'
       }
     });
     console.log('✅ Test database schema created');

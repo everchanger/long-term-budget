@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { db } from "../../server/utils/drizzle";
+import { db } from "@s/utils/drizzle";
 
 describe("Database Test", () => {
   it("should connect to database", () => {
