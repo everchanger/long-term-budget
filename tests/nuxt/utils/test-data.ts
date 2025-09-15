@@ -2,17 +2,13 @@ import { like, eq } from "drizzle-orm";
 import { randomBytes } from "crypto";
 import { users, households, persons } from "../../../database/schema";
 import { db } from "../../../server/utils/drizzle";
-
-import { createAuthClient } from "better-auth/client";
-
-// Create auth client instance
-const client = createAuthClient();
+import { auth } from "../../../lib/auth";
 
 export interface TestUser {
   id: string;
   name: string;
   email: string;
-  token: string;
+  sessionCookie: string;
   householdId: number;
 }
 
@@ -27,37 +23,27 @@ export async function createTestUser(name: string): Promise<TestUser> {
   const password = `testpass_${randomId}`;
 
   try {
-    const { data: signUpResponse } = await client.signUp.email({
-      name,
-      email,
-      password,
-      callbackURL: "/dashboard",
+    const { headers, response: signUpResponse } = await auth.api.signUpEmail({
+      body: {
+        name,
+        email,
+        password,
+        callbackURL: "/dashboard",
+      },
+      returnHeaders: true,
     });
 
     if (!signUpResponse || !signUpResponse.user) {
       throw new Error("Failed to create user with Better Auth API");
     }
 
-    const { data: signInResponse } = await client.signIn.email({
-      email,
-      password,
-    });
+    const sessionCookie = headers
+      .get("set-cookie")
+      ?.split("; ")?.[0]
+      ?.split("=")?.[1];
 
-    console.log("Sign-in response structure:", signInResponse);
-    console.log(
-      "Response keys:",
-      signInResponse ? Object.keys(signInResponse) : "null/undefined"
-    );
-
-    // Try to extract session token from various possible locations
-    const sessionToken = signInResponse?.token;
-
-    if (!sessionToken) {
-      throw new Error(
-        `No session token found in sign-in response. Response: ${JSON.stringify(
-          signInResponse
-        )}`
-      );
+    if (!sessionCookie) {
+      throw new Error("No session cookie returned after sign-up");
     }
 
     // Get the household that was created by the auth hook
@@ -75,8 +61,8 @@ export async function createTestUser(name: string): Promise<TestUser> {
       id: signUpResponse.user.id,
       name: signUpResponse.user.name,
       email: signUpResponse.user.email,
-      token: sessionToken,
       householdId: userHouseholds[0].id,
+      sessionCookie: sessionCookie,
     };
   } catch (error) {
     console.error("Failed to create test user:", error);

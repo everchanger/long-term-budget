@@ -35,18 +35,11 @@ export const auth = betterAuth({
         const newSession = ctx.context.newSession;
         if (newSession && newSession.user) {
           try {
-            console.log(
-              "Creating default household for user:",
-              newSession.user.id
-            );
             // Create a default household for the new user
             await db.insert(households).values({
               name: `${newSession.user.name}'s Household`,
               userId: newSession.user.id,
             });
-            console.log(
-              `Created default household for user: ${newSession.user.id}`
-            );
           } catch (error) {
             console.error("Failed to create default household:", error);
             // Don't throw error as this would break user creation

@@ -30,22 +30,7 @@ describe("/api/persons integration tests", async () => {
 
   beforeAll(async () => {
     // Set up test data before running tests
-    console.log("Setting up test users...");
     testUsers = await setupTestUsers();
-    console.log("Test users created:", {
-      user1: {
-        id: testUsers.user1.id,
-        email: testUsers.user1.email,
-        token: testUsers.user1.token,
-        householdId: testUsers.user1.householdId,
-      },
-      user2: {
-        id: testUsers.user2.id,
-        email: testUsers.user2.email,
-        token: testUsers.user2.token,
-        householdId: testUsers.user2.householdId,
-      },
-    });
   });
 
   afterAll(async () => {
@@ -65,24 +50,13 @@ describe("/api/persons integration tests", async () => {
       }
     });
 
-    it.only("should only return persons from authenticated user household", async () => {
+    it("should only return persons from authenticated user household", async () => {
       // Make request as user1 using session cookie
-
-      const user1Persons = (await fetch("http://localhost:5000/api/persons", {
+      const user1Persons = await $fetch<Person[]>("/api/persons", {
         headers: {
-          "cache-control": "no-cache",
-          cookie: `better-auth.session_token=${testUsers.user1.token}`,
+          cookie: `better-auth.session_token=${testUsers.user1.sessionCookie}`,
         },
-      })) as unknown as Person[];
-      // const user1Persons = await $fetch<Person[]>(
-      //   "http://localhost:5000/api/persons",
-      //   {
-      //     headers: {
-      //       "cache-control": "no-cache",
-      //       cookie: `session_token=${testUsers.user1.token}`,
-      //     },
-      //   }
-      // );
+      });
 
       // Should only get user1's persons, not user2's
       expect(user1Persons).toHaveLength(2);
@@ -106,14 +80,14 @@ describe("/api/persons integration tests", async () => {
       // Get persons for user1
       const user1Persons = await $fetch<Person[]>("/api/persons", {
         headers: {
-          Cookie: `session_token=${testUsers.user1.token}`,
+          cookie: `better-auth.session_token=${testUsers.user1.sessionCookie}`,
         },
       });
 
       // Get persons for user2
       const user2Persons = await $fetch<Person[]>("/api/persons", {
         headers: {
-          Cookie: `session_token=${testUsers.user2.token}`,
+          cookie: `better-auth.session_token=${testUsers.user2.sessionCookie}`,
         },
       }); // Verify each user gets different data
       expect(user1Persons).toHaveLength(2);
@@ -165,7 +139,7 @@ describe("/api/persons integration tests", async () => {
         await $fetch("/api/persons", {
           method: "POST",
           headers: {
-            Cookie: `session_token=${testUsers.user1.token}`,
+            cookie: `better-auth.session_token=${testUsers.user1.sessionCookie}`,
           },
           body: {
             name: "Malicious Person",
@@ -187,7 +161,7 @@ describe("/api/persons integration tests", async () => {
       const newPerson = await $fetch<Person>("/api/persons", {
         method: "POST",
         headers: {
-          Cookie: `session_token=${testUsers.user1.token}`,
+          cookie: `better-auth.session_token=${testUsers.user1.sessionCookie}`,
         },
         body: {
           name: "New Person",
