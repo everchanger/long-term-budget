@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import {
-  setupTestUsers,
+  TestDataBuilder,
   cleanupTestData,
   type TestUser,
 } from "../../utils/test-data";
@@ -9,9 +9,9 @@ import {
 interface Person {
   id: number;
   name: string;
-  age: number;
+  age: number | null;
   householdId: number;
-  createdAt: string;
+  createdAt: string | Date;
 }
 
 interface FetchError {
@@ -26,11 +26,25 @@ describe("/api/persons integration tests", async () => {
     host: `http://localhost:${process.env.NUXT_DEVSERVER_PORT || 3000}`,
   });
 
-  let testUsers: { user1: TestUser; user2: TestUser };
+  let testUsers: {
+    user1: TestUser & { persons: Person[] };
+    user2: TestUser & { persons: Person[] };
+  };
 
   beforeAll(async () => {
-    // Set up test data before running tests
-    testUsers = await setupTestUsers();
+    // Set up test data before running tests - create two users with basic persons
+    const user1 = await TestDataBuilder.createUser("TestUser1")
+      .then((b) => b.addPerson("John User1", 30))
+      .then((b) => b.addPerson("Jane User1", 28));
+
+    const user2 = await TestDataBuilder.createUser("TestUser2")
+      .then((b) => b.addPerson("Bob User2", 35))
+      .then((b) => b.addPerson("Alice User2", 32));
+
+    testUsers = {
+      user1: user1.build(),
+      user2: user2.build(),
+    };
   });
 
   afterAll(async () => {

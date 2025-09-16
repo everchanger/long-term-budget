@@ -1,6 +1,14 @@
 import { like, eq } from "drizzle-orm";
 import { randomBytes } from "crypto";
-import { users, households, persons } from "../../../database/schema";
+import {
+  users,
+  households,
+  persons,
+  incomeSources,
+  expenses,
+  savingsAccounts,
+  loans,
+} from "../../../database/schema";
 import { db } from "../../../server/utils/drizzle";
 import { auth } from "../../../lib/auth";
 
@@ -90,6 +98,291 @@ export async function createTestPerson(
   return person;
 }
 
+// Type for person with optional financial data (using actual DB types)
+type TestPerson = {
+  id: number;
+  name: string;
+  age: number | null;
+  householdId: number;
+  createdAt: Date;
+  incomeSources?: Array<{
+    id: number;
+    personId: number;
+    name: string;
+    amount: string;
+    frequency: string;
+    startDate: Date | null;
+    endDate: Date | null;
+    isActive: boolean;
+    createdAt: Date;
+  }>;
+  expenses?: Array<{
+    id: number;
+    personId: number;
+    name: string;
+    amount: string;
+    frequency: string;
+    category: string | null;
+    isFixed: boolean;
+    startDate: Date | null;
+    endDate: Date | null;
+    isActive: boolean;
+    createdAt: Date;
+  }>;
+  savingsAccounts?: Array<{
+    id: number;
+    personId: number;
+    name: string;
+    currentBalance: string;
+    interestRate: string | null;
+    accountType: string | null;
+    createdAt: Date;
+  }>;
+  loans?: Array<{
+    id: number;
+    personId: number;
+    name: string;
+    originalAmount: string;
+    currentBalance: string;
+    interestRate: string;
+    monthlyPayment: string;
+    loanType: string | null;
+    startDate: Date;
+    endDate: Date | null;
+    createdAt: Date;
+  }>;
+};
+
+/**
+ * Chainable test data builder for creating users and their related entities.
+ * See tests/nuxt/README.md for comprehensive usage examples.
+ */
+export class TestDataBuilder {
+  private user?: TestUser;
+  private persons: TestPerson[] = [];
+
+  /**
+   * Create a new test user and start the chain
+   */
+  static async createUser(name: string): Promise<TestDataBuilder> {
+    const builder = new TestDataBuilder();
+    builder.user = await createTestUser(name);
+    return builder;
+  }
+
+  /**
+   * Add a person to the user's household
+   */
+  async addPerson(name: string, age: number = 25): Promise<TestDataBuilder> {
+    if (!this.user) {
+      throw new Error("Must create a user first");
+    }
+
+    const person = await createTestPerson(this.user.householdId, name, age);
+    this.persons.push(person);
+    return this;
+  }
+
+  /**
+   * Add multiple persons to the user's household
+   */
+  async addPersons(
+    personData: Array<{ name: string; age?: number }>
+  ): Promise<TestDataBuilder> {
+    for (const person of personData) {
+      await this.addPerson(person.name, person.age);
+    }
+    return this;
+  }
+
+  /**
+   * Add an income source to the last added person
+   */
+  async addIncomeSource(data?: {
+    name?: string;
+    amount?: number;
+    frequency?: string;
+    startDate?: Date;
+    endDate?: Date;
+    isActive?: boolean;
+  }): Promise<TestDataBuilder> {
+    const lastPerson = this.persons[this.persons.length - 1];
+    if (!lastPerson) {
+      throw new Error("Must add a person before adding income source");
+    }
+
+    // Insert into database using actual schema
+    const [incomeSource] = await db
+      .insert(incomeSources)
+      .values({
+        personId: lastPerson.id,
+        name: data?.name || "Test Salary",
+        amount: (data?.amount || 5000).toString(),
+        frequency: data?.frequency || "monthly",
+        startDate: data?.startDate || null,
+        endDate: data?.endDate || null,
+        isActive: data?.isActive ?? true,
+      })
+      .returning();
+
+    // Store income source on the person for easy access
+    if (!lastPerson.incomeSources) lastPerson.incomeSources = [];
+    lastPerson.incomeSources.push(incomeSource);
+
+    return this;
+  }
+
+  /**
+   * Add an expense to the last added person
+   */
+  async addExpense(data?: {
+    name?: string;
+    amount?: number;
+    frequency?: string;
+    category?: string;
+    isFixed?: boolean;
+    startDate?: Date;
+    endDate?: Date;
+    isActive?: boolean;
+  }): Promise<TestDataBuilder> {
+    const lastPerson = this.persons[this.persons.length - 1];
+    if (!lastPerson) {
+      throw new Error("Must add a person before adding expense");
+    }
+
+    // Insert into database using actual schema
+    const [expense] = await db
+      .insert(expenses)
+      .values({
+        personId: lastPerson.id,
+        name: data?.name || "Test Expense",
+        amount: (data?.amount || 1000).toString(),
+        frequency: data?.frequency || "monthly",
+        category: data?.category || "living",
+        isFixed: data?.isFixed || false,
+        startDate: data?.startDate || null,
+        endDate: data?.endDate || null,
+        isActive: data?.isActive ?? true,
+      })
+      .returning();
+
+    if (!lastPerson.expenses) lastPerson.expenses = [];
+    lastPerson.expenses.push(expense);
+
+    return this;
+  }
+
+  /**
+   * Add a savings account to the last added person
+   */
+  async addSavingsAccount(data?: {
+    name?: string;
+    currentBalance?: number;
+    interestRate?: number;
+    accountType?: string;
+  }): Promise<TestDataBuilder> {
+    const lastPerson = this.persons[this.persons.length - 1];
+    if (!lastPerson) {
+      throw new Error("Must add a person before adding savings account");
+    }
+
+    // Insert into database using actual schema
+    const [savingsAccount] = await db
+      .insert(savingsAccounts)
+      .values({
+        personId: lastPerson.id,
+        name: data?.name || "Test Savings",
+        currentBalance: (data?.currentBalance || 10000).toString(),
+        interestRate: data?.interestRate
+          ? data.interestRate.toString()
+          : "0.02",
+        accountType: data?.accountType || "savings",
+      })
+      .returning();
+
+    if (!lastPerson.savingsAccounts) lastPerson.savingsAccounts = [];
+    lastPerson.savingsAccounts.push(savingsAccount);
+
+    return this;
+  }
+
+  /**
+   * Add a loan to the last added person
+   */
+  async addLoan(data?: {
+    name?: string;
+    originalAmount?: number;
+    currentBalance?: number;
+    interestRate?: number;
+    monthlyPayment?: number;
+    loanType?: string;
+    startDate?: Date;
+    endDate?: Date;
+  }): Promise<TestDataBuilder> {
+    const lastPerson = this.persons[this.persons.length - 1];
+    if (!lastPerson) {
+      throw new Error("Must add a person before adding loan");
+    }
+
+    const originalAmount = data?.originalAmount || 25000;
+    const currentBalance = data?.currentBalance || originalAmount;
+    const interestRate = data?.interestRate || 0.05;
+    const monthlyPayment = data?.monthlyPayment || originalAmount * 0.01; // Default to 1% of original
+
+    // Insert into database using actual schema
+    const [loan] = await db
+      .insert(loans)
+      .values({
+        personId: lastPerson.id,
+        name: data?.name || "Test Loan",
+        originalAmount: originalAmount.toString(),
+        currentBalance: currentBalance.toString(),
+        interestRate: interestRate.toString(),
+        monthlyPayment: monthlyPayment.toString(),
+        loanType: data?.loanType || "personal",
+        startDate: data?.startDate || new Date(),
+        endDate: data?.endDate || null,
+      })
+      .returning();
+
+    if (!lastPerson.loans) lastPerson.loans = [];
+    lastPerson.loans.push(loan);
+
+    return this;
+  }
+
+  /**
+   * Get the built user with all their data
+   */
+  build(): TestUser & { persons: TestPerson[] } {
+    if (!this.user) {
+      throw new Error("Must create a user first");
+    }
+
+    return {
+      ...this.user,
+      persons: this.persons,
+    };
+  }
+
+  /**
+   * Get just the user data without persons
+   */
+  getUser(): TestUser {
+    if (!this.user) {
+      throw new Error("Must create a user first");
+    }
+    return this.user;
+  }
+
+  /**
+   * Get the persons array
+   */
+  getPersons(): TestPerson[] {
+    return this.persons;
+  }
+}
+
 /**
  * Clean up all test data (users, sessions, households, persons)
  */
@@ -103,18 +396,15 @@ export async function cleanupTestData() {
 }
 
 /**
- * Setup test data for integration tests
+ * Setup basic test users for integration tests (without any entities)
  */
 export async function setupTestUsers() {
   // Create two test users for cross-user testing
-  const user1 = await createTestUser("TestUser1");
-  const user2 = await createTestUser("TestUser2");
+  const user1 = await TestDataBuilder.createUser("TestUser1");
+  const user2 = await TestDataBuilder.createUser("TestUser2");
 
-  // Create some test persons for each user
-  await createTestPerson(user1.householdId, "John User1", 30);
-  await createTestPerson(user1.householdId, "Jane User1", 28);
-  await createTestPerson(user2.householdId, "Bob User2", 35);
-  await createTestPerson(user2.householdId, "Alice User2", 32);
-
-  return { user1, user2 };
+  return {
+    user1: user1.getUser(),
+    user2: user2.getUser(),
+  };
 }
