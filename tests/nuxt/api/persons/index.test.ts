@@ -3,6 +3,7 @@ import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import {
   TestDataBuilder,
   cleanupTestData,
+  authenticatedFetch,
   type TestUser,
 } from "../../utils/test-data";
 
@@ -66,11 +67,10 @@ describe("/api/persons integration tests", async () => {
 
     it("should only return persons from authenticated user household", async () => {
       // Make request as user1 using session cookie
-      const user1Persons = await $fetch<Person[]>("/api/persons", {
-        headers: {
-          cookie: `better-auth.session_token=${testUsers.user1.sessionCookie}`,
-        },
-      });
+      const user1Persons = await authenticatedFetch<Person[]>(
+        testUsers.user1,
+        "/api/persons"
+      );
 
       // Should only get user1's persons, not user2's
       expect(user1Persons).toHaveLength(2);
@@ -92,18 +92,16 @@ describe("/api/persons integration tests", async () => {
 
     it("should return different persons for different users", async () => {
       // Get persons for user1
-      const user1Persons = await $fetch<Person[]>("/api/persons", {
-        headers: {
-          cookie: `better-auth.session_token=${testUsers.user1.sessionCookie}`,
-        },
-      });
+      const user1Persons = await authenticatedFetch<Person[]>(
+        testUsers.user1,
+        "/api/persons"
+      );
 
       // Get persons for user2
-      const user2Persons = await $fetch<Person[]>("/api/persons", {
-        headers: {
-          cookie: `better-auth.session_token=${testUsers.user2.sessionCookie}`,
-        },
-      }); // Verify each user gets different data
+      const user2Persons = await authenticatedFetch<Person[]>(
+        testUsers.user2,
+        "/api/persons"
+      ); // Verify each user gets different data
       expect(user1Persons).toHaveLength(2);
       expect(user2Persons).toHaveLength(2);
 
@@ -118,13 +116,20 @@ describe("/api/persons integration tests", async () => {
     });
 
     it("should return empty array when user has no persons", async () => {
-      // TODO: Create a user with no persons
-      // const emptyUserPersons = await $fetch('/api/persons', {
-      //   headers: {
-      //     Authorization: `Bearer empty-user-token`
-      //   }
-      // })
-      // expect(emptyUserPersons).toEqual([])
+      // Create a user with no persons (just the basic user)
+      const emptyUser = await TestDataBuilder.createUser("EmptyUser").then(
+        (b) => b.getUser()
+      );
+
+      // Make request as this user
+      const emptyUserPersons = await authenticatedFetch<Person[]>(
+        emptyUser,
+        "/api/persons"
+      );
+
+      // Should get empty array
+      expect(emptyUserPersons).toEqual([]);
+      expect(emptyUserPersons).toHaveLength(0);
     });
   });
 
@@ -150,11 +155,8 @@ describe("/api/persons integration tests", async () => {
     it("should prevent creating person in another users household", async () => {
       // Try to create person in user2's household while authenticated as user1
       try {
-        await $fetch("/api/persons", {
+        await authenticatedFetch(testUsers.user1, "/api/persons", {
           method: "POST",
-          headers: {
-            cookie: `better-auth.session_token=${testUsers.user1.sessionCookie}`,
-          },
           body: {
             name: "Malicious Person",
             age: 25,
@@ -172,17 +174,18 @@ describe("/api/persons integration tests", async () => {
     });
 
     it("should allow creating person in own household", async () => {
-      const newPerson = await $fetch<Person>("/api/persons", {
-        method: "POST",
-        headers: {
-          cookie: `better-auth.session_token=${testUsers.user1.sessionCookie}`,
-        },
-        body: {
-          name: "New Person",
-          age: 30,
-          household_id: testUsers.user1.householdId,
-        },
-      });
+      const newPerson = await authenticatedFetch<Person>(
+        testUsers.user1,
+        "/api/persons",
+        {
+          method: "POST",
+          body: {
+            name: "New Person",
+            age: 30,
+            household_id: testUsers.user1.householdId,
+          },
+        }
+      );
 
       expect(newPerson).toMatchObject({
         name: "New Person",

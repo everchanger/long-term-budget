@@ -1,5 +1,6 @@
 import { like, eq } from "drizzle-orm";
 import { randomBytes } from "crypto";
+import { $fetch } from "@nuxt/test-utils/e2e";
 import {
   users,
   households,
@@ -407,4 +408,25 @@ export async function setupTestUsers() {
     user1: user1.getUser(),
     user2: user2.getUser(),
   };
+}
+
+/**
+ * Authenticated $fetch wrapper that automatically includes session cookie
+ * @param user - TestUser with sessionCookie for authentication
+ * @param url - API endpoint to call
+ * @param options - Additional fetch options (method, body, etc.)
+ * @returns Promise with the API response
+ */
+export async function authenticatedFetch<T = unknown>(
+  user: TestUser,
+  url: string,
+  options: Parameters<typeof $fetch>[1] = {}
+): Promise<T> {
+  return $fetch<T>(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      cookie: `better-auth.session_token=${user.sessionCookie}`,
+    },
+  });
 }

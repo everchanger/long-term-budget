@@ -30,6 +30,23 @@ const user = await TestDataBuilder
 console.log(user.sessionCookie); // For authentication in API tests
 ```
 
+#### Making Authenticated API Calls
+```typescript
+import { authenticatedFetch } from '../utils/test-data';
+
+const user = await TestDataBuilder.createUser("ApiTestUser")
+  .then(b => b.getUser());
+
+// GET request
+const persons = await authenticatedFetch<Person[]>(user, "/api/persons");
+
+// POST request
+const newPerson = await authenticatedFetch<Person>(user, "/api/persons", {
+  method: "POST",
+  body: { name: "Test Person", age: 25, household_id: user.householdId }
+});
+```
+
 ### Financial Instruments
 
 All financial instruments are inserted into the actual database with proper foreign key relationships.
@@ -331,4 +348,5 @@ All methods return promises and can be chained with `.then()` for sequential ope
 - `cleanupTestData()` - Remove all test data from database (use in afterAll)
 - `createTestUser(name)` - Create single authenticated user
 - `createTestPerson(householdId, name, age)` - Create single person
+- `authenticatedFetch<T>(user, url, options?)` - Wrapper around $fetch that automatically includes session cookie for authentication
 
