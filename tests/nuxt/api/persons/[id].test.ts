@@ -5,15 +5,11 @@ import {
   cleanupTestData,
   authenticatedFetch,
   type TestUser,
+  type TestPerson,
 } from "../../utils/test-data";
 
-interface Person {
-  id: number;
-  name: string;
-  age: number | null;
-  householdId: number;
-  createdAt: string | Date;
-}
+// Use proper Drizzle-inferred person type
+type Person = TestPerson;
 
 interface FetchError {
   status: number;

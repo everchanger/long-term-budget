@@ -11,12 +11,11 @@ export default defineEventHandler(async (event) => {
     const session = await auth.api.getSession({
       headers: event.headers,
     });
-
+    
     // Add session to event context so API routes can access it
     event.context.session = session;
-  } catch (error) {
-    // Log the error but don't throw - let individual routes handle auth requirements
-    console.error("Session middleware error:", error);
+  } catch {
+    // Log the error but don't throw - let individual routes handle auth requirements  
     event.context.session = null;
   }
 });

@@ -1,4 +1,4 @@
-import { like, eq } from "drizzle-orm";
+import { like, eq, type InferSelectModel } from "drizzle-orm";
 import { randomBytes } from "crypto";
 import { $fetch } from "@nuxt/test-utils/e2e";
 import {
@@ -13,10 +13,13 @@ import {
 import { db } from "../../../server/utils/drizzle";
 import { auth } from "../../../lib/auth";
 
-export interface TestUser {
-  id: string;
-  name: string;
-  email: string;
+// Infer types from Drizzle schemas
+type User = InferSelectModel<typeof users>;
+type Person = InferSelectModel<typeof persons>;
+
+// Extended test user type that includes session cookie and household reference
+export interface TestUser
+  extends Omit<User, "emailVerified" | "image" | "updatedAt"> {
   sessionCookie: string;
   householdId: number;
 }
@@ -46,13 +49,21 @@ export async function createTestUser(name: string): Promise<TestUser> {
       throw new Error("Failed to create user with Better Auth API");
     }
 
-    const sessionCookie = headers
-      .get("set-cookie")
-      ?.split("; ")?.[0]
-      ?.split("=")?.[1];
+    // Extract session cookie from set-cookie header
+    const setCookieHeader = headers.get("set-cookie");
+
+    if (!setCookieHeader) {
+      throw new Error("No set-cookie header returned after sign-up");
+    }
+
+    // Parse the session cookie (Better Auth typically uses 'better-auth.session_token')
+    const sessionCookieMatch = setCookieHeader.match(
+      /better-auth\.session_token=([^;]+)/
+    );
+    const sessionCookie = sessionCookieMatch?.[1];
 
     if (!sessionCookie) {
-      throw new Error("No session cookie returned after sign-up");
+      throw new Error("No session cookie found in set-cookie header");
     }
 
     // Get the household that was created by the auth hook
@@ -70,6 +81,7 @@ export async function createTestUser(name: string): Promise<TestUser> {
       id: signUpResponse.user.id,
       name: signUpResponse.user.name,
       email: signUpResponse.user.email,
+      createdAt: signUpResponse.user.createdAt,
       householdId: userHouseholds[0].id,
       sessionCookie: sessionCookie,
     };
@@ -99,59 +111,17 @@ export async function createTestPerson(
   return person;
 }
 
-// Type for person with optional financial data (using actual DB types)
-type TestPerson = {
-  id: number;
-  name: string;
-  age: number | null;
-  householdId: number;
-  createdAt: Date;
-  incomeSources?: Array<{
-    id: number;
-    personId: number;
-    name: string;
-    amount: string;
-    frequency: string;
-    startDate: Date | null;
-    endDate: Date | null;
-    isActive: boolean;
-    createdAt: Date;
-  }>;
-  expenses?: Array<{
-    id: number;
-    personId: number;
-    name: string;
-    amount: string;
-    frequency: string;
-    category: string | null;
-    isFixed: boolean;
-    startDate: Date | null;
-    endDate: Date | null;
-    isActive: boolean;
-    createdAt: Date;
-  }>;
-  savingsAccounts?: Array<{
-    id: number;
-    personId: number;
-    name: string;
-    currentBalance: string;
-    interestRate: string | null;
-    accountType: string | null;
-    createdAt: Date;
-  }>;
-  loans?: Array<{
-    id: number;
-    personId: number;
-    name: string;
-    originalAmount: string;
-    currentBalance: string;
-    interestRate: string;
-    monthlyPayment: string;
-    loanType: string | null;
-    startDate: Date;
-    endDate: Date | null;
-    createdAt: Date;
-  }>;
+// Type for person with optional financial data using Drizzle inferred types
+type IncomeSource = InferSelectModel<typeof incomeSources>;
+type Expense = InferSelectModel<typeof expenses>;
+type SavingsAccount = InferSelectModel<typeof savingsAccounts>;
+type Loan = InferSelectModel<typeof loans>;
+
+export type TestPerson = Person & {
+  incomeSources?: IncomeSource[];
+  expenses?: Expense[];
+  savingsAccounts?: SavingsAccount[];
+  loans?: Loan[];
 };
 
 /**
@@ -422,11 +392,13 @@ export async function authenticatedFetch<T = unknown>(
   url: string,
   options: Parameters<typeof $fetch>[1] = {}
 ): Promise<T> {
+  const cookieHeader = `better-auth.session_token=${user.sessionCookie}`;
+
   return $fetch<T>(url, {
     ...options,
     headers: {
       ...options.headers,
-      cookie: `better-auth.session_token=${user.sessionCookie}`,
+      cookie: cookieHeader,
     },
   });
 }

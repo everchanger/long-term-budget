@@ -22,15 +22,41 @@ async function setupTestDatabase() {
 
     // Drop test database if it exists
     try {
+      // First, terminate any active connections to the test database
+      await adminClient.query(`
+        SELECT pg_terminate_backend(pid)
+        FROM pg_stat_activity
+        WHERE datname = '${TEST_DB_NAME}' AND pid <> pg_backend_pid()
+      `);
+      console.log('🔌 Terminated active connections to test database');
+      
       await adminClient.query(`DROP DATABASE IF EXISTS "${TEST_DB_NAME}"`);
       console.log('🗑️  Dropped existing test database (if any)');
     } catch (error) {
-      console.log('ℹ️  No existing test database to drop');
+      console.log('ℹ️  Error dropping test database:', error.message);
+      // Continue anyway, maybe the database doesn't exist
     }
 
     // Create fresh test database
-    await adminClient.query(`CREATE DATABASE "${TEST_DB_NAME}"`);
-    console.log(`✅ Created test database: ${TEST_DB_NAME}`);
+    try {
+      await adminClient.query(`CREATE DATABASE "${TEST_DB_NAME}"`);
+      console.log(`✅ Created test database: ${TEST_DB_NAME}`);
+    } catch (error) {
+      if (error.code === '42P04') {
+        console.log('⚠️  Database already exists, trying to drop with force...');
+        // Force drop with active connection termination
+        await adminClient.query(`
+          SELECT pg_terminate_backend(pid)
+          FROM pg_stat_activity
+          WHERE datname = '${TEST_DB_NAME}' AND pid <> pg_backend_pid()
+        `);
+        await adminClient.query(`DROP DATABASE "${TEST_DB_NAME}"`);
+        await adminClient.query(`CREATE DATABASE "${TEST_DB_NAME}"`);
+        console.log(`✅ Force-created test database: ${TEST_DB_NAME}`);
+      } else {
+        throw error;
+      }
+    }
 
   } catch (error) {
     console.error('❌ Failed to setup test database:', error);
