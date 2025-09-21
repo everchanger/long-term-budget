@@ -281,18 +281,6 @@ const response = await $fetch("/api/persons", {
 });
 ```
 
-## Data Cleanup
-
-Always clean up test data after tests:
-
-```typescript
-import { cleanupTestData } from '../utils/test-data';
-
-afterAll(async () => {
-  await cleanupTestData();
-});
-```
-
 ## Database Integration
 
 - **Real Database Inserts**: All data is inserted into the test database using Drizzle ORM
@@ -324,7 +312,6 @@ await TestDataBuilder
 
 1. **Use specific names** for test users to make debugging easier
 2. **Create minimal data** - only add what your specific test needs  
-3. **Clean up after tests** - use `cleanupTestData()` in `afterAll`
 4. **Use real values** - amounts, dates, etc. that make sense for your test scenarios
 5. **Chain operations** - build complex test data step by step with the fluent API
 
@@ -345,7 +332,6 @@ The chainable API for creating test data:
 All methods return promises and can be chained with `.then()` for sequential operations.
 
 ### Utility Functions
-- `cleanupTestData()` - Remove all test data from database (use in afterAll)
 - `createTestUser(name)` - Create single authenticated user
 - `createTestPerson(householdId, name, age)` - Create single person
 - `authenticatedFetch<T>(user, url, options?)` - Wrapper around $fetch that automatically includes session cookie for authentication

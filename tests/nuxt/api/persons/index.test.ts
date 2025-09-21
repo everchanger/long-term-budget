@@ -2,7 +2,6 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import {
   TestDataBuilder,
-  cleanupTestData,
   authenticatedFetch,
   type TestUser,
 } from "../../utils/test-data";
@@ -46,11 +45,6 @@ describe("/api/persons integration tests", async () => {
       user1: user1.build(),
       user2: user2.build(),
     };
-  });
-
-  afterAll(async () => {
-    // Clean up test data after all tests
-    await cleanupTestData();
   });
 
   describe("GET /api/persons", () => {
