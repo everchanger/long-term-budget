@@ -1,15 +1,6 @@
-import { auth } from "~~/lib/auth";
-
 export default defineEventHandler(async (event) => {
-  // Get session for authorization
-  console.log("event", event, JSON.stringify(event));
-  console.log("Headers:", event.headers, JSON.stringify(event.headers));
-
-  const session = await auth.api.getSession({
-    headers: event.headers,
-  });
-
-  console.log("Session:", session, session?.user?.id);
+  // Get session from middleware
+  const session = event.context.session;
 
   if (!session?.user?.id) {
     throw createError({
