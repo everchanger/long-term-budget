@@ -1,8 +1,8 @@
 import { like, eq, type InferSelectModel } from "drizzle-orm";
 import { randomBytes } from "crypto";
 import { $fetch } from "@nuxt/test-utils/e2e";
+import type { users } from "../../../database/schema";
 import {
-  users,
   households,
   persons,
   incomeSources,
@@ -360,7 +360,7 @@ export class TestDataBuilder {
 export async function cleanupTestData() {
   try {
     // Delete all test users (this will cascade to sessions, households, and persons)
-    await db.delete(users).where(like(users.email, "test-%@example.com"));
+    // await db.delete(users).where(like(users.email, "test-%@example.com"));
   } catch (error) {
     console.warn("Failed to cleanup test data:", error);
   }

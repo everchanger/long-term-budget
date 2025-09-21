@@ -24,7 +24,7 @@ interface FetchError {
 describe("/api/persons integration tests", async () => {
   await setup({
     // Can add any specific test config here
-    host: `http://localhost:${process.env.NUXT_DEVSERVER_PORT || 3000}`,
+    host: `http://localhost:${process.env.NUXT_DEVSERVER_PORT || 5000}`,
   });
 
   let testUsers: {

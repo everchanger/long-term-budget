@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { $fetch } from "@nuxt/test-utils/e2e";
+import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import {
   TestDataBuilder,
   cleanupTestData,
@@ -18,6 +18,10 @@ interface FetchError {
 }
 
 describe("/api/persons/[id] integration tests", async () => {
+  await setup({
+    // Can add any specific test config here
+    host: `http://localhost:${process.env.NUXT_DEVSERVER_PORT || 5000}`,
+  });
   let testUsers: {
     user1: TestUser & { persons: Person[] };
     user2: TestUser & { persons: Person[] };
