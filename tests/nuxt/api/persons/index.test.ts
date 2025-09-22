@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import {
   TestDataBuilder,
