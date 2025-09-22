@@ -1,11 +1,8 @@
-import { auth } from "~~/lib/auth";
 import { verifyPersonAccess } from "@s/utils/authorization";
 
 export default defineEventHandler(async (event) => {
-  // Get session from Better Auth
-  const session = await auth.api.getSession({
-    headers: event.headers,
-  });
+  // Get session from middleware
+  const session = event.context.session;
 
   if (!session?.user?.id) {
     throw createError({
@@ -23,13 +20,22 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // Validate that ID is a valid integer
+  const incomeSourceId = parseInt(id);
+  if (isNaN(incomeSourceId)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Income source ID is required",
+    });
+  }
+
   const db = useDrizzle();
 
   // First get the income source to check which person it belongs to
   const [existingIncomeSource] = await db
     .select()
     .from(tables.incomeSources)
-    .where(eq(tables.incomeSources.id, parseInt(id)))
+    .where(eq(tables.incomeSources.id, incomeSourceId))
     .limit(1);
 
   if (!existingIncomeSource) {
@@ -53,68 +59,65 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  try {
-    if (event.node.req.method === "PUT") {
-      // Update income source
-      const body = await readBody(event);
-      const { name, amount, frequency, start_date, end_date, is_active } = body;
-
-      if (!name || !amount || !frequency) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Name, amount, and frequency are required",
-        });
-      }
-
-      const [updatedIncomeSource] = await db
-        .update(tables.incomeSources)
-        .set({
-          name,
-          amount: amount.toString(),
-          frequency,
-          startDate: start_date ? new Date(start_date) : null,
-          endDate: end_date ? new Date(end_date) : null,
-          isActive: is_active ?? true,
-        })
-        .where(eq(tables.incomeSources.id, parseInt(id)))
-        .returning();
-
-      if (!updatedIncomeSource) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: "Income source not found",
-        });
-      }
-
-      return updatedIncomeSource;
-    }
-
-    if (event.node.req.method === "DELETE") {
-      // Delete income source
-      const [deletedIncomeSource] = await db
-        .delete(tables.incomeSources)
-        .where(eq(tables.incomeSources.id, parseInt(id)))
-        .returning();
-
-      if (!deletedIncomeSource) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: "Income source not found",
-        });
-      }
-
-      return { message: "Income source deleted successfully" };
-    }
-
-    throw createError({
-      statusCode: 405,
-      statusMessage: "Method not allowed",
-    });
-  } catch (error) {
-    console.error("Income source API error:", error);
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Internal server error",
-    });
+  if (event.node.req.method === "GET") {
+    // Return the income source
+    return existingIncomeSource;
   }
+
+  if (event.node.req.method === "PUT") {
+    // Update income source
+    const body = await readBody(event);
+    const { name, amount, frequency, start_date, end_date, is_active } = body;
+
+    if (!name || !amount || !frequency) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Name, amount, and frequency are required",
+      });
+    }
+
+    const [updatedIncomeSource] = await db
+      .update(tables.incomeSources)
+      .set({
+        name,
+        amount: amount.toString(),
+        frequency,
+        startDate: start_date ? new Date(start_date) : null,
+        endDate: end_date ? new Date(end_date) : null,
+        isActive: is_active ?? true,
+      })
+      .where(eq(tables.incomeSources.id, incomeSourceId))
+      .returning();
+
+    if (!updatedIncomeSource) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Income source not found",
+      });
+    }
+
+    return updatedIncomeSource;
+  }
+
+  if (event.node.req.method === "DELETE") {
+    // Delete income source
+    const [deletedIncomeSource] = await db
+      .delete(tables.incomeSources)
+      .where(eq(tables.incomeSources.id, incomeSourceId))
+      .returning();
+
+    if (!deletedIncomeSource) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Income source not found",
+      });
+    }
+
+    return { message: "Income source deleted successfully" };
+  }
+
+  throw createError({
+    statusCode: 405,
+    statusMessage: "Method not allowed",
+  });
 });
