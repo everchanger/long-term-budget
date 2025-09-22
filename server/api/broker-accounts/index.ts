@@ -1,67 +1,73 @@
-import { auth } from "~~/lib/auth";
-import { verifyPersonAccess, getUserPersons } from "@s/utils/authorization";
-
 export default defineEventHandler(async (event) => {
-  try {
-    // Get session from Better Auth
-    const session = await auth.api.getSession({
-      headers: event.headers,
+  const session = event.context.session;
+
+  if (!session?.user?.id) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+      message: "You must be logged in to access broker accounts",
     });
+  }
 
-    if (!session?.user?.id) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: "Unauthorized",
-      });
-    }
+  const method = getMethod(event);
+  const db = useDrizzle();
 
-    const method = getMethod(event);
-
+  try {
     if (method === "GET") {
       const query = getQuery(event);
       const personId = query.personId as string;
 
       if (personId) {
         // Get broker accounts for specific person with authorization
-        const authorizedPerson = await verifyPersonAccess(
-          parseInt(personId),
-          session.user.id
-        );
-
-        if (!authorizedPerson) {
-          throw createError({
-            statusCode: 403,
-            statusMessage:
-              "Access denied: Person does not belong to your household",
-          });
-        }
-
-        const db = useDrizzle();
-
         const result = await db
-          .select()
+          .select({
+            id: tables.brokerAccounts.id,
+            name: tables.brokerAccounts.name,
+            brokerName: tables.brokerAccounts.brokerName,
+            accountType: tables.brokerAccounts.accountType,
+            currentValue: tables.brokerAccounts.currentValue,
+            personId: tables.brokerAccounts.personId,
+            createdAt: tables.brokerAccounts.createdAt,
+          })
           .from(tables.brokerAccounts)
-          .where(eq(tables.brokerAccounts.personId, parseInt(personId)));
+          .innerJoin(
+            tables.persons,
+            eq(tables.brokerAccounts.personId, tables.persons.id)
+          )
+          .innerJoin(
+            tables.households,
+            eq(tables.persons.householdId, tables.households.id)
+          )
+          .where(
+            and(
+              eq(tables.brokerAccounts.personId, parseInt(personId)),
+              eq(tables.households.userId, session.user.id)
+            )
+          );
 
         return result;
       } else {
         // Get all broker accounts for all persons in the user's household
-        const userPersons = await getUserPersons(session.user.id);
-
-        if (userPersons.length === 0) {
-          return [];
-        }
-
-        const db = useDrizzle();
-        const personIds = userPersons.map((p) => p.id);
         const result = await db
-          .select()
+          .select({
+            id: tables.brokerAccounts.id,
+            name: tables.brokerAccounts.name,
+            brokerName: tables.brokerAccounts.brokerName,
+            accountType: tables.brokerAccounts.accountType,
+            currentValue: tables.brokerAccounts.currentValue,
+            personId: tables.brokerAccounts.personId,
+            createdAt: tables.brokerAccounts.createdAt,
+          })
           .from(tables.brokerAccounts)
-          .where(
-            personIds.length === 1
-              ? eq(tables.brokerAccounts.personId, personIds[0])
-              : inArray(tables.brokerAccounts.personId, personIds)
-          );
+          .innerJoin(
+            tables.persons,
+            eq(tables.brokerAccounts.personId, tables.persons.id)
+          )
+          .innerJoin(
+            tables.households,
+            eq(tables.persons.householdId, tables.households.id)
+          )
+          .where(eq(tables.households.userId, session.user.id));
 
         return result;
       }
@@ -74,25 +80,34 @@ export default defineEventHandler(async (event) => {
       if (!name || !currentValue || !personId) {
         throw createError({
           statusCode: 400,
-          statusMessage: "Missing required fields",
+          statusMessage: "Bad Request",
+          message:
+            "Missing required fields: name, currentValue, and personId are required",
         });
       }
 
       // Verify that the person belongs to the authenticated user's household
-      const authorizedPerson = await verifyPersonAccess(
-        parseInt(personId),
-        session.user.id
-      );
+      const [authorizedPerson] = await db
+        .select({ id: tables.persons.id })
+        .from(tables.persons)
+        .innerJoin(
+          tables.households,
+          eq(tables.persons.householdId, tables.households.id)
+        )
+        .where(
+          and(
+            eq(tables.persons.id, parseInt(personId)),
+            eq(tables.households.userId, session.user.id)
+          )
+        );
 
       if (!authorizedPerson) {
         throw createError({
           statusCode: 403,
-          statusMessage:
-            "Access denied: Person does not belong to your household",
+          statusMessage: "Forbidden",
+          message: "Access denied: Person does not belong to your household",
         });
       }
-
-      const db = useDrizzle();
 
       const result = await db
         .insert(tables.brokerAccounts)

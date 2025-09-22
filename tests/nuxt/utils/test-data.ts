@@ -9,6 +9,7 @@ import {
   expenses,
   savingsAccounts,
   loans,
+  brokerAccounts,
 } from "../../../database/schema";
 import { db } from "../../../server/utils/drizzle";
 import { auth } from "../../../lib/auth";
@@ -116,12 +117,14 @@ type IncomeSource = InferSelectModel<typeof incomeSources>;
 type Expense = InferSelectModel<typeof expenses>;
 type SavingsAccount = InferSelectModel<typeof savingsAccounts>;
 type Loan = InferSelectModel<typeof loans>;
+type BrokerAccount = InferSelectModel<typeof brokerAccounts>;
 
 export type TestPerson = Person & {
   incomeSources?: IncomeSource[];
   expenses?: Expense[];
   savingsAccounts?: SavingsAccount[];
   loans?: Loan[];
+  brokerAccounts?: BrokerAccount[];
 };
 
 /**
@@ -318,6 +321,38 @@ export class TestDataBuilder {
 
     if (!lastPerson.loans) lastPerson.loans = [];
     lastPerson.loans.push(loan);
+
+    return this;
+  }
+
+  /**
+   * Add a broker account to the last added person
+   */
+  async addBrokerAccount(data?: {
+    name?: string;
+    brokerName?: string;
+    accountType?: string;
+    currentValue?: number;
+  }): Promise<TestDataBuilder> {
+    const lastPerson = this.persons[this.persons.length - 1];
+    if (!lastPerson) {
+      throw new Error("Must add a person before adding broker account");
+    }
+
+    // Insert into database using actual schema
+    const [brokerAccount] = await db
+      .insert(brokerAccounts)
+      .values({
+        personId: lastPerson.id,
+        name: data?.name || "Test Broker Account",
+        brokerName: data?.brokerName || "Test Broker",
+        accountType: data?.accountType || "investment",
+        currentValue: (data?.currentValue || 50000).toString(),
+      })
+      .returning();
+
+    if (!lastPerson.brokerAccounts) lastPerson.brokerAccounts = [];
+    lastPerson.brokerAccounts.push(brokerAccount);
 
     return this;
   }
