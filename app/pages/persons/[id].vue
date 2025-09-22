@@ -12,8 +12,8 @@
         <UIcon name="i-heroicons-exclamation-triangle" class="mx-auto h-16 w-16 text-red-400 mb-4" />
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Person Not Found</h3>
         <p class="text-gray-600 dark:text-gray-400 mb-4">The person you're looking for doesn't exist.</p>
-        <UButton to="/households" icon="i-heroicons-arrow-left">
-          Back to Household
+        <UButton to="/economy" icon="i-heroicons-arrow-left">
+          Back to Economy
         </UButton>
       </UCard>
     </div>
@@ -24,8 +24,8 @@
       <div class="mb-8">
         <div class="flex items-center justify-between">
           <div>
-            <UButton to="/households" variant="ghost" icon="i-heroicons-arrow-left" class="mb-4">
-              Back to Household
+            <UButton to="/economy" variant="ghost" icon="i-heroicons-arrow-left" class="mb-4">
+              Back to Economy
             </UButton>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ person.name }}</h1>
             <p class="text-gray-600 dark:text-gray-400">

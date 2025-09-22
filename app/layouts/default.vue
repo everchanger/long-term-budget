@@ -24,10 +24,9 @@
               active-class="text-blue-600 dark:text-blue-400">
               Dashboard
             </NuxtLink>
-            <NuxtLink to="/households"
-              class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              active-class="text-blue-600 dark:text-blue-400">
-              Households
+            <NuxtLink to="/economy"
+              class="text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+              Economy
             </NuxtLink>
             <NuxtLink to="/scenarios"
               class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
@@ -93,10 +92,10 @@
               active-class="text-blue-600 dark:text-blue-400" @click="isMobileMenuOpen = false">
               Dashboard
             </NuxtLink>
-            <NuxtLink to="/households"
+            <NuxtLink to="/economy"
               class="block text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-base font-medium transition-colors"
               active-class="text-blue-600 dark:text-blue-400" @click="isMobileMenuOpen = false">
-              Households
+              Economy
             </NuxtLink>
             <NuxtLink to="/scenarios"
               class="block text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-base font-medium transition-colors"

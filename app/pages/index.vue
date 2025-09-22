@@ -24,18 +24,18 @@
 
     <!-- Features Grid -->
     <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-      <!-- Household Economics Card -->
+      <!-- Economy Card -->
       <UCard class="text-center border-0 bg-gray-50 dark:bg-gray-800/50">
         <template #header>
           <div class="bg-gray-100 dark:bg-gray-700 w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center">
             <UIcon name="i-heroicons-home" class="text-2xl text-gray-600 dark:text-gray-300" />
           </div>
           <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
-            Household Economics
+            Economy
           </h3>
         </template>
         <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
-          Model your household's complete financial picture including income, expenses, savings, and loans across all
+          Model your complete financial picture including income, expenses, savings, and loans across all
           family
           members.
         </p>
