@@ -1,4 +1,4 @@
-import { verifyPersonAccess, getUserPersons } from "@s/utils/authorization";
+import { getUserPersons } from "@s/utils/authorization";
 
 export default defineEventHandler(async (event) => {
   // Get session from middleware
@@ -20,12 +20,21 @@ export default defineEventHandler(async (event) => {
 
     if (personId) {
       // Verify person belongs to user's household
-      const authorizedPerson = await verifyPersonAccess(
-        parseInt(personId),
-        session.user.id
-      );
+      const [personExists] = await db
+        .select({ id: tables.persons.id })
+        .from(tables.persons)
+        .innerJoin(
+          tables.households,
+          eq(tables.persons.householdId, tables.households.id)
+        )
+        .where(
+          and(
+            eq(tables.persons.id, parseInt(personId)),
+            eq(tables.households.userId, session.user.id)
+          )
+        );
 
-      if (!authorizedPerson) {
+      if (!personExists) {
         throw createError({
           statusCode: 403,
           statusMessage:
@@ -83,12 +92,21 @@ export default defineEventHandler(async (event) => {
     }
 
     // Verify person belongs to user's household
-    const authorizedPerson = await verifyPersonAccess(
-      person_id,
-      session.user.id
-    );
+    const [personExists] = await db
+      .select({ id: tables.persons.id })
+      .from(tables.persons)
+      .innerJoin(
+        tables.households,
+        eq(tables.persons.householdId, tables.households.id)
+      )
+      .where(
+        and(
+          eq(tables.persons.id, person_id),
+          eq(tables.households.userId, session.user.id)
+        )
+      );
 
-    if (!authorizedPerson) {
+    if (!personExists) {
       throw createError({
         statusCode: 403,
         statusMessage:

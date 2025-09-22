@@ -1,11 +1,6 @@
-import { auth } from "~~/lib/auth";
-import { verifyPersonAccess } from "@s/utils/authorization";
-
 export default defineEventHandler(async (event) => {
-  // Get session from Better Auth
-  const session = await auth.api.getSession({
-    headers: event.headers,
-  });
+  // Get session from middleware
+  const session = event.context.session;
 
   if (!session?.user?.id) {
     throw createError({
@@ -22,29 +17,47 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // Validate that ID is a valid integer
+  const loanIdInt = parseInt(loanId);
+  if (isNaN(loanIdInt)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Loan ID is required",
+    });
+  }
+
   const db = useDrizzle();
 
-  // First get the loan to check which person it belongs to
-  const existingLoan = await db
+  // First get the loan to check if it exists
+  const [existingLoan] = await db
     .select()
     .from(tables.loans)
-    .where(eq(tables.loans.id, parseInt(loanId)))
+    .where(eq(tables.loans.id, loanIdInt))
     .limit(1);
 
-  if (existingLoan.length === 0) {
+  if (!existingLoan) {
     throw createError({
       statusCode: 404,
       statusMessage: "Loan not found",
     });
   }
 
-  // Verify that the loan's person belongs to the authenticated user's household
-  const authorizedPerson = await verifyPersonAccess(
-    existingLoan[0].personId,
-    session.user.id
-  );
+  // Then verify that the loan's person belongs to the authenticated user's household
+  const [personExists] = await db
+    .select({ id: tables.persons.id })
+    .from(tables.persons)
+    .innerJoin(
+      tables.households,
+      eq(tables.persons.householdId, tables.households.id)
+    )
+    .where(
+      and(
+        eq(tables.persons.id, existingLoan.personId),
+        eq(tables.households.userId, session.user.id)
+      )
+    );
 
-  if (!authorizedPerson) {
+  if (!personExists) {
     throw createError({
       statusCode: 403,
       statusMessage: "Access denied: Loan does not belong to your household",
@@ -52,6 +65,11 @@ export default defineEventHandler(async (event) => {
   }
 
   const method = getMethod(event);
+
+  if (method === "GET") {
+    // Return the loan
+    return existingLoan;
+  }
 
   if (method === "PUT") {
     const body = await readBody(event);
@@ -79,62 +97,45 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    try {
-      const result = await db
-        .update(tables.loans)
-        .set({
-          name,
-          originalAmount: originalAmount.toString(),
-          currentBalance: currentBalance.toString(),
-          interestRate: interestRate.toString(),
-          monthlyPayment: monthlyPayment.toString(),
-          loanType,
-          startDate: startDate ? new Date(startDate) : new Date(),
-          endDate: endDate ? new Date(endDate) : null,
-        })
-        .where(eq(tables.loans.id, parseInt(loanId)))
-        .returning();
+    const [updatedLoan] = await db
+      .update(tables.loans)
+      .set({
+        name,
+        originalAmount: originalAmount.toString(),
+        currentBalance: currentBalance.toString(),
+        interestRate: interestRate.toString(),
+        monthlyPayment: monthlyPayment.toString(),
+        loanType,
+        startDate: startDate ? new Date(startDate) : new Date(),
+        endDate: endDate ? new Date(endDate) : null,
+      })
+      .where(eq(tables.loans.id, loanIdInt))
+      .returning();
 
-      if (result.length === 0) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: "Loan not found",
-        });
-      }
-
-      return result[0];
-    } catch (error) {
-      console.error("Failed to update loan:", error);
+    if (!updatedLoan) {
       throw createError({
-        statusCode: 500,
-        statusMessage: "Failed to update loan",
+        statusCode: 404,
+        statusMessage: "Loan not found",
       });
     }
+
+    return updatedLoan;
   }
 
   if (method === "DELETE") {
-    try {
-      // TODO: Add authorization check to ensure loan belongs to user's household
-      const result = await db
-        .delete(tables.loans)
-        .where(eq(tables.loans.id, parseInt(loanId)))
-        .returning();
+    const [deletedLoan] = await db
+      .delete(tables.loans)
+      .where(eq(tables.loans.id, loanIdInt))
+      .returning();
 
-      if (result.length === 0) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: "Loan not found",
-        });
-      }
-
-      return { success: true };
-    } catch (error) {
-      console.error("Failed to delete loan:", error);
+    if (!deletedLoan) {
       throw createError({
-        statusCode: 500,
-        statusMessage: "Failed to delete loan",
+        statusCode: 404,
+        statusMessage: "Loan not found",
       });
     }
+
+    return { message: "Loan deleted successfully" };
   }
 
   throw createError({

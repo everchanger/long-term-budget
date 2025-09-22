@@ -1,5 +1,3 @@
-import { verifyPersonAccess } from "@s/utils/authorization";
-
 export default defineEventHandler(async (event) => {
   // Get session from middleware
   const session = event.context.session;
@@ -31,7 +29,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDrizzle();
 
-  // First get the income source to check which person it belongs to
+  // First get the income source to check if it exists
   const [existingIncomeSource] = await db
     .select()
     .from(tables.incomeSources)
@@ -45,13 +43,22 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Verify that the income source's person belongs to the authenticated user's household
-  const authorizedPerson = await verifyPersonAccess(
-    existingIncomeSource.personId,
-    session.user.id
-  );
+  // Then verify that the income source's person belongs to the authenticated user's household
+  const [personExists] = await db
+    .select({ id: tables.persons.id })
+    .from(tables.persons)
+    .innerJoin(
+      tables.households,
+      eq(tables.persons.householdId, tables.households.id)
+    )
+    .where(
+      and(
+        eq(tables.persons.id, existingIncomeSource.personId),
+        eq(tables.households.userId, session.user.id)
+      )
+    );
 
-  if (!authorizedPerson) {
+  if (!personExists) {
     throw createError({
       statusCode: 403,
       statusMessage:

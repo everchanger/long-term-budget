@@ -7,6 +7,7 @@ export interface AuthorizedPerson {
 
 /**
  * Verify that a person belongs to the authenticated user's household
+ * @deprecated Use direct database queries with household joins instead. Will be removed in future refactor.
  */
 export async function verifyPersonAccess(
   personId: number,
