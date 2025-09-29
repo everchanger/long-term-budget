@@ -53,7 +53,7 @@
             <UButton
               variant="soft"
               icon="i-heroicons-pencil"
-              @click="openEditPersonModal"
+              @click="() => openEditPersonModal(person || null)"
             >
               Edit
             </UButton>
@@ -487,12 +487,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  SelectIncomeSource,
-  SelectPerson,
-  SelectLoan,
-  SelectSavingsAccount,
-} from "~~/database/validation-schemas";
+import type { SelectPerson } from "~~/database/validation-schemas";
 
 // Route params
 const route = useRoute();
@@ -506,7 +501,6 @@ const {
 } = await useFetch<SelectPerson>(`/api/persons/${personId}`);
 
 // Financial tabs
-
 const financialTabs = [
   { value: "income", label: "Income Sources", icon: "i-heroicons-banknotes" },
   { value: "loans", label: "Loans & Debts", icon: "i-heroicons-credit-card" },
@@ -515,482 +509,68 @@ const financialTabs = [
 
 const selectedTab = ref(financialTabs[0]?.value);
 
-// Income sources
+// Use composables for financial data management
+const incomeSourcesComposable = useIncomeSources(personId);
+const loansComposable = useLoans(personId);
+const savingsAccountsComposable = useSavingsAccounts(personId);
+const personEditComposable = usePersonEdit(personId, refreshPerson);
+
+// Extract values from composables for template usage
 const {
-  data: incomeSources,
-  pending: incomeSourcesLoading,
-  refresh: refreshIncomeSources,
-} = await useFetch<SelectIncomeSource[]>("/api/income-sources", {
-  query: { personId },
-  default: () => [],
-});
+  incomeSources,
+  incomeSourcesLoading,
+  isIncomeModalOpen,
+  isIncomeSubmitting,
+  editingIncomeSource,
+  totalMonthlyIncome,
+  openIncomeModal,
+  closeIncomeModal,
+  editIncome,
+  handleIncomeSubmit,
+  deleteIncome,
+} = incomeSourcesComposable;
 
-// Loans
 const {
-  data: loans,
-  pending: loansLoading,
-  refresh: refreshLoans,
-} = await useFetch<SelectLoan[]>("/api/loans", {
-  query: { personId },
-  default: () => [],
-});
+  loans,
+  loansLoading,
+  isLoanModalOpen,
+  isLoanSubmitting,
+  editingLoan,
+  totalDebt,
+  openLoanModal,
+  closeLoanModal,
+  editLoan,
+  handleLoanSubmit,
+  deleteLoan,
+} = loansComposable;
 
-// Savings accounts
 const {
-  data: savingsAccounts,
-  pending: savingsLoading,
-  refresh: refreshSavings,
-} = await useFetch<SelectSavingsAccount[]>("/api/savings-accounts", {
-  query: { personId },
-  default: () => [],
-});
+  savingsAccounts,
+  savingsLoading,
+  isSavingsModalOpen,
+  isSavingsSubmitting,
+  editingSavings,
+  totalSavings,
+  openSavingsModal,
+  closeSavingsModal,
+  editSavings,
+  handleSavingsSubmit,
+  deleteSavings,
+} = savingsAccountsComposable;
 
-// Income form state
-const isIncomeModalOpen = ref(false);
-const isIncomeSubmitting = ref(false);
-const editingIncomeSource = ref<SelectIncomeSource | null>(null);
-const incomeFormState = reactive({
-  name: "",
-  amount: "",
-  frequency: "",
-});
+const {
+  isEditPersonModalOpen,
+  openEditPersonModal,
+  closeEditPersonModal,
+  handleEditPersonSubmit,
+} = personEditComposable;
 
-// Loans form state
-const isLoanModalOpen = ref(false);
-const isLoanSubmitting = ref(false);
-const editingLoan = ref<SelectLoan | null>(null);
-const loanFormState = reactive({
-  name: "",
-  amount: "",
-  interestRate: "",
-  monthlyPayment: "",
-  loanType: "",
-});
-
-// Savings form state
-const isSavingsModalOpen = ref(false);
-const isSavingsSubmitting = ref(false);
-const editingSavings = ref<SelectSavingsAccount | null>(null);
-const savingsFormState = reactive({
-  name: "",
-  balance: "",
-  interestRate: "",
-  accountType: "",
-});
-
-// Computed values
-const totalMonthlyIncome = computed(() => {
-  if (!incomeSources.value) return "0.00";
-  return incomeSources.value
-    .filter((income) => income.isActive)
-    .reduce((total, income) => {
-      const amount = parseFloat(income.amount);
-      switch (income.frequency) {
-        case "monthly":
-          return total + amount;
-        case "yearly":
-          return total + amount / 12;
-        case "weekly":
-          return total + amount * 4.33;
-        case "bi-weekly":
-          return total + amount * 2.17;
-        default:
-          return total;
-      }
-    }, 0)
-    .toFixed(2);
-});
-
-const totalSavings = computed(() => {
-  if (!savingsAccounts.value) return "0.00";
-  return savingsAccounts.value
-    .reduce(
-      (total, account) => total + parseFloat(account.currentBalance || "0"),
-      0
-    )
-    .toFixed(2);
-});
-
-const totalDebt = computed(() => {
-  if (!loans.value) return "0.00";
-  return loans.value
-    .reduce((total, loan) => total + parseFloat(loan.currentBalance || "0"), 0)
-    .toFixed(2);
-});
-
-const isIncomeFormValid = computed(() => {
-  return (
-    incomeFormState.name.trim() !== "" &&
-    incomeFormState.amount !== "" &&
-    parseFloat(incomeFormState.amount) > 0 &&
-    incomeFormState.frequency !== ""
-  );
-});
-
-const isSavingsFormValid = computed(() => {
-  return (
-    savingsFormState.name.trim() !== "" &&
-    savingsFormState.balance !== "" &&
-    parseFloat(savingsFormState.balance) >= 0
-  );
-});
-
-// Functions
+// Utility functions
 function formatDate(date: Date | string) {
   if (date instanceof Date) {
     return date.toLocaleDateString();
   }
   return new Date(date).toLocaleDateString();
-}
-
-function openIncomeModal() {
-  editingIncomeSource.value = null;
-  incomeFormState.name = "";
-  incomeFormState.amount = "";
-  incomeFormState.frequency = "";
-  isIncomeModalOpen.value = true;
-}
-
-function closeIncomeModal() {
-  isIncomeModalOpen.value = false;
-  editingIncomeSource.value = null;
-}
-
-function editIncome(income: SelectIncomeSource) {
-  editingIncomeSource.value = income;
-  incomeFormState.name = income.name;
-  incomeFormState.amount = income.amount;
-  incomeFormState.frequency = income.frequency;
-  isIncomeModalOpen.value = true;
-}
-
-async function handleIncomeSubmit() {
-  if (!isIncomeFormValid.value) return;
-
-  isIncomeSubmitting.value = true;
-
-  try {
-    const payload = {
-      name: incomeFormState.name.trim(),
-      amount: parseFloat(incomeFormState.amount),
-      frequency: incomeFormState.frequency,
-      person_id: parseInt(personId),
-      is_active: true,
-    };
-
-    if (editingIncomeSource.value) {
-      // Update existing income source
-      await $fetch(`/api/income-sources/${editingIncomeSource.value.id}`, {
-        method: "PUT",
-        body: payload,
-      });
-    } else {
-      // Create new income source
-      await $fetch("/api/income-sources", {
-        method: "POST",
-        body: payload,
-      });
-    }
-
-    await refreshIncomeSources();
-    closeIncomeModal();
-
-    // Show success notification
-    const toast = useToast();
-    toast.add({
-      title: editingIncomeSource.value
-        ? "Income source updated"
-        : "Income source added",
-      description: `${incomeFormState.name} has been ${
-        editingIncomeSource.value ? "updated" : "added"
-      } successfully.`,
-      color: "success",
-    });
-  } catch (error: unknown) {
-    const toast = useToast();
-    toast.add({
-      title: "Error",
-      description:
-        (error as { data?: { message?: string } }).data?.message ||
-        "An error occurred",
-      color: "error",
-    });
-  } finally {
-    isIncomeSubmitting.value = false;
-  }
-}
-
-async function deleteIncome(income: SelectIncomeSource) {
-  try {
-    await $fetch(`/api/income-sources/${income.id}`, {
-      method: "DELETE",
-    });
-
-    await refreshIncomeSources();
-
-    const toast = useToast();
-    toast.add({
-      title: "Income source deleted",
-      description: `${income.name} has been removed.`,
-      color: "success",
-    });
-  } catch (error: unknown) {
-    const toast = useToast();
-    toast.add({
-      title: "Error",
-      description:
-        (error as { data?: { message?: string } }).data?.message ||
-        "Failed to delete income source",
-      color: "error",
-    });
-  }
-}
-
-// Person editing modal state
-const isEditPersonModalOpen = ref(false);
-const editPersonFormState = reactive({
-  name: "",
-  age: null as number | null,
-});
-
-function openEditPersonModal() {
-  if (person.value) {
-    editPersonFormState.name = person.value.name;
-    editPersonFormState.age = person.value.age;
-    isEditPersonModalOpen.value = true;
-  }
-}
-
-function closeEditPersonModal() {
-  isEditPersonModalOpen.value = false;
-}
-
-async function handleEditPersonSubmit() {
-  if (!editPersonFormState.name.trim()) return;
-
-  try {
-    await $fetch(`/api/persons/${personId}`, {
-      method: "PUT",
-      body: {
-        name: editPersonFormState.name.trim(),
-        age: editPersonFormState.age,
-      },
-    });
-
-    // Refresh person data
-    await refreshPerson();
-
-    closeEditPersonModal();
-
-    const toast = useToast();
-    toast.add({
-      title: "Person updated",
-      description: `${editPersonFormState.name} has been updated successfully.`,
-      color: "success",
-    });
-  } catch (error: unknown) {
-    const toast = useToast();
-    toast.add({
-      title: "Error",
-      description:
-        (error as { data?: { message?: string } }).data?.message ||
-        "Failed to update person",
-      color: "error",
-    });
-  }
-}
-
-function openLoanModal() {
-  editingLoan.value = null;
-  loanFormState.name = "";
-  loanFormState.amount = "";
-  loanFormState.interestRate = "";
-  loanFormState.monthlyPayment = "";
-  loanFormState.loanType = "";
-  isLoanModalOpen.value = true;
-}
-
-function closeLoanModal() {
-  isLoanModalOpen.value = false;
-  editingLoan.value = null;
-}
-
-async function handleLoanSubmit() {
-  if (!loanFormState.name || !loanFormState.amount) return;
-
-  isLoanSubmitting.value = true;
-
-  try {
-    const payload = {
-      name: loanFormState.name.trim(),
-      originalAmount: parseFloat(loanFormState.amount),
-      currentBalance: parseFloat(loanFormState.amount),
-      interestRate: parseFloat(loanFormState.interestRate) || 0,
-      monthlyPayment: parseFloat(loanFormState.monthlyPayment) || 0,
-      loanType: loanFormState.loanType,
-      personId: parseInt(personId),
-    };
-
-    if (editingLoan.value) {
-      await $fetch(`/api/loans/${editingLoan.value.id}`, {
-        method: "PUT",
-        body: payload,
-      });
-    } else {
-      await $fetch("/api/loans", {
-        method: "POST",
-        body: payload,
-      });
-    }
-
-    await refreshLoans();
-    closeLoanModal();
-
-    const toast = useToast();
-    toast.add({
-      title: editingLoan.value ? "Loan updated" : "Loan added",
-      description: `${loanFormState.name} has been ${
-        editingLoan.value ? "updated" : "added"
-      } successfully.`,
-      color: "success",
-    });
-  } catch (error: unknown) {
-    const toast = useToast();
-    toast.add({
-      title: "Error",
-      description: error instanceof Error ? error.message : "An error occurred",
-      color: "error",
-    });
-  } finally {
-    isLoanSubmitting.value = false;
-  }
-}
-
-function openSavingsModal() {
-  editingSavings.value = null;
-  savingsFormState.name = "";
-  savingsFormState.balance = "";
-  savingsFormState.interestRate = "";
-  savingsFormState.accountType = "";
-  isSavingsModalOpen.value = true;
-}
-
-function closeSavingsModal() {
-  isSavingsModalOpen.value = false;
-  editingSavings.value = null;
-}
-
-async function handleSavingsSubmit() {
-  if (!isSavingsFormValid.value) return;
-
-  isSavingsSubmitting.value = true;
-
-  try {
-    const payload = {
-      name: savingsFormState.name.trim(),
-      currentBalance: parseFloat(savingsFormState.balance),
-      interestRate: parseFloat(savingsFormState.interestRate) || 0,
-      accountType: savingsFormState.accountType || null,
-      personId: parseInt(personId),
-    };
-
-    if (editingSavings.value) {
-      await $fetch(`/api/savings-accounts/${editingSavings.value.id}`, {
-        method: "PUT",
-        body: payload,
-      });
-    } else {
-      await $fetch("/api/savings-accounts", {
-        method: "POST",
-        body: payload,
-      });
-    }
-
-    await refreshSavings();
-    closeSavingsModal();
-
-    const toast = useToast();
-    toast.add({
-      title: editingSavings.value
-        ? "Savings account updated"
-        : "Savings account added",
-      description: `${savingsFormState.name} has been ${
-        editingSavings.value ? "updated" : "added"
-      } successfully.`,
-      color: "success",
-    });
-  } catch (error: unknown) {
-    const toast = useToast();
-    toast.add({
-      title: "Error",
-      description: error instanceof Error ? error.message : "An error occurred",
-      color: "error",
-    });
-  } finally {
-    isSavingsSubmitting.value = false;
-  }
-}
-
-function editSavings(account: SelectSavingsAccount) {
-  editingSavings.value = account;
-  savingsFormState.name = account.name;
-  savingsFormState.balance = account.currentBalance;
-  savingsFormState.interestRate = account.interestRate || "";
-  savingsFormState.accountType = account.accountType || "";
-  isSavingsModalOpen.value = true;
-}
-
-async function deleteSavings(account: SelectSavingsAccount) {
-  try {
-    await $fetch(`/api/savings-accounts/${account.id}`, { method: "DELETE" });
-    await refreshSavings();
-    const toast = useToast();
-    toast.add({
-      title: "Savings account deleted",
-      description: `${account.name} has been removed.`,
-      color: "success",
-    });
-  } catch (error: unknown) {
-    const toast = useToast();
-    toast.add({
-      title: "Error",
-      description:
-        error instanceof Error
-          ? error.message
-          : "Failed to delete savings account",
-      color: "error",
-    });
-  }
-}
-
-// CRUD functions for loans
-function editLoan(loan: SelectLoan) {
-  editingLoan.value = loan;
-  loanFormState.name = loan.name;
-  loanFormState.amount = loan.currentBalance;
-  loanFormState.interestRate = loan.interestRate;
-  loanFormState.loanType = loan.loanType || "";
-  isLoanModalOpen.value = true;
-}
-
-async function deleteLoan(loan: SelectLoan) {
-  try {
-    await $fetch(`/api/loans/${loan.id}`, { method: "DELETE" });
-    refreshLoans();
-    const toast = useToast();
-    toast.add({
-      title: "Loan deleted",
-      description: `${loan.name} has been removed.`,
-      color: "success",
-    });
-  } catch {
-    const toast = useToast();
-    toast.add({
-      title: "Error",
-      description: "Failed to delete loan",
-      color: "error",
-    });
-  }
 }
 
 // SEO
