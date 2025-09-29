@@ -1,0 +1,1 @@
+ALTER TABLE "savings_goals" DROP COLUMN "current_amount";

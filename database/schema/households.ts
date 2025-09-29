@@ -3,6 +3,7 @@ import { relations } from "drizzle-orm";
 import { users } from "./users";
 import { persons } from "./persons";
 import { scenarios } from "./scenarios";
+import { savingsGoals } from "./savings-goals";
 
 export const households = pgTable("households", {
   id: serial("id").primaryKey(),
@@ -25,4 +26,5 @@ export const householdsRelations = relations(households, ({ one, many }) => ({
   }),
   persons: many(persons),
   scenarios: many(scenarios),
+  savingsGoals: many(savingsGoals),
 }));

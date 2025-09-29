@@ -317,8 +317,318 @@
               </div>
             </div>
           </div>
+
+          <!-- Savings Goals Section -->
+          <div
+            v-if="userHousehold && householdMembers.length > 0"
+            class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700"
+          >
+            <div
+              class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div
+                    class="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center mr-3"
+                  >
+                    <UIcon
+                      name="i-heroicons-flag"
+                      class="w-4 h-4 text-purple-600 dark:text-purple-400"
+                    />
+                  </div>
+                  <div>
+                    <h3
+                      class="text-lg font-medium text-neutral-900 dark:text-white"
+                    >
+                      Savings Goals
+                    </h3>
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                      Track your family's financial objectives
+                    </p>
+                  </div>
+                </div>
+                <UButton
+                  size="sm"
+                  variant="soft"
+                  icon="i-heroicons-plus"
+                  @click="() => openSavingsGoalModal()"
+                >
+                  Add Goal
+                </UButton>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div v-if="savingsGoalsLoading" class="text-center py-8">
+                <UIcon
+                  name="i-heroicons-arrow-path"
+                  class="animate-spin h-6 w-6 mx-auto mb-2 text-purple-600"
+                />
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                  Loading goals...
+                </p>
+              </div>
+
+              <div v-else-if="activeGoals.length > 0" class="space-y-4">
+                <div
+                  v-for="goal in activeGoals"
+                  :key="goal.id"
+                  class="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-700"
+                >
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                      <div class="mr-3">
+                        <h4
+                          class="font-semibold text-neutral-900 dark:text-white"
+                        >
+                          {{ goal.name }}
+                        </h4>
+                        <p
+                          v-if="goal.description"
+                          class="text-sm text-neutral-600 dark:text-neutral-400"
+                        >
+                          {{ goal.description }}
+                        </p>
+                      </div>
+                      <div v-if="goal.priority" class="flex items-center">
+                        <UBadge
+                          :color="
+                            goal.priority === 3
+                              ? 'error'
+                              : goal.priority === 2
+                              ? 'warning'
+                              : 'success'
+                          "
+                          size="sm"
+                        >
+                          {{
+                            goal.priority === 3
+                              ? "High"
+                              : goal.priority === 2
+                              ? "Medium"
+                              : "Low"
+                          }}
+                          Priority
+                        </UBadge>
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <UButton
+                        size="sm"
+                        variant="ghost"
+                        icon="i-heroicons-pencil"
+                        @click="editSavingsGoal(goal)"
+                      />
+                      <UButton
+                        size="sm"
+                        variant="ghost"
+                        color="error"
+                        icon="i-heroicons-trash"
+                        @click="deleteSavingsGoal(goal.id)"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Progress Bar -->
+                  <div class="mb-3">
+                    <div class="flex justify-between text-sm mb-1">
+                      <span class="text-neutral-600 dark:text-neutral-400"
+                        >Progress</span
+                      >
+                      <span class="font-medium"
+                        >{{ getGoalProgress(goal).toFixed(1) }}%</span
+                      >
+                    </div>
+                    <div
+                      class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2"
+                    >
+                      <div
+                        class="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                        :style="{
+                          width: `${Math.min(getGoalProgress(goal), 100)}%`,
+                        }"
+                      />
+                    </div>
+                    <div
+                      class="flex justify-between text-xs text-neutral-500 dark:text-neutral-500 mt-1"
+                    >
+                      <span
+                        >${{
+                          parseFloat(goal.currentAmount).toLocaleString()
+                        }}</span
+                      >
+                      <span
+                        >${{
+                          parseFloat(goal.targetAmount).toLocaleString()
+                        }}</span
+                      >
+                    </div>
+                  </div>
+
+                  <!-- Goal Details -->
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <p class="text-neutral-600 dark:text-neutral-400">
+                        Remaining
+                      </p>
+                      <p class="font-medium">
+                        ${{ getRemainingAmount(goal).toLocaleString() }}
+                      </p>
+                    </div>
+                    <div v-if="goal.targetDate">
+                      <p class="text-neutral-600 dark:text-neutral-400">
+                        Target Date
+                      </p>
+                      <p class="font-medium">
+                        {{ new Date(goal.targetDate).toLocaleDateString() }}
+                      </p>
+                    </div>
+                    <div v-if="goal.category">
+                      <p class="text-neutral-600 dark:text-neutral-400">
+                        Category
+                      </p>
+                      <p class="font-medium capitalize">
+                        {{ goal.category.replace("-", " ") }}
+                      </p>
+                    </div>
+                    <div
+                      v-if="
+                        financialSummary &&
+                        financialSummary.totalMonthlyIncome > 0
+                      "
+                    >
+                      <p class="text-neutral-600 dark:text-neutral-400">
+                        Time to Goal
+                      </p>
+                      <p class="font-medium">
+                        {{
+                          calculateTimeToGoal(
+                            goal,
+                            Math.max(
+                              (financialSummary.totalMonthlyIncome -
+                                financialSummary.totalDebt) *
+                                0.2,
+                              0
+                            )
+                          ) || "N/A"
+                        }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Quick Actions -->
+                  <div
+                    class="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700"
+                  >
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center space-x-2">
+                        <UButton
+                          v-if="getGoalProgress(goal) >= 100"
+                          size="sm"
+                          variant="soft"
+                          color="success"
+                          @click="markGoalAsCompleted(goal)"
+                        >
+                          > Mark Complete
+                        </UButton>
+                        <UButton
+                          size="sm"
+                          variant="soft"
+                          @click="
+                            updateGoalProgress(
+                              goal,
+                              (parseFloat(goal.currentAmount) + 100).toString()
+                            )
+                          "
+                        >
+                          Add $100
+                        </UButton>
+                      </div>
+                      <p class="text-xs text-neutral-500 dark:text-neutral-500">
+                        Created
+                        {{ new Date(goal.createdAt).toLocaleDateString() }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Summary Stats -->
+                <div
+                  class="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 rounded-lg border border-purple-200 dark:border-purple-700"
+                >
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="text-center">
+                      <p
+                        class="text-2xl font-bold text-purple-600 dark:text-purple-400"
+                      >
+                        ${{ totalTargetAmount }}
+                      </p>
+                      <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                        Total Goal Amount
+                      </p>
+                    </div>
+                    <div class="text-center">
+                      <p
+                        class="text-2xl font-bold text-purple-600 dark:text-purple-400"
+                      >
+                        ${{ totalCurrentAmount }}
+                      </p>
+                      <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                        Total Saved
+                      </p>
+                    </div>
+                    <div class="text-center">
+                      <p
+                        class="text-2xl font-bold text-purple-600 dark:text-purple-400"
+                      >
+                        {{ totalProgress.toFixed(1) }}%
+                      </p>
+                      <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                        Overall Progress
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div v-else class="text-center py-12">
+                <div
+                  class="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4"
+                >
+                  <UIcon
+                    name="i-heroicons-flag"
+                    class="w-8 h-8 text-purple-600 dark:text-purple-400"
+                  />
+                </div>
+                <h4
+                  class="text-lg font-medium text-neutral-900 dark:text-white mb-2"
+                >
+                  No savings goals yet
+                </h4>
+                <p class="text-neutral-600 dark:text-neutral-400 mb-6">
+                  Set your first savings goal to start tracking your progress
+                </p>
+                <UButton
+                  variant="soft"
+                  icon="i-heroicons-plus"
+                  @click="() => openSavingsGoalModal()"
+                >
+                  Create First Goal
+                </UButton>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Savings Goal Modal -->
+      <SavingsGoalModal
+        :is-open="isSavingsGoalModalOpen"
+        :is-submitting="isSavingsGoalSubmitting"
+        :editing-goal="editingSavingsGoal"
+        @submit="handleSavingsGoalSubmit"
+        @close="closeSavingsGoalModal"
+      />
 
       <!-- Add/Edit Person Modal -->
       <UModal v-model:open="isPersonModalOpen">
@@ -644,4 +954,60 @@ async function confirmPersonDelete() {
     isDeletingPerson.value = false;
   }
 }
+
+// Savings Goals Management
+const savingsGoalsHouseholdId = computed(
+  () => userHousehold.value?.id.toString() || ""
+);
+
+// Direct modal state management (like person modal)
+const isSavingsGoalModalOpen = ref(false);
+const isSavingsGoalSubmitting = ref(false);
+const editingSavingsGoal = ref(null);
+
+const openSavingsGoalModal = () => {
+  isSavingsGoalModalOpen.value = true;
+  editingSavingsGoal.value = null;
+};
+
+const closeSavingsGoalModal = () => {
+  isSavingsGoalModalOpen.value = false;
+  editingSavingsGoal.value = null;
+};
+
+// Get the other functions from the composable
+const {
+  savingsGoals: _savingsGoalsData,
+  savingsGoalsLoading,
+  activeGoals,
+  totalTargetAmount,
+  totalCurrentAmount,
+  totalProgress,
+  getGoalProgress,
+  getRemainingAmount,
+  getEstimatedCompletionTime: _getEstimatedCompletionTime,
+  saveSavingsGoal,
+  deleteSavingsGoal,
+  markGoalAsCompleted,
+} = useSavingsGoals(savingsGoalsHouseholdId);
+
+// Handle savings goal submission
+const handleSavingsGoalSubmit = async (formData: {
+  name: string;
+  description: string;
+  targetAmount: string;
+  targetDate: Date | null;
+  priority: number;
+  category: string;
+}) => {
+  isSavingsGoalSubmitting.value = true;
+  try {
+    await saveSavingsGoal(formData);
+    closeSavingsGoalModal();
+  } catch (error) {
+    console.error("Error saving goal:", error);
+  } finally {
+    isSavingsGoalSubmitting.value = false;
+  }
+};
 </script>

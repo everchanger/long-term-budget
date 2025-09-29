@@ -62,19 +62,40 @@ export const useLoans = (personId: string) => {
   };
 
   // CRUD operations
-  const handleLoanSubmit = async () => {
-    if (!loanFormState.name || !loanFormState.amount) return;
+  const handleLoanSubmit = async (formData?: {
+    name: string;
+    originalAmount: string;
+    currentBalance: string;
+    interestRate: string;
+    monthlyPayment: string;
+    loanType: string;
+  }) => {
+    // Use provided form data if available, otherwise use internal form state
+    const data = formData || {
+      name: loanFormState.name.trim(),
+      originalAmount: loanFormState.amount,
+      currentBalance: loanFormState.amount,
+      interestRate: loanFormState.interestRate,
+      monthlyPayment: loanFormState.monthlyPayment,
+      loanType: loanFormState.loanType,
+    };
+
+    // Validate the data
+    if (!data.name.trim() || !data.originalAmount) {
+      return;
+    }
 
     isLoanSubmitting.value = true;
 
     try {
       const payload = {
-        name: loanFormState.name.trim(),
-        originalAmount: parseFloat(loanFormState.amount),
-        currentBalance: parseFloat(loanFormState.amount),
-        interestRate: parseFloat(loanFormState.interestRate) || 0,
-        monthlyPayment: parseFloat(loanFormState.monthlyPayment) || 0,
-        loanType: loanFormState.loanType,
+        name: data.name.trim(),
+        originalAmount: parseFloat(data.originalAmount),
+        currentBalance:
+          parseFloat(data.currentBalance) || parseFloat(data.originalAmount),
+        interestRate: parseFloat(data.interestRate) || 0,
+        monthlyPayment: parseFloat(data.monthlyPayment) || 0,
+        loanType: data.loanType,
         personId: parseInt(personId),
       };
 
@@ -96,7 +117,7 @@ export const useLoans = (personId: string) => {
       const toast = useToast();
       toast.add({
         title: editingLoan.value ? "Loan updated" : "Loan added",
-        description: `${loanFormState.name} has been ${
+        description: `${data.name} has been ${
           editingLoan.value ? "updated" : "added"
         } successfully.`,
         color: "success",

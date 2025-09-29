@@ -6,6 +6,7 @@ import { persons } from "./schema/persons";
 import { incomeSources } from "./schema/income-sources";
 import { expenses } from "./schema/expenses";
 import { savingsAccounts } from "./schema/savings-accounts";
+import { savingsGoals } from "./schema/savings-goals";
 import { loans } from "./schema/loans";
 import { scenarios } from "./schema/scenarios";
 
@@ -141,6 +142,25 @@ export const updateLoanSchema = insertLoanSchema
   .partial()
   .omit({ id: true, createdAt: true, personId: true });
 
+// Savings Goals schemas
+export const insertSavingsGoalSchema = createInsertSchema(savingsGoals, {
+  name: z.string().min(1, "Goal name is required"),
+  description: z.string().optional(),
+  targetAmount: z
+    .string()
+    .refine((val) => parseFloat(val) > 0, "Target amount must be positive"),
+  targetDate: z.coerce.date().optional(),
+  priority: z.number().int().min(1).max(3).default(1),
+  category: z.string().optional(),
+  householdId: z.number().positive("Household ID is required"),
+});
+
+export const selectSavingsGoalSchema = createSelectSchema(savingsGoals);
+
+export const updateSavingsGoalSchema = insertSavingsGoalSchema
+  .partial()
+  .omit({ id: true, createdAt: true, updatedAt: true, householdId: true });
+
 // Scenario schemas
 export const insertScenarioSchema = createInsertSchema(scenarios, {
   name: z.string().min(1, "Scenario name is required"),
@@ -191,6 +211,11 @@ export const schemas = {
   selectLoan: selectLoanSchema,
   updateLoan: updateLoanSchema,
 
+  // Savings goals schemas
+  insertSavingsGoal: insertSavingsGoalSchema,
+  selectSavingsGoal: selectSavingsGoalSchema,
+  updateSavingsGoal: updateSavingsGoalSchema,
+
   // Scenario schemas
   insertScenario: insertScenarioSchema,
   selectScenario: selectScenarioSchema,
@@ -225,6 +250,10 @@ export type UpdateSavingsAccount = z.infer<typeof updateSavingsAccountSchema>;
 export type InsertLoan = z.infer<typeof insertLoanSchema>;
 export type SelectLoan = z.infer<typeof selectLoanSchema>;
 export type UpdateLoan = z.infer<typeof updateLoanSchema>;
+
+export type InsertSavingsGoal = z.infer<typeof insertSavingsGoalSchema>;
+export type SelectSavingsGoal = z.infer<typeof selectSavingsGoalSchema>;
+export type UpdateSavingsGoal = z.infer<typeof updateSavingsGoalSchema>;
 
 export type InsertScenario = z.infer<typeof insertScenarioSchema>;
 export type SelectScenario = z.infer<typeof selectScenarioSchema>;

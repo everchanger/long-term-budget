@@ -68,17 +68,31 @@ export const useSavingsAccounts = (personId: string) => {
   };
 
   // CRUD operations
-  const handleSavingsSubmit = async () => {
-    if (!isSavingsFormValid.value) return;
+  const handleSavingsSubmit = async (formData?: {
+    name: string;
+    currentBalance: string;
+    interestRate: string;
+    accountType: string;
+  }) => {
+    // Use form data from modal if provided, otherwise use internal state
+    const data = formData || {
+      name: savingsFormState.name,
+      currentBalance: savingsFormState.balance,
+      interestRate: savingsFormState.interestRate,
+      accountType: savingsFormState.accountType,
+    };
+
+    // Validate the data
+    if (!data.name.trim() || !data.currentBalance) return;
 
     isSavingsSubmitting.value = true;
 
     try {
       const payload = {
-        name: savingsFormState.name.trim(),
-        currentBalance: parseFloat(savingsFormState.balance),
-        interestRate: parseFloat(savingsFormState.interestRate) || 0,
-        accountType: savingsFormState.accountType || null,
+        name: data.name.trim(),
+        currentBalance: parseFloat(data.currentBalance),
+        interestRate: parseFloat(data.interestRate) || 0,
+        accountType: data.accountType || null,
         personId: parseInt(personId),
       };
 

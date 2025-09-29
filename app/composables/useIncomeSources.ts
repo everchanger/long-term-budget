@@ -78,16 +78,35 @@ export const useIncomeSources = (personId: string) => {
   };
 
   // CRUD operations
-  const handleIncomeSubmit = async () => {
-    if (!isIncomeFormValid.value) return;
+  const handleIncomeSubmit = async (formData?: {
+    name: string;
+    amount: number;
+    frequency: string;
+  }) => {
+    // Use provided form data if available, otherwise use internal form state
+    const data = formData || {
+      name: incomeFormState.name.trim(),
+      amount: parseFloat(incomeFormState.amount),
+      frequency: incomeFormState.frequency,
+    };
+
+    // Validate the data
+    if (
+      !data.name.trim() ||
+      !data.amount ||
+      data.amount <= 0 ||
+      !data.frequency
+    ) {
+      return;
+    }
 
     isIncomeSubmitting.value = true;
 
     try {
       const payload = {
-        name: incomeFormState.name.trim(),
-        amount: parseFloat(incomeFormState.amount),
-        frequency: incomeFormState.frequency,
+        name: data.name.trim(),
+        amount: data.amount,
+        frequency: data.frequency,
         person_id: parseInt(personId),
         is_active: true,
       };
@@ -115,7 +134,7 @@ export const useIncomeSources = (personId: string) => {
         title: editingIncomeSource.value
           ? "Income source updated"
           : "Income source added",
-        description: `${incomeFormState.name} has been ${
+        description: `${data.name} has been ${
           editingIncomeSource.value ? "updated" : "added"
         } successfully.`,
         color: "success",
