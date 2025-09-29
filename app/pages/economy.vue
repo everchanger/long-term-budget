@@ -209,7 +209,7 @@
 
             <div class="p-6">
               <div
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"
               >
                 <!-- Monthly Income -->
                 <div
@@ -252,27 +252,6 @@
                     </p>
                     <p class="text-xs text-neutral-500 dark:text-neutral-500">
                       {{ financialSummary.savingsAccountsCount }} accounts
-                    </p>
-                  </div>
-                </div>
-
-                <!-- Total Investments -->
-                <div
-                  class="bg-neutral-50 dark:bg-neutral-900 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700"
-                >
-                  <div>
-                    <p
-                      class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
-                    >
-                      Investments
-                    </p>
-                    <p
-                      class="text-2xl font-bold text-neutral-900 dark:text-white"
-                    >
-                      ${{ financialSummary.totalInvestments.toLocaleString() }}
-                    </p>
-                    <p class="text-xs text-neutral-500 dark:text-neutral-500">
-                      {{ financialSummary.investmentAccountsCount }} accounts
                     </p>
                   </div>
                 </div>
@@ -320,7 +299,7 @@
                         Estimated Net Worth
                       </p>
                       <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                        (Savings + Investments - Debt)
+                        (Savings - Debt)
                       </p>
                     </div>
                   </div>
@@ -460,13 +439,11 @@ interface FinancialSummary {
   totalMonthlyIncome: number;
   totalAnnualIncome: number;
   totalSavings: number;
-  totalInvestments: number;
   totalDebt: number;
   memberCount: number;
   incomeSourcesCount: number;
   loansCount: number;
   savingsAccountsCount: number;
-  investmentAccountsCount: number;
 }
 
 // Reactive state
@@ -554,11 +531,7 @@ const isPersonFormValid = computed(() => {
 
 const netWorth = computed(() => {
   if (!financialSummary.value) return 0;
-  return (
-    financialSummary.value.totalSavings +
-    financialSummary.value.totalInvestments -
-    financialSummary.value.totalDebt
-  );
+  return financialSummary.value.totalSavings - financialSummary.value.totalDebt;
 });
 
 // Person Management Methods

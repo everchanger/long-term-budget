@@ -65,3 +65,45 @@ The project uses Drizzle ORM for database operations. Available database scripts
 2. For development: Run `npm run db:push` to sync changes immediately
 3. For production: Run `npm run db:generate` to create migrations, then `npm run db:migrate`
 4. Use `npm run db:studio` to inspect your database visually
+
+## Testing
+
+### Running API Tests
+
+The project includes comprehensive end-to-end API tests using Vitest and Nuxt's testing utilities.
+
+**Run all API tests:**
+```bash
+npm run test:e2e
+```
+
+**Run specific test files:**
+```bash
+# Test specific endpoint
+npm run test:e2e -- "tests/nuxt/api/households"
+
+# Test specific file
+npm run test:e2e -- "tests/nuxt/api/households/index.test.ts"
+```
+
+**What happens when you run tests:**
+
+1. **Test Database Setup**: Automatically creates a clean PostgreSQL test database (`budgetdb_test`)
+2. **Development Server**: Starts a Nuxt dev server on port 5000 for testing
+3. **Database Migration**: Applies the latest schema to the test database
+4. **Test Execution**: Runs the specified tests with full authentication and database integration
+5. **Cleanup**: Test database is reset between test runs for isolation
+
+**Test Database Details:**
+- Database: `budgetdb_test` (separate from development database)
+- Schema: Automatically synced with your current Drizzle schema
+- Data: Each test creates its own isolated test data using the TestDataBuilder pattern
+
+**Test Coverage:**
+- Authentication and authorization flows
+- CRUD operations for all entities (households, persons, income sources, loans, etc.)
+- Financial calculations and aggregations
+- Error handling and edge cases
+- Cross-user data isolation
+
+The tests use a comprehensive TestDataBuilder pattern that automatically creates users, households, and associated financial data for realistic testing scenarios.

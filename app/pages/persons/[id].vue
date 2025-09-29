@@ -62,7 +62,7 @@
       </div>
 
       <!-- Financial Overview Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <UCard>
           <div class="flex items-center justify-between">
             <div>
@@ -96,25 +96,6 @@
             </div>
             <UIcon
               name="i-heroicons-building-library"
-              class="h-8 w-8 text-neutral-400"
-            />
-          </div>
-        </UCard>
-
-        <UCard>
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                Investment Value
-              </p>
-              <p
-                class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
-              >
-                ${{ totalInvestments }}
-              </p>
-            </div>
-            <UIcon
-              name="i-heroicons-chart-bar-square"
               class="h-8 w-8 text-neutral-400"
             />
           </div>
@@ -364,15 +345,15 @@
                   <div class="flex items-center gap-3">
                     <UIcon
                       name="i-heroicons-building-library"
-                      class="h-6 w-6 text-gray-400"
+                      class="h-6 w-6 text-neutral-400"
                     />
                     <div>
                       <h3
-                        class="text-xl font-semibold text-gray-900 dark:text-white"
+                        class="text-xl font-semibold text-neutral-900 dark:text-white"
                       >
                         Savings Accounts
                       </h3>
-                      <p class="text-gray-600 dark:text-gray-400">
+                      <p class="text-neutral-600 dark:text-neutral-400">
                         Manage {{ person.name }}'s savings accounts
                       </p>
                     </div>
@@ -381,18 +362,29 @@
                     Add Savings Account
                   </UButton>
                 </div>
-                <div class="text-center py-12">
+
+                <div v-if="savingsLoading" class="text-center py-8">
+                  <UIcon
+                    name="i-heroicons-arrow-path"
+                    class="animate-spin h-6 w-6 mx-auto"
+                  />
+                </div>
+                <div
+                  v-else-if="savingsAccounts.length === 0"
+                  class="text-center py-12"
+                >
                   <UIcon
                     name="i-heroicons-building-library"
-                    class="mx-auto h-12 w-12 text-gray-400 mb-4"
+                    class="mx-auto h-12 w-12 text-neutral-400 mb-4"
                   />
                   <h4
-                    class="text-lg font-medium text-gray-900 dark:text-white mb-2"
+                    class="text-lg font-medium text-neutral-900 dark:text-white mb-2"
                   >
-                    No Savings Accounts Yet
+                    No Savings Accounts
                   </h4>
-                  <p class="text-gray-600 dark:text-gray-400 mb-4">
-                    Add savings accounts to track balances and interest.
+                  <p class="text-neutral-600 dark:text-neutral-400 mb-4">
+                    Add {{ person.name }}'s first savings account to start
+                    tracking balances.
                   </p>
                   <UButton
                     variant="soft"
@@ -402,51 +394,54 @@
                     Add Savings Account
                   </UButton>
                 </div>
-              </div>
-
-              <!-- Investment Accounts Tab -->
-              <div v-else-if="item.value === 'investments'">
-                <div class="flex justify-between items-center mb-6">
-                  <div class="flex items-center gap-3">
-                    <UIcon
-                      name="i-heroicons-chart-bar-square"
-                      class="h-6 w-6 text-gray-400"
-                    />
-                    <div>
-                      <h3
-                        class="text-xl font-semibold text-gray-900 dark:text-white"
-                      >
-                        Investment Accounts
-                      </h3>
-                      <p class="text-gray-600 dark:text-gray-400">
-                        Manage {{ person.name }}'s investment portfolios
-                      </p>
+                <div v-else class="space-y-4">
+                  <UCard v-for="account in savingsAccounts" :key="account.id">
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                          <h4
+                            class="font-semibold text-neutral-900 dark:text-white"
+                          >
+                            {{ account.name }}
+                          </h4>
+                          <UBadge v-if="account.accountType" color="neutral">{{
+                            account.accountType
+                          }}</UBadge>
+                        </div>
+                        <p
+                          class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-1"
+                        >
+                          ${{
+                            parseFloat(account.currentBalance).toLocaleString()
+                          }}
+                          balance
+                        </p>
+                        <div
+                          class="text-sm text-neutral-600 dark:text-neutral-400"
+                        >
+                          <p v-if="account.interestRate">
+                            Interest Rate:
+                            {{ parseFloat(account.interestRate).toFixed(2) }}%
+                          </p>
+                        </div>
+                      </div>
+                      <div class="flex gap-2">
+                        <UButton
+                          size="sm"
+                          variant="ghost"
+                          icon="i-heroicons-pencil"
+                          @click="editSavings(account)"
+                        />
+                        <UButton
+                          size="sm"
+                          variant="ghost"
+                          color="error"
+                          icon="i-heroicons-trash"
+                          @click="deleteSavings(account)"
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <UButton icon="i-heroicons-plus" @click="openInvestmentModal">
-                    Add Investment Account
-                  </UButton>
-                </div>
-                <div class="text-center py-12">
-                  <UIcon
-                    name="i-heroicons-chart-bar-square"
-                    class="mx-auto h-12 w-12 text-gray-400 mb-4"
-                  />
-                  <h4
-                    class="text-lg font-medium text-gray-900 dark:text-white mb-2"
-                  >
-                    No Investment Accounts Yet
-                  </h4>
-                  <p class="text-gray-600 dark:text-gray-400 mb-4">
-                    Add investment accounts to track portfolio performance.
-                  </p>
-                  <UButton
-                    variant="soft"
-                    icon="i-heroicons-plus"
-                    @click="openInvestmentModal"
-                  >
-                    Add Investment Account
-                  </UButton>
+                  </UCard>
                 </div>
               </div>
             </div>
@@ -455,423 +450,49 @@
       </UCard>
     </div>
 
-    <!-- Income Source Modal -->
-    <UModal v-model:open="isIncomeModalOpen">
-      <template #header>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {{ editingIncomeSource ? "Edit Income Source" : "Add Income Source" }}
-        </h3>
-      </template>
+    <!-- Modal Components -->
+    <IncomeSourceModal
+      v-model:open="isIncomeModalOpen"
+      :income-source="editingIncomeSource"
+      :loading="isIncomeSubmitting"
+      @submit="handleIncomeSubmit"
+      @cancel="closeIncomeModal"
+    />
 
-      <template #body>
-        <div class="space-y-4">
-          <div>
-            <label
-              for="income-name"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
-              Name *
-            </label>
-            <input
-              id="income-name"
-              v-model="incomeFormState.name"
-              type="text"
-              placeholder="e.g., Salary, Freelance, etc."
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-
-          <div>
-            <label
-              for="income-amount"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
-              Amount *
-            </label>
-            <input
-              id="income-amount"
-              v-model="incomeFormState.amount"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-
-          <div>
-            <label
-              for="income-frequency"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
-              Frequency *
-            </label>
-            <select
-              id="income-frequency"
-              v-model="incomeFormState.frequency"
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="">Select frequency</option>
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
-              <option value="weekly">Weekly</option>
-              <option value="bi-weekly">Bi-weekly</option>
-            </select>
-          </div>
-        </div>
-      </template>
-
-      <template #footer>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="closeIncomeModal">Cancel</UButton>
-          <UButton
-            :loading="isIncomeSubmitting"
-            :disabled="!isIncomeFormValid"
-            @click="handleIncomeSubmit"
-          >
-            {{ editingIncomeSource ? "Update" : "Add" }}
-          </UButton>
-        </div>
-      </template>
-    </UModal>
-
-    <!-- Loan Modal -->
-    <UModal v-model:open="isLoanModalOpen">
-      <template #header>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          Add Loan/Debt
-        </h3>
-      </template>
-
-      <template #body>
-        <div class="space-y-4">
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >Name *</label
-            >
-            <input
-              v-model="loanFormState.name"
-              type="text"
-              placeholder="e.g., Mortgage, Credit Card, etc."
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >Outstanding Amount *</label
-            >
-            <input
-              v-model="loanFormState.amount"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >Interest Rate (%)</label
-            >
-            <input
-              v-model="loanFormState.interestRate"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="5.00"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >Monthly Payment</label
-            >
-            <input
-              v-model="loanFormState.monthlyPayment"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >Loan Type</label
-            >
-            <select
-              v-model="loanFormState.loanType"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="">Select type</option>
-              <option value="mortgage">Mortgage</option>
-              <option value="personal">Personal Loan</option>
-              <option value="credit-card">Credit Card</option>
-              <option value="auto">Auto Loan</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-      </template>
-
-      <template #footer>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="closeLoanModal">Cancel</UButton>
-          <UButton :loading="isLoanSubmitting" @click="handleLoanSubmit">
-            {{ editingLoan ? "Update" : "Add" }} Loan
-          </UButton>
-        </div>
-      </template>
-    </UModal>
+    <LoanModal
+      v-model:open="isLoanModalOpen"
+      :loan="editingLoan"
+      :loading="isLoanSubmitting"
+      @submit="handleLoanSubmit"
+      @cancel="closeLoanModal"
+    />
 
     <!-- Savings Modal -->
-    <UModal v-model:open="isSavingsModalOpen">
-      <template #header>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          Add Savings Account
-        </h3>
-      </template>
+    <SavingsAccountModal
+      v-model:open="isSavingsModalOpen"
+      :savings-account="editingSavings"
+      :loading="isSavingsSubmitting"
+      @submit="handleSavingsSubmit"
+      @cancel="closeSavingsModal"
+    />
 
-      <template #body>
-        <div class="space-y-4">
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >Account Name *</label
-            >
-            <input
-              v-model="savingsFormState.name"
-              type="text"
-              placeholder="e.g., Emergency Fund, Vacation Fund, etc."
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >Current Balance *</label
-            >
-            <input
-              v-model="savingsFormState.balance"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >Interest Rate (%)</label
-            >
-            <input
-              v-model="savingsFormState.interestRate"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="2.50"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >Account Type</label
-            >
-            <select
-              v-model="savingsFormState.accountType"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="">Select type</option>
-              <option value="high-yield">High Yield Savings</option>
-              <option value="regular">Regular Savings</option>
-              <option value="money-market">Money Market</option>
-              <option value="cd">Certificate of Deposit</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <p class="text-sm text-gray-500">
-            This feature is coming soon! For now, this will just close the
-            modal.
-          </p>
-        </div>
-      </template>
-
-      <template #footer>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="closeSavingsModal">Cancel</UButton>
-          <UButton @click="closeSavingsModal">Add (Coming Soon)</UButton>
-        </div>
-      </template>
-    </UModal>
-
-    <!-- Investment Modal -->
-    <UModal v-model:open="isInvestmentModalOpen">
-      <template #header>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          Add Investment Account
-        </h3>
-      </template>
-
-      <template #body>
-        <div class="space-y-4">
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >Account Name *</label
-            >
-            <input
-              v-model="investmentFormState.name"
-              type="text"
-              placeholder="e.g., 401k, Roth IRA, Brokerage, etc."
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >Current Value *</label
-            >
-            <input
-              v-model="investmentFormState.currentValue"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >Account Type</label
-            >
-            <select
-              v-model="investmentFormState.accountType"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="">Select type</option>
-              <option value="401k">401(k)</option>
-              <option value="roth-ira">Roth IRA</option>
-              <option value="traditional-ira">Traditional IRA</option>
-              <option value="brokerage">Brokerage Account</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <p class="text-sm text-gray-500">
-            This feature is coming soon! For now, this will just close the
-            modal.
-          </p>
-        </div>
-      </template>
-
-      <template #footer>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="closeInvestmentModal"
-            >Cancel</UButton
-          >
-          <UButton @click="closeInvestmentModal">Add (Coming Soon)</UButton>
-        </div>
-      </template>
-    </UModal>
-
-    <!-- Edit Person Modal -->
-    <UModal v-model:open="isEditPersonModalOpen">
-      <template #header>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          Edit Person
-        </h3>
-      </template>
-
-      <template #body>
-        <div class="space-y-4">
-          <div>
-            <label
-              for="edit-person-name"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
-              Name *
-            </label>
-            <input
-              id="edit-person-name"
-              v-model="editPersonFormState.name"
-              type="text"
-              placeholder="Enter person's name"
-              required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-          <div>
-            <label
-              for="edit-person-age"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
-              Age (optional)
-            </label>
-            <input
-              id="edit-person-age"
-              v-model="editPersonFormState.age"
-              type="number"
-              min="0"
-              max="150"
-              placeholder="Enter age"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-        </div>
-      </template>
-
-      <template #footer>
-        <div class="flex justify-end gap-3">
-          <UButton variant="ghost" @click="closeEditPersonModal"
-            >Cancel</UButton
-          >
-          <UButton
-            :disabled="!editPersonFormState.name.trim()"
-            @click="handleEditPersonSubmit"
-          >
-            Update
-          </UButton>
-        </div>
-      </template>
-    </UModal>
+    <EditPersonModal
+      v-model:open="isEditPersonModalOpen"
+      :person="person"
+      :loading="false"
+      @submit="handleEditPersonSubmit"
+      @cancel="closeEditPersonModal"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-interface IncomeSource {
-  id: number;
-  name: string;
-  amount: string;
-  frequency: string;
-  startDate: string | null;
-  endDate: string | null;
-  isActive: boolean;
-  personId: number;
-}
-
-interface Person {
-  id: number;
-  name: string;
-  age: number | null;
-  householdId: number;
-  householdName?: string;
-}
+import type {
+  SelectIncomeSource,
+  SelectPerson,
+  SelectLoan,
+  SelectSavingsAccount,
+} from "~~/database/validation-schemas";
 
 // Route params
 const route = useRoute();
@@ -882,7 +503,7 @@ const {
   data: person,
   pending: personLoading,
   refresh: refreshPerson,
-} = await useFetch<Person>(`/api/persons/${personId}`);
+} = await useFetch<SelectPerson>(`/api/persons/${personId}`);
 
 // Financial tabs
 
@@ -890,11 +511,6 @@ const financialTabs = [
   { value: "income", label: "Income Sources", icon: "i-heroicons-banknotes" },
   { value: "loans", label: "Loans & Debts", icon: "i-heroicons-credit-card" },
   { value: "savings", label: "Savings", icon: "i-heroicons-building-library" },
-  {
-    value: "investments",
-    label: "Investments",
-    icon: "i-heroicons-chart-bar-square",
-  },
 ];
 
 const selectedTab = ref(financialTabs[0]?.value);
@@ -904,7 +520,7 @@ const {
   data: incomeSources,
   pending: incomeSourcesLoading,
   refresh: refreshIncomeSources,
-} = await useFetch<IncomeSource[]>("/api/income-sources", {
+} = await useFetch<SelectIncomeSource[]>("/api/income-sources", {
   query: { personId },
   default: () => [],
 });
@@ -914,7 +530,7 @@ const {
   data: loans,
   pending: loansLoading,
   refresh: refreshLoans,
-} = await useFetch<any[]>("/api/loans", {
+} = await useFetch<SelectLoan[]>("/api/loans", {
   query: { personId },
   default: () => [],
 });
@@ -924,17 +540,7 @@ const {
   data: savingsAccounts,
   pending: savingsLoading,
   refresh: refreshSavings,
-} = await useFetch<any[]>("/api/savings-accounts", {
-  query: { personId },
-  default: () => [],
-});
-
-// Broker accounts (investments)
-const {
-  data: brokerAccounts,
-  pending: investmentsLoading,
-  refresh: refreshInvestments,
-} = await useFetch<any[]>("/api/broker-accounts", {
+} = await useFetch<SelectSavingsAccount[]>("/api/savings-accounts", {
   query: { personId },
   default: () => [],
 });
@@ -942,7 +548,7 @@ const {
 // Income form state
 const isIncomeModalOpen = ref(false);
 const isIncomeSubmitting = ref(false);
-const editingIncomeSource = ref<IncomeSource | null>(null);
+const editingIncomeSource = ref<SelectIncomeSource | null>(null);
 const incomeFormState = reactive({
   name: "",
   amount: "",
@@ -952,7 +558,7 @@ const incomeFormState = reactive({
 // Loans form state
 const isLoanModalOpen = ref(false);
 const isLoanSubmitting = ref(false);
-const editingLoan = ref<any>(null);
+const editingLoan = ref<SelectLoan | null>(null);
 const loanFormState = reactive({
   name: "",
   amount: "",
@@ -964,21 +570,11 @@ const loanFormState = reactive({
 // Savings form state
 const isSavingsModalOpen = ref(false);
 const isSavingsSubmitting = ref(false);
-const editingSavings = ref<any>(null);
+const editingSavings = ref<SelectSavingsAccount | null>(null);
 const savingsFormState = reactive({
   name: "",
   balance: "",
   interestRate: "",
-  accountType: "",
-});
-
-// Investments form state
-const isInvestmentModalOpen = ref(false);
-const isInvestmentSubmitting = ref(false);
-const editingInvestment = ref<any>(null);
-const investmentFormState = reactive({
-  name: "",
-  currentValue: "",
   accountType: "",
 });
 
@@ -1009,17 +605,7 @@ const totalSavings = computed(() => {
   if (!savingsAccounts.value) return "0.00";
   return savingsAccounts.value
     .reduce(
-      (total, account) => total + parseFloat(account.currentBalance || 0),
-      0
-    )
-    .toFixed(2);
-});
-
-const totalInvestments = computed(() => {
-  if (!brokerAccounts.value) return "0.00";
-  return brokerAccounts.value
-    .reduce(
-      (total, account) => total + parseFloat(account.currentValue || 0),
+      (total, account) => total + parseFloat(account.currentBalance || "0"),
       0
     )
     .toFixed(2);
@@ -1028,7 +614,7 @@ const totalInvestments = computed(() => {
 const totalDebt = computed(() => {
   if (!loans.value) return "0.00";
   return loans.value
-    .reduce((total, loan) => total + parseFloat(loan.currentBalance || 0), 0)
+    .reduce((total, loan) => total + parseFloat(loan.currentBalance || "0"), 0)
     .toFixed(2);
 });
 
@@ -1041,9 +627,20 @@ const isIncomeFormValid = computed(() => {
   );
 });
 
+const isSavingsFormValid = computed(() => {
+  return (
+    savingsFormState.name.trim() !== "" &&
+    savingsFormState.balance !== "" &&
+    parseFloat(savingsFormState.balance) >= 0
+  );
+});
+
 // Functions
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString();
+function formatDate(date: Date | string) {
+  if (date instanceof Date) {
+    return date.toLocaleDateString();
+  }
+  return new Date(date).toLocaleDateString();
 }
 
 function openIncomeModal() {
@@ -1059,7 +656,7 @@ function closeIncomeModal() {
   editingIncomeSource.value = null;
 }
 
-function editIncome(income: IncomeSource) {
+function editIncome(income: SelectIncomeSource) {
   editingIncomeSource.value = income;
   incomeFormState.name = income.name;
   incomeFormState.amount = income.amount;
@@ -1109,11 +706,13 @@ async function handleIncomeSubmit() {
       } successfully.`,
       color: "success",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     const toast = useToast();
     toast.add({
       title: "Error",
-      description: error.data?.message || "An error occurred",
+      description:
+        (error as { data?: { message?: string } }).data?.message ||
+        "An error occurred",
       color: "error",
     });
   } finally {
@@ -1121,7 +720,7 @@ async function handleIncomeSubmit() {
   }
 }
 
-async function deleteIncome(income: IncomeSource) {
+async function deleteIncome(income: SelectIncomeSource) {
   try {
     await $fetch(`/api/income-sources/${income.id}`, {
       method: "DELETE",
@@ -1135,11 +734,13 @@ async function deleteIncome(income: IncomeSource) {
       description: `${income.name} has been removed.`,
       color: "success",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     const toast = useToast();
     toast.add({
       title: "Error",
-      description: error.data?.message || "Failed to delete income source",
+      description:
+        (error as { data?: { message?: string } }).data?.message ||
+        "Failed to delete income source",
       color: "error",
     });
   }
@@ -1187,11 +788,13 @@ async function handleEditPersonSubmit() {
       description: `${editPersonFormState.name} has been updated successfully.`,
       color: "success",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     const toast = useToast();
     toast.add({
       title: "Error",
-      description: error.data?.message || "Failed to update person",
+      description:
+        (error as { data?: { message?: string } }).data?.message ||
+        "Failed to update person",
       color: "error",
     });
   }
@@ -1277,30 +880,100 @@ function closeSavingsModal() {
   editingSavings.value = null;
 }
 
-function openInvestmentModal() {
-  editingInvestment.value = null;
-  investmentFormState.name = "";
-  investmentFormState.currentValue = "";
-  investmentFormState.accountType = "";
-  isInvestmentModalOpen.value = true;
+async function handleSavingsSubmit() {
+  if (!isSavingsFormValid.value) return;
+
+  isSavingsSubmitting.value = true;
+
+  try {
+    const payload = {
+      name: savingsFormState.name.trim(),
+      currentBalance: parseFloat(savingsFormState.balance),
+      interestRate: parseFloat(savingsFormState.interestRate) || 0,
+      accountType: savingsFormState.accountType || null,
+      personId: parseInt(personId),
+    };
+
+    if (editingSavings.value) {
+      await $fetch(`/api/savings-accounts/${editingSavings.value.id}`, {
+        method: "PUT",
+        body: payload,
+      });
+    } else {
+      await $fetch("/api/savings-accounts", {
+        method: "POST",
+        body: payload,
+      });
+    }
+
+    await refreshSavings();
+    closeSavingsModal();
+
+    const toast = useToast();
+    toast.add({
+      title: editingSavings.value
+        ? "Savings account updated"
+        : "Savings account added",
+      description: `${savingsFormState.name} has been ${
+        editingSavings.value ? "updated" : "added"
+      } successfully.`,
+      color: "success",
+    });
+  } catch (error: unknown) {
+    const toast = useToast();
+    toast.add({
+      title: "Error",
+      description: error instanceof Error ? error.message : "An error occurred",
+      color: "error",
+    });
+  } finally {
+    isSavingsSubmitting.value = false;
+  }
 }
 
-function closeInvestmentModal() {
-  isInvestmentModalOpen.value = false;
-  editingInvestment.value = null;
+function editSavings(account: SelectSavingsAccount) {
+  editingSavings.value = account;
+  savingsFormState.name = account.name;
+  savingsFormState.balance = account.currentBalance;
+  savingsFormState.interestRate = account.interestRate || "";
+  savingsFormState.accountType = account.accountType || "";
+  isSavingsModalOpen.value = true;
+}
+
+async function deleteSavings(account: SelectSavingsAccount) {
+  try {
+    await $fetch(`/api/savings-accounts/${account.id}`, { method: "DELETE" });
+    await refreshSavings();
+    const toast = useToast();
+    toast.add({
+      title: "Savings account deleted",
+      description: `${account.name} has been removed.`,
+      color: "success",
+    });
+  } catch (error: unknown) {
+    const toast = useToast();
+    toast.add({
+      title: "Error",
+      description:
+        error instanceof Error
+          ? error.message
+          : "Failed to delete savings account",
+      color: "error",
+    });
+  }
 }
 
 // CRUD functions for loans
-function editLoan(loan: any) {
+function editLoan(loan: SelectLoan) {
   editingLoan.value = loan;
   loanFormState.name = loan.name;
   loanFormState.amount = loan.currentBalance;
   loanFormState.interestRate = loan.interestRate;
-  loanFormState.loanType = loan.loanType;
+  loanFormState.loanType = loan.loanType || "";
   isLoanModalOpen.value = true;
 }
 
-async function deleteLoan(loan: any) {
+async function deleteLoan(loan: SelectLoan) {
   try {
     await $fetch(`/api/loans/${loan.id}`, { method: "DELETE" });
     refreshLoans();
@@ -1310,7 +983,7 @@ async function deleteLoan(loan: any) {
       description: `${loan.name} has been removed.`,
       color: "success",
     });
-  } catch (error) {
+  } catch {
     const toast = useToast();
     toast.add({
       title: "Error",
