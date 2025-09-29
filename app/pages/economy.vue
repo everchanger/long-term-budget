@@ -142,7 +142,6 @@
                       variant="soft"
                       color="error"
                       icon="i-heroicons-trash"
-                      square
                       @click="openDeletePersonModal(member)"
                       >Delete</UButton
                     >

@@ -1,30 +1,52 @@
-import { z } from "zod";
-
-const paramsSchema = z.object({
-  id: z.string().transform(Number),
-});
-
 export default defineEventHandler(async (event) => {
-  try {
-    // Validate params
-    const { id: householdId } = await getValidatedRouterParams(
-      event,
-      paramsSchema.parse
-    );
+  const session = event.context.session;
 
+  if (!session?.user?.id) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+      message: "You must be logged in to access financial summary",
+    });
+  }
+
+  const householdId = getRouterParam(event, "id");
+  if (!householdId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Household ID is required",
+    });
+  }
+
+  // Validate that householdId is a valid number
+  const householdIdNum = parseInt(householdId);
+  if (isNaN(householdIdNum)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Household ID is required",
+    });
+  }
+
+  try {
     const db = useDrizzle();
 
-    // Check if household exists
-    const household = await db
+    // Check if household exists and belongs to the current user
+    const [household] = await db
       .select()
       .from(tables.households)
-      .where(eq(tables.households.id, householdId))
-      .limit(1);
+      .where(
+        and(
+          eq(tables.households.id, householdIdNum),
+          eq(tables.households.userId, session.user.id)
+        )
+      );
 
-    if (!household.length) {
+    if (!household) {
       throw createError({
         statusCode: 404,
-        statusMessage: "Household not found",
+        statusMessage: "Not Found",
+        message: "Household not found or access denied",
       });
     }
 
@@ -32,7 +54,7 @@ export default defineEventHandler(async (event) => {
     const householdPersons = await db
       .select()
       .from(tables.persons)
-      .where(eq(tables.persons.householdId, householdId));
+      .where(eq(tables.persons.householdId, householdIdNum));
 
     const personIds = householdPersons.map((p) => p.id);
 
@@ -180,10 +202,15 @@ export default defineEventHandler(async (event) => {
       investmentAccountsCount: investmentAccountsCount[0]?.count || 0,
     };
   } catch (error) {
-    console.error("Error fetching household financial summary:", error);
+    // Re-throw HTTP errors as-is
+    if (error && typeof error === "object" && "statusCode" in error) {
+      throw error;
+    }
+
+    // Wrap other errors
     throw createError({
       statusCode: 500,
-      statusMessage: "Failed to fetch household financial summary",
+      statusMessage: "Internal server error",
     });
   }
 });

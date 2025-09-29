@@ -1,31 +1,38 @@
-import { auth } from "~~/lib/auth";
-
 export default defineEventHandler(async (event) => {
-  const householdId = parseInt(getRouterParam(event, "id") || "0");
-
-  if (!householdId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid household ID",
-    });
-  }
-
-  // Get session to verify user authentication
-  const session = await auth.api.getSession({
-    headers: event.headers,
-  });
+  const session = event.context.session;
 
   if (!session?.user?.id) {
     throw createError({
       statusCode: 401,
-      statusMessage: "Unauthorized - please sign in",
+      statusMessage: "Unauthorized",
+      message: "You must be logged in to access households",
     });
   }
 
+  const householdId = getRouterParam(event, "id");
+  if (!householdId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Household ID is required",
+    });
+  }
+
+  // Validate that householdId is a valid number
+  const householdIdNum = parseInt(householdId);
+  if (isNaN(householdIdNum)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Bad Request",
+      message: "Household ID is required",
+    });
+  }
+
+  const method = getMethod(event);
   const db = useDrizzle();
 
   try {
-    if (event.node.req.method === "GET") {
+    if (method === "GET") {
       // Get specific household with owner info - only if it belongs to the current user
       const [household] = await db
         .select({
@@ -39,7 +46,7 @@ export default defineEventHandler(async (event) => {
         .leftJoin(tables.users, eq(tables.households.userId, tables.users.id))
         .where(
           and(
-            eq(tables.households.id, householdId),
+            eq(tables.households.id, householdIdNum),
             eq(tables.households.userId, session.user.id)
           )
         );
@@ -47,7 +54,8 @@ export default defineEventHandler(async (event) => {
       if (!household) {
         throw createError({
           statusCode: 404,
-          statusMessage: "Household not found or access denied",
+          statusMessage: "Not Found",
+          message: "Household not found or access denied",
         });
       }
 
@@ -55,7 +63,7 @@ export default defineEventHandler(async (event) => {
       const persons = await db
         .select()
         .from(tables.persons)
-        .where(eq(tables.persons.householdId, householdId))
+        .where(eq(tables.persons.householdId, householdIdNum))
         .orderBy(tables.persons.createdAt);
 
       return {
@@ -64,7 +72,7 @@ export default defineEventHandler(async (event) => {
       };
     }
 
-    if (event.node.req.method === "PUT") {
+    if (method === "PUT") {
       // Update household - only if it belongs to the current user
       const body = await readBody(event);
       const { name } = body;
@@ -72,7 +80,8 @@ export default defineEventHandler(async (event) => {
       if (!name) {
         throw createError({
           statusCode: 400,
-          statusMessage: "Name is required",
+          statusMessage: "Bad Request",
+          message: "Name is required",
         });
       }
 
@@ -81,7 +90,7 @@ export default defineEventHandler(async (event) => {
         .set({ name })
         .where(
           and(
-            eq(tables.households.id, householdId),
+            eq(tables.households.id, householdIdNum),
             eq(tables.households.userId, session.user.id)
           )
         )
@@ -90,7 +99,8 @@ export default defineEventHandler(async (event) => {
       if (!updatedHousehold) {
         throw createError({
           statusCode: 404,
-          statusMessage: "Household not found or access denied",
+          statusMessage: "Not Found",
+          message: "Household not found or access denied",
         });
       }
 
@@ -99,14 +109,18 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 405,
-      statusMessage:
-        "Method not allowed - only GET and PUT requests are supported",
+      statusMessage: "Method Not Allowed",
     });
   } catch (error) {
-    console.error("Database error:", error);
+    // Re-throw HTTP errors as-is
+    if (error && typeof error === "object" && "statusCode" in error) {
+      throw error;
+    }
+
+    // Wrap other errors
     throw createError({
       statusCode: 500,
-      statusMessage: "Database operation failed",
+      statusMessage: "Internal server error",
     });
   }
 });

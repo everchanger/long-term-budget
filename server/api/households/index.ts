@@ -1,22 +1,17 @@
-import { auth } from "~~/lib/auth";
-
 export default defineEventHandler(async (event) => {
+  const session = event.context.session;
+
+  if (!session?.user?.id) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+      message: "You must be logged in to view households",
+    });
+  }
+
   try {
     // Only allow GET requests
     assertMethod(event, "GET");
-
-    // Get session from Better Auth
-    const session = await auth.api.getSession({
-      headers: event.headers,
-    });
-
-    if (!session?.user?.id) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: "Unauthorized",
-        message: "You must be logged in to view households",
-      });
-    }
 
     const db = useDrizzle();
 
