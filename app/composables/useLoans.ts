@@ -11,21 +11,7 @@ export const useLoans = (personId: string) => {
     default: () => [],
   });
 
-  // Modal state
-  const isLoanModalOpen = ref(false);
-  const isLoanSubmitting = ref(false);
-  const editingLoan = ref<SelectLoan | null>(null);
-
-  // Form state
-  const loanFormState = reactive({
-    name: "",
-    amount: "",
-    interestRate: "",
-    monthlyPayment: "",
-    loanType: "",
-  });
-
-  // Computed values
+  // Computed values - business logic only
   const totalDebt = computed(() => {
     if (!loans.value) return "0.00";
     return loans.value
@@ -36,33 +22,8 @@ export const useLoans = (personId: string) => {
       .toFixed(2);
   });
 
-  // Modal functions
-  const openLoanModal = () => {
-    editingLoan.value = null;
-    loanFormState.name = "";
-    loanFormState.amount = "";
-    loanFormState.interestRate = "";
-    loanFormState.monthlyPayment = "";
-    loanFormState.loanType = "";
-    isLoanModalOpen.value = true;
-  };
-
-  const closeLoanModal = () => {
-    isLoanModalOpen.value = false;
-    editingLoan.value = null;
-  };
-
-  const editLoan = (loan: SelectLoan) => {
-    editingLoan.value = loan;
-    loanFormState.name = loan.name;
-    loanFormState.amount = loan.currentBalance;
-    loanFormState.interestRate = loan.interestRate;
-    loanFormState.loanType = loan.loanType || "";
-    isLoanModalOpen.value = true;
-  };
-
-  // CRUD operations
-  const handleLoanSubmit = async (formData?: {
+  // API operations only
+  const createLoan = async (data: {
     name: string;
     originalAmount: string;
     currentBalance: string;
@@ -70,89 +31,58 @@ export const useLoans = (personId: string) => {
     monthlyPayment: string;
     loanType: string;
   }) => {
-    // Use provided form data if available, otherwise use internal form state
-    const data = formData || {
-      name: loanFormState.name.trim(),
-      originalAmount: loanFormState.amount,
-      currentBalance: loanFormState.amount,
-      interestRate: loanFormState.interestRate,
-      monthlyPayment: loanFormState.monthlyPayment,
-      loanType: loanFormState.loanType,
+    const payload = {
+      name: data.name.trim(),
+      originalAmount: parseFloat(data.originalAmount),
+      currentBalance:
+        parseFloat(data.currentBalance) || parseFloat(data.originalAmount),
+      interestRate: parseFloat(data.interestRate) || 0,
+      monthlyPayment: parseFloat(data.monthlyPayment) || 0,
+      loanType: data.loanType,
+      personId: parseInt(personId),
     };
 
-    // Validate the data
-    if (!data.name.trim() || !data.originalAmount) {
-      return;
-    }
+    await $fetch("/api/loans", {
+      method: "POST",
+      body: payload,
+    });
 
-    isLoanSubmitting.value = true;
-
-    try {
-      const payload = {
-        name: data.name.trim(),
-        originalAmount: parseFloat(data.originalAmount),
-        currentBalance:
-          parseFloat(data.currentBalance) || parseFloat(data.originalAmount),
-        interestRate: parseFloat(data.interestRate) || 0,
-        monthlyPayment: parseFloat(data.monthlyPayment) || 0,
-        loanType: data.loanType,
-        personId: parseInt(personId),
-      };
-
-      if (editingLoan.value) {
-        await $fetch(`/api/loans/${editingLoan.value.id}`, {
-          method: "PUT",
-          body: payload,
-        });
-      } else {
-        await $fetch("/api/loans", {
-          method: "POST",
-          body: payload,
-        });
-      }
-
-      await refreshLoans();
-      closeLoanModal();
-
-      const toast = useToast();
-      toast.add({
-        title: editingLoan.value ? "Loan updated" : "Loan added",
-        description: `${data.name} has been ${
-          editingLoan.value ? "updated" : "added"
-        } successfully.`,
-        color: "success",
-      });
-    } catch (error: unknown) {
-      const toast = useToast();
-      toast.add({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "An error occurred",
-        color: "error",
-      });
-    } finally {
-      isLoanSubmitting.value = false;
-    }
+    await refreshLoans();
   };
 
-  const deleteLoan = async (loan: SelectLoan) => {
-    try {
-      await $fetch(`/api/loans/${loan.id}`, { method: "DELETE" });
-      refreshLoans();
-      const toast = useToast();
-      toast.add({
-        title: "Loan deleted",
-        description: `${loan.name} has been removed.`,
-        color: "success",
-      });
-    } catch {
-      const toast = useToast();
-      toast.add({
-        title: "Error",
-        description: "Failed to delete loan",
-        color: "error",
-      });
+  const updateLoan = async (
+    id: number,
+    data: {
+      name: string;
+      originalAmount: string;
+      currentBalance: string;
+      interestRate: string;
+      monthlyPayment: string;
+      loanType: string;
     }
+  ) => {
+    const payload = {
+      name: data.name.trim(),
+      originalAmount: parseFloat(data.originalAmount),
+      currentBalance:
+        parseFloat(data.currentBalance) || parseFloat(data.originalAmount),
+      interestRate: parseFloat(data.interestRate) || 0,
+      monthlyPayment: parseFloat(data.monthlyPayment) || 0,
+      loanType: data.loanType,
+      personId: parseInt(personId),
+    };
+
+    await $fetch(`/api/loans/${id}`, {
+      method: "PUT",
+      body: payload,
+    });
+
+    await refreshLoans();
+  };
+
+  const deleteLoan = async (id: number) => {
+    await $fetch(`/api/loans/${id}`, { method: "DELETE" });
+    await refreshLoans();
   };
 
   return {
@@ -161,22 +91,12 @@ export const useLoans = (personId: string) => {
     loansLoading,
     refreshLoans,
 
-    // Modal state
-    isLoanModalOpen,
-    isLoanSubmitting,
-    editingLoan,
-
-    // Form state
-    loanFormState,
-
     // Computed
     totalDebt,
 
-    // Functions
-    openLoanModal,
-    closeLoanModal,
-    editLoan,
-    handleLoanSubmit,
+    // API operations
+    createLoan,
+    updateLoan,
     deleteLoan,
   };
 };

@@ -15,7 +15,7 @@
           </p>
         </div>
       </div>
-      <UButton icon="i-heroicons-plus" @click="onAddClick">
+      <UButton icon="i-heroicons-plus" @click="openSavingsModal">
         Add Savings Account
       </UButton>
     </div>
@@ -37,7 +37,7 @@
       <p class="text-neutral-600 dark:text-neutral-400 mb-4">
         Add {{ personName }}'s first savings account to start tracking balances.
       </p>
-      <UButton variant="soft" icon="i-heroicons-plus" @click="onAddClick">
+      <UButton variant="soft" icon="i-heroicons-plus" @click="openSavingsModal">
         Add Savings Account
       </UButton>
     </div>
@@ -70,19 +70,28 @@
               size="sm"
               variant="ghost"
               icon="i-heroicons-pencil"
-              @click="onEditClick(account)"
+              @click="editSavings(account)"
             />
             <UButton
               size="sm"
               variant="ghost"
               color="error"
               icon="i-heroicons-trash"
-              @click="onDeleteClick(account)"
+              @click="deleteSavings(account)"
             />
           </div>
         </div>
       </UCard>
     </div>
+
+    <!-- Savings Account Modal -->
+    <SavingsAccountModal
+      v-model:open="isSavingsModalOpen"
+      :savings-account="editingSavings"
+      :loading="isSavingsSubmitting"
+      @submit="handleSavingsSubmit"
+      @cancel="closeSavingsModal"
+    />
   </div>
 </template>
 
@@ -93,20 +102,98 @@ interface Props {
   savingsAccounts: SelectSavingsAccount[];
   loading: boolean;
   personName: string;
+  personId: string;
 }
 
-interface Emits {
-  addSavings: [];
-  editSavings: [account: SelectSavingsAccount];
-  deleteSavings: [account: SelectSavingsAccount];
-}
+const props = defineProps<Props>();
 
-defineProps<Props>();
-const emit = defineEmits<Emits>();
+// Use the simplified composable for API operations only
+const {
+  createSavingsAccount,
+  updateSavingsAccount,
+  deleteSavingsAccount: deleteSavingsAccountAPI,
+} = useSavingsAccounts(props.personId);
 
-const onAddClick = () => emit("addSavings");
-const onEditClick = (account: SelectSavingsAccount) =>
-  emit("editSavings", account);
-const onDeleteClick = (account: SelectSavingsAccount) =>
-  emit("deleteSavings", account);
+// Modal state - now managed by this component
+const isSavingsModalOpen = ref(false);
+const isSavingsSubmitting = ref(false);
+const editingSavings = ref<SelectSavingsAccount | null>(null);
+
+// Modal functions
+const openSavingsModal = () => {
+  editingSavings.value = null;
+  isSavingsModalOpen.value = true;
+};
+
+const closeSavingsModal = () => {
+  isSavingsModalOpen.value = false;
+  editingSavings.value = null;
+};
+
+const editSavings = (account: SelectSavingsAccount) => {
+  editingSavings.value = account;
+  isSavingsModalOpen.value = true;
+};
+
+// Handle form submission
+const handleSavingsSubmit = async (formData: {
+  name: string;
+  currentBalance: string;
+  interestRate: string;
+  accountType: string;
+}) => {
+  isSavingsSubmitting.value = true;
+
+  try {
+    if (editingSavings.value) {
+      await updateSavingsAccount(editingSavings.value.id, formData);
+    } else {
+      await createSavingsAccount(formData);
+    }
+
+    closeSavingsModal();
+
+    // Show success notification
+    const toast = useToast();
+    toast.add({
+      title: editingSavings.value
+        ? "Savings account updated"
+        : "Savings account added",
+      description: `${formData.name} has been ${
+        editingSavings.value ? "updated" : "added"
+      } successfully.`,
+      color: "success",
+    });
+  } catch (error: unknown) {
+    const toast = useToast();
+    toast.add({
+      title: "Error",
+      description: error instanceof Error ? error.message : "An error occurred",
+      color: "error",
+    });
+  } finally {
+    isSavingsSubmitting.value = false;
+  }
+};
+
+// Handle deletion
+const deleteSavings = async (account: SelectSavingsAccount) => {
+  try {
+    await deleteSavingsAccountAPI(account.id);
+
+    const toast = useToast();
+    toast.add({
+      title: "Savings account deleted",
+      description: `${account.name} has been removed.`,
+      color: "success",
+    });
+  } catch {
+    const toast = useToast();
+    toast.add({
+      title: "Error",
+      description: "Failed to delete savings account",
+      color: "error",
+    });
+  }
+};
 </script>

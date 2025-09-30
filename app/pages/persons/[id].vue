@@ -76,9 +76,7 @@
               :income-sources="incomeSources"
               :loading="incomeSourcesLoading"
               :person-name="person.name"
-              @add-income="openIncomeModal"
-              @edit-income="editIncome"
-              @delete-income="deleteIncome"
+              :person-id="personId"
             />
 
             <LoansTab
@@ -86,9 +84,7 @@
               :loans="loans"
               :loading="loansLoading"
               :person-name="person.name"
-              @add-loan="openLoanModal"
-              @edit-loan="editLoan"
-              @delete-loan="deleteLoan"
+              :person-id="personId"
             />
 
             <SavingsAccountsTab
@@ -96,38 +92,12 @@
               :savings-accounts="savingsAccounts"
               :loading="savingsLoading"
               :person-name="person.name"
-              @add-savings="openSavingsModal"
-              @edit-savings="editSavings"
-              @delete-savings="deleteSavings"
+              :person-id="personId"
             />
           </template>
         </UTabs>
       </UCard>
     </div>
-
-    <IncomeSourceModal
-      v-model:open="isIncomeModalOpen"
-      :income-source="editingIncomeSource"
-      :loading="isIncomeSubmitting"
-      @submit="handleIncomeSubmit"
-      @cancel="closeIncomeModal"
-    />
-
-    <LoanModal
-      v-model:open="isLoanModalOpen"
-      :loan="editingLoan"
-      :loading="isLoanSubmitting"
-      @submit="handleLoanSubmit"
-      @cancel="closeLoanModal"
-    />
-
-    <SavingsAccountModal
-      v-model:open="isSavingsModalOpen"
-      :savings-account="editingSavings"
-      :loading="isSavingsSubmitting"
-      @submit="handleSavingsSubmit"
-      @cancel="closeSavingsModal"
-    />
 
     <EditPersonModal
       v-model:open="isEditPersonModalOpen"
@@ -169,47 +139,13 @@ const savingsAccountsComposable = useSavingsAccounts(personId);
 const personEditComposable = usePersonEdit(personId, refreshPerson);
 
 // Extract values from composables for template usage
-const {
-  incomeSources,
-  incomeSourcesLoading,
-  isIncomeModalOpen,
-  isIncomeSubmitting,
-  editingIncomeSource,
-  totalMonthlyIncome,
-  openIncomeModal,
-  closeIncomeModal,
-  editIncome,
-  handleIncomeSubmit,
-  deleteIncome,
-} = incomeSourcesComposable;
+const { incomeSources, incomeSourcesLoading, totalMonthlyIncome } =
+  incomeSourcesComposable;
 
-const {
-  loans,
-  loansLoading,
-  isLoanModalOpen,
-  isLoanSubmitting,
-  editingLoan,
-  totalDebt,
-  openLoanModal,
-  closeLoanModal,
-  editLoan,
-  handleLoanSubmit,
-  deleteLoan,
-} = loansComposable;
+const { loans, loansLoading, totalDebt } = loansComposable;
 
-const {
-  savingsAccounts,
-  savingsLoading,
-  isSavingsModalOpen,
-  isSavingsSubmitting,
-  editingSavings,
-  totalSavings,
-  openSavingsModal,
-  closeSavingsModal,
-  editSavings,
-  handleSavingsSubmit,
-  deleteSavings,
-} = savingsAccountsComposable;
+const { savingsAccounts, savingsLoading, totalSavings } =
+  savingsAccountsComposable;
 
 const {
   isEditPersonModalOpen,

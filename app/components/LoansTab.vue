@@ -12,7 +12,9 @@
           </p>
         </div>
       </div>
-      <UButton icon="i-heroicons-plus" @click="onAddClick"> Add Loan </UButton>
+      <UButton icon="i-heroicons-plus" @click="openLoanModal">
+        Add Loan
+      </UButton>
     </div>
 
     <div v-if="loading" class="text-center py-8">
@@ -32,7 +34,7 @@
       <p class="text-gray-600 dark:text-gray-400 mb-4">
         Add loans and debts to track payments and balances.
       </p>
-      <UButton variant="soft" icon="i-heroicons-plus" @click="onAddClick">
+      <UButton variant="soft" icon="i-heroicons-plus" @click="openLoanModal">
         Add Loan
       </UButton>
     </div>
@@ -69,19 +71,28 @@
               size="sm"
               variant="ghost"
               icon="i-heroicons-pencil"
-              @click="onEditClick(loan)"
+              @click="editLoan(loan)"
             />
             <UButton
               size="sm"
               variant="ghost"
               color="error"
               icon="i-heroicons-trash"
-              @click="onDeleteClick(loan)"
+              @click="deleteLoan(loan)"
             />
           </div>
         </div>
       </UCard>
     </div>
+
+    <!-- Loan Modal -->
+    <LoanModal
+      v-model:open="isLoanModalOpen"
+      :loan="editingLoan"
+      :loading="isLoanSubmitting"
+      @submit="handleLoanSubmit"
+      @cancel="closeLoanModal"
+    />
   </div>
 </template>
 
@@ -92,18 +103,98 @@ interface Props {
   loans: SelectLoan[];
   loading: boolean;
   personName: string;
+  personId: string;
 }
 
-interface Emits {
-  addLoan: [];
-  editLoan: [loan: SelectLoan];
-  deleteLoan: [loan: SelectLoan];
-}
+const props = defineProps<Props>();
 
-defineProps<Props>();
-const emit = defineEmits<Emits>();
+// Use the simplified composable for API operations only
+const {
+  createLoan,
+  updateLoan,
+  deleteLoan: deleteLoanAPI,
+} = useLoans(props.personId);
 
-const onAddClick = () => emit("addLoan");
-const onEditClick = (loan: SelectLoan) => emit("editLoan", loan);
-const onDeleteClick = (loan: SelectLoan) => emit("deleteLoan", loan);
+// Modal state - now managed by this component
+const isLoanModalOpen = ref(false);
+const isLoanSubmitting = ref(false);
+const editingLoan = ref<SelectLoan | null>(null);
+
+// Modal functions
+const openLoanModal = () => {
+  editingLoan.value = null;
+  isLoanModalOpen.value = true;
+};
+
+const closeLoanModal = () => {
+  isLoanModalOpen.value = false;
+  editingLoan.value = null;
+};
+
+const editLoan = (loan: SelectLoan) => {
+  editingLoan.value = loan;
+  isLoanModalOpen.value = true;
+};
+
+// Handle form submission
+const handleLoanSubmit = async (formData: {
+  name: string;
+  originalAmount: string;
+  currentBalance: string;
+  interestRate: string;
+  monthlyPayment: string;
+  loanType: string;
+}) => {
+  isLoanSubmitting.value = true;
+
+  try {
+    if (editingLoan.value) {
+      await updateLoan(editingLoan.value.id, formData);
+    } else {
+      await createLoan(formData);
+    }
+
+    closeLoanModal();
+
+    // Show success notification
+    const toast = useToast();
+    toast.add({
+      title: editingLoan.value ? "Loan updated" : "Loan added",
+      description: `${formData.name} has been ${
+        editingLoan.value ? "updated" : "added"
+      } successfully.`,
+      color: "success",
+    });
+  } catch (error: unknown) {
+    const toast = useToast();
+    toast.add({
+      title: "Error",
+      description: error instanceof Error ? error.message : "An error occurred",
+      color: "error",
+    });
+  } finally {
+    isLoanSubmitting.value = false;
+  }
+};
+
+// Handle deletion
+const deleteLoan = async (loan: SelectLoan) => {
+  try {
+    await deleteLoanAPI(loan.id);
+
+    const toast = useToast();
+    toast.add({
+      title: "Loan deleted",
+      description: `${loan.name} has been removed.`,
+      color: "success",
+    });
+  } catch {
+    const toast = useToast();
+    toast.add({
+      title: "Error",
+      description: "Failed to delete loan",
+      color: "error",
+    });
+  }
+};
 </script>

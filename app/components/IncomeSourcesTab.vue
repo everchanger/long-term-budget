@@ -12,7 +12,7 @@
           </p>
         </div>
       </div>
-      <UButton icon="i-heroicons-plus" @click="onAddClick">
+      <UButton icon="i-heroicons-plus" @click="openIncomeModal">
         Add Income Source
       </UButton>
     </div>
@@ -34,7 +34,7 @@
       <p class="text-neutral-600 dark:text-neutral-400 mb-4">
         Add {{ personName }}'s first income source to get started.
       </p>
-      <UButton variant="soft" icon="i-heroicons-plus" @click="onAddClick">
+      <UButton variant="soft" icon="i-heroicons-plus" @click="openIncomeModal">
         Add Income Source
       </UButton>
     </div>
@@ -69,19 +69,28 @@
               size="sm"
               variant="ghost"
               icon="i-heroicons-pencil"
-              @click="onEditClick(income)"
+              @click="editIncome(income)"
             />
             <UButton
               size="sm"
               variant="ghost"
               color="error"
               icon="i-heroicons-trash"
-              @click="onDeleteClick(income)"
+              @click="deleteIncome(income)"
             />
           </div>
         </div>
       </UCard>
     </div>
+
+    <!-- Income Source Modal -->
+    <IncomeSourceModal
+      v-model:open="isIncomeModalOpen"
+      :income-source="editingIncomeSource"
+      :loading="isIncomeSubmitting"
+      @submit="handleIncomeSubmit"
+      @cancel="closeIncomeModal"
+    />
   </div>
 </template>
 
@@ -92,21 +101,100 @@ interface Props {
   incomeSources: SelectIncomeSource[];
   loading: boolean;
   personName: string;
+  personId: string;
 }
 
-interface Emits {
-  addIncome: [];
-  editIncome: [income: SelectIncomeSource];
-  deleteIncome: [income: SelectIncomeSource];
-}
+const props = defineProps<Props>();
 
-defineProps<Props>();
-const emit = defineEmits<Emits>();
+// Use the simplified composable for API operations only
+const { createIncomeSource, updateIncomeSource, deleteIncomeSource } =
+  useIncomeSources(props.personId);
 
-const onAddClick = () => emit("addIncome");
-const onEditClick = (income: SelectIncomeSource) => emit("editIncome", income);
-const onDeleteClick = (income: SelectIncomeSource) =>
-  emit("deleteIncome", income);
+// Modal state - now managed by this component
+const isIncomeModalOpen = ref(false);
+const isIncomeSubmitting = ref(false);
+const editingIncomeSource = ref<SelectIncomeSource | null>(null);
+
+// Modal functions
+const openIncomeModal = () => {
+  editingIncomeSource.value = null;
+  isIncomeModalOpen.value = true;
+};
+
+const closeIncomeModal = () => {
+  isIncomeModalOpen.value = false;
+  editingIncomeSource.value = null;
+};
+
+const editIncome = (income: SelectIncomeSource) => {
+  editingIncomeSource.value = income;
+  isIncomeModalOpen.value = true;
+};
+
+// Handle form submission
+const handleIncomeSubmit = async (formData: {
+  name: string;
+  amount: number;
+  frequency: string;
+}) => {
+  isIncomeSubmitting.value = true;
+
+  try {
+    if (editingIncomeSource.value) {
+      await updateIncomeSource(editingIncomeSource.value.id, formData);
+    } else {
+      await createIncomeSource(formData);
+    }
+
+    closeIncomeModal();
+
+    // Show success notification
+    const toast = useToast();
+    toast.add({
+      title: editingIncomeSource.value
+        ? "Income source updated"
+        : "Income source added",
+      description: `${formData.name} has been ${
+        editingIncomeSource.value ? "updated" : "added"
+      } successfully.`,
+      color: "success",
+    });
+  } catch (error: unknown) {
+    const toast = useToast();
+    toast.add({
+      title: "Error",
+      description:
+        (error as { data?: { message?: string } }).data?.message ||
+        "An error occurred",
+      color: "error",
+    });
+  } finally {
+    isIncomeSubmitting.value = false;
+  }
+};
+
+// Handle deletion
+const deleteIncome = async (income: SelectIncomeSource) => {
+  try {
+    await deleteIncomeSource(income.id);
+
+    const toast = useToast();
+    toast.add({
+      title: "Income source deleted",
+      description: `${income.name} has been removed.`,
+      color: "success",
+    });
+  } catch (error: unknown) {
+    const toast = useToast();
+    toast.add({
+      title: "Error",
+      description:
+        (error as { data?: { message?: string } }).data?.message ||
+        "Failed to delete income source",
+      color: "error",
+    });
+  }
+};
 
 function formatDate(date: Date | string) {
   if (date instanceof Date) {
