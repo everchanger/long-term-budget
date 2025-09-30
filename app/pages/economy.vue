@@ -623,11 +623,11 @@
 
       <!-- Savings Goal Modal -->
       <SavingsGoalModal
-        :is-open="isSavingsGoalModalOpen"
-        :is-submitting="isSavingsGoalSubmitting"
+        v-model:open="isSavingsGoalModalOpen"
+        :loading="isSavingsGoalSubmitting"
         :editing-goal="editingSavingsGoal"
         @submit="handleSavingsGoalSubmit"
-        @close="closeSavingsGoalModal"
+        @cancel="closeSavingsGoalModal"
       />
 
       <!-- Add/Edit Person Modal -->
@@ -966,6 +966,7 @@ const isSavingsGoalSubmitting = ref(false);
 const editingSavingsGoal = ref(null);
 
 const openSavingsGoalModal = () => {
+  console.log("Opening savings goal modal");
   isSavingsGoalModalOpen.value = true;
   editingSavingsGoal.value = null;
 };

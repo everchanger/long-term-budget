@@ -1,9 +1,5 @@
 <template>
-  <UModal
-    :model-value="isOpen"
-    @update:model-value="$emit('close')"
-    :ui="{ width: 'sm:max-w-2xl' }"
-  >
+  <UModal v-model:open="isOpen">
     <template #header>
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
         {{ isEditing ? "Edit Savings Goal" : "Add Savings Goal" }}
@@ -11,7 +7,7 @@
     </template>
 
     <template #body>
-      <form @submit.prevent="handleSubmit" class="space-y-6">
+      <form class="space-y-6" @submit.prevent="handleSubmit">
         <!-- Goal Name -->
         <div>
           <label
@@ -44,7 +40,7 @@
             rows="3"
             placeholder="Optional description of your savings goal"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-          ></textarea>
+          />
         </div>
 
         <!-- Target Amount -->
@@ -171,10 +167,10 @@
 
     <template #footer>
       <div class="flex justify-end space-x-3">
-        <UButton color="gray" variant="ghost" @click="$emit('close')">
+        <UButton color="neutral" variant="ghost" @click="handleCancel">
           Cancel
         </UButton>
-        <UButton :loading="isSubmitting" @click="handleSubmit">
+        <UButton :loading="loading" @click="handleSubmit">
           {{ isEditing ? "Update Goal" : "Create Goal" }}
         </UButton>
       </div>
@@ -184,8 +180,8 @@
 
 <script setup lang="ts">
 interface Props {
-  isOpen: boolean;
-  isSubmitting: boolean;
+  open?: boolean;
+  loading?: boolean;
   editingGoal?: {
     id: number;
     householdId: number;
@@ -212,11 +208,14 @@ interface FormData {
 }
 
 interface Emits {
-  close: [];
+  "update:open": [value: boolean];
   submit: [data: FormData];
+  cancel: [];
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  open: false,
+  loading: false,
   editingGoal: null,
 });
 
@@ -232,6 +231,12 @@ const formState = reactive<FormData>({
 });
 
 const isEditing = computed(() => props.editingGoal !== null);
+
+// Computed properties
+const isOpen = computed({
+  get: () => props.open,
+  set: (value: boolean) => emit("update:open", value),
+});
 
 // Reset form when modal closes
 const resetForm = () => {
@@ -266,7 +271,7 @@ watch(
 
 // Watch for modal close to reset form
 watch(
-  () => props.isOpen,
+  () => props.open,
   (newValue) => {
     if (!newValue && !props.editingGoal) {
       resetForm();
@@ -283,5 +288,10 @@ const handleSubmit = () => {
     priority: formState.priority,
     category: formState.category,
   });
+};
+
+const handleCancel = () => {
+  emit("cancel");
+  emit("update:open", false);
 };
 </script>

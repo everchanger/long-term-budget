@@ -107,6 +107,21 @@ CREATE TABLE "savings_accounts" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "savings_goals" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"household_id" integer NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"description" text,
+	"target_amount" numeric(12, 2) NOT NULL,
+	"target_date" timestamp,
+	"is_completed" boolean DEFAULT false NOT NULL,
+	"completed_at" timestamp,
+	"priority" integer DEFAULT 1,
+	"category" varchar(100),
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "loans" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"person_id" integer NOT NULL,
@@ -139,5 +154,6 @@ ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_users_id_fk" FOREIGN KEY
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "persons" ADD CONSTRAINT "persons_household_id_households_id_fk" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "savings_accounts" ADD CONSTRAINT "savings_accounts_person_id_persons_id_fk" FOREIGN KEY ("person_id") REFERENCES "public"."persons"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "savings_goals" ADD CONSTRAINT "savings_goals_household_id_households_id_fk" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "loans" ADD CONSTRAINT "loans_person_id_persons_id_fk" FOREIGN KEY ("person_id") REFERENCES "public"."persons"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "scenarios" ADD CONSTRAINT "scenarios_household_id_households_id_fk" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE cascade ON UPDATE no action;
