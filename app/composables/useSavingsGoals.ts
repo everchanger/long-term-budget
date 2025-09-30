@@ -24,20 +24,7 @@ export const useSavingsGoals = (householdId: MaybeRefOrGetter<string>) => {
     default: () => [],
   });
 
-  // Modal state
-  const isSavingsGoalModalOpen = ref(false);
-  const isSavingsGoalSubmitting = ref(false);
-  const editingSavingsGoal = ref<EnrichedSavingsGoal | null>(null);
-
-  // Form state (removed currentAmount since it's calculated)
-  const savingsGoalFormState = reactive({
-    name: "",
-    description: "",
-    targetAmount: "",
-    targetDate: null as Date | null,
-    priority: 1,
-    category: "",
-  });
+  // Modal state removed - now managed by components that use this composable
 
   // Computed values
   const totalTargetAmount = computed(() => {
@@ -106,44 +93,10 @@ export const useSavingsGoals = (householdId: MaybeRefOrGetter<string>) => {
     }
   };
 
-  // Modal functions
-  const openSavingsGoalModal = () => {
-    isSavingsGoalModalOpen.value = true;
-  };
+  // Modal functions removed - now handled by components
 
-  const closeSavingsGoalModal = () => {
-    isSavingsGoalModalOpen.value = false;
-    editingSavingsGoal.value = null;
-    resetSavingsGoalForm();
-  };
-
-  const resetSavingsGoalForm = () => {
-    savingsGoalFormState.name = "";
-    savingsGoalFormState.description = "";
-    savingsGoalFormState.targetAmount = "";
-    savingsGoalFormState.targetDate = null;
-    savingsGoalFormState.priority = 1;
-    savingsGoalFormState.category = "";
-  };
-
-  const editSavingsGoal = (goal: EnrichedSavingsGoal) => {
-    editingSavingsGoal.value = goal;
-
-    // Populate form with goal data
-    Object.assign(savingsGoalFormState, {
-      name: goal.name,
-      description: goal.description || "",
-      targetAmount: goal.targetAmount,
-      targetDate: goal.targetDate ? new Date(goal.targetDate) : null,
-      priority: goal.priority || 1,
-      category: goal.category || "",
-    });
-
-    openSavingsGoalModal();
-  };
-
-  // Form submission
-  const saveSavingsGoal = async (formData: {
+  // API functions for CRUD operations
+  const createSavingsGoal = async (goalData: {
     name: string;
     description: string;
     targetAmount: string;
@@ -151,50 +104,50 @@ export const useSavingsGoals = (householdId: MaybeRefOrGetter<string>) => {
     priority: number;
     category: string;
   }) => {
-    try {
-      isSavingsGoalSubmitting.value = true;
+    const insertData: InsertSavingsGoal = {
+      name: goalData.name,
+      description: goalData.description,
+      targetAmount: goalData.targetAmount.toString(),
+      targetDate: goalData.targetDate || undefined,
+      priority: Number(goalData.priority) || 1,
+      category: goalData.category,
+      householdId: parseInt(toValue(householdId)),
+    };
 
-      if (editingSavingsGoal.value) {
-        // Update existing goal
-        const updateData: UpdateSavingsGoal = {
-          name: formData.name,
-          description: formData.description,
-          targetAmount: formData.targetAmount.toString(),
-          targetDate: formData.targetDate || undefined,
-          priority: Number(formData.priority) || 1,
-          category: formData.category,
-        };
+    await $fetch("/api/savings-goals", {
+      method: "POST",
+      body: insertData,
+    });
 
-        await $fetch(`/api/savings-goals/${editingSavingsGoal.value.id}`, {
-          method: "PUT",
-          body: updateData,
-        });
-      } else {
-        // Create new goal
-        const insertData: InsertSavingsGoal = {
-          name: formData.name,
-          description: formData.description,
-          targetAmount: formData.targetAmount.toString(),
-          targetDate: formData.targetDate || undefined,
-          priority: Number(formData.priority) || 1,
-          category: formData.category,
-          householdId: parseInt(toValue(householdId)),
-        };
+    await refreshSavingsGoals();
+  };
 
-        await $fetch("/api/savings-goals", {
-          method: "POST",
-          body: insertData,
-        });
-      }
-
-      await refreshSavingsGoals();
-      closeSavingsGoalModal();
-    } catch (error) {
-      console.error("Error submitting savings goal:", error);
-      throw error;
-    } finally {
-      isSavingsGoalSubmitting.value = false;
+  const updateSavingsGoal = async (
+    goalId: number,
+    goalData: {
+      name: string;
+      description: string;
+      targetAmount: string;
+      targetDate: Date | null;
+      priority: number;
+      category: string;
     }
+  ) => {
+    const updateData: UpdateSavingsGoal = {
+      name: goalData.name,
+      description: goalData.description,
+      targetAmount: goalData.targetAmount.toString(),
+      targetDate: goalData.targetDate || undefined,
+      priority: Number(goalData.priority) || 1,
+      category: goalData.category,
+    };
+
+    await $fetch(`/api/savings-goals/${goalId}`, {
+      method: "PUT",
+      body: updateData,
+    });
+
+    await refreshSavingsGoals();
   };
 
   const deleteSavingsGoal = async (goalId: number) => {
@@ -233,12 +186,6 @@ export const useSavingsGoals = (householdId: MaybeRefOrGetter<string>) => {
     savingsGoals,
     savingsGoalsLoading,
 
-    // Modal state
-    isSavingsGoalModalOpen,
-    isSavingsGoalSubmitting,
-    editingSavingsGoal,
-    savingsGoalFormState,
-
     // Computed
     totalTargetAmount,
     totalCurrentAmount,
@@ -246,17 +193,16 @@ export const useSavingsGoals = (householdId: MaybeRefOrGetter<string>) => {
     activeGoals,
     completedGoals,
 
-    // Functions
+    // API operations
     refreshSavingsGoals,
+    createSavingsGoal,
+    updateSavingsGoal,
+    deleteSavingsGoal,
+    markGoalAsCompleted,
+
+    // Utilities
     getGoalProgress,
     getRemainingAmount,
     getEstimatedCompletionTime,
-    openSavingsGoalModal,
-    closeSavingsGoalModal,
-    resetSavingsGoalForm,
-    editSavingsGoal,
-    saveSavingsGoal,
-    deleteSavingsGoal,
-    markGoalAsCompleted,
   };
 };

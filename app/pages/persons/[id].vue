@@ -136,7 +136,7 @@ const selectedTab = ref(financialTabs[0]?.value);
 const incomeSourcesComposable = useIncomeSources(personId);
 const loansComposable = useLoans(personId);
 const savingsAccountsComposable = useSavingsAccounts(personId);
-const personEditComposable = usePersonEdit(personId, refreshPerson);
+const { updatePerson } = usePersonEdit(personId);
 
 // Extract values from composables for template usage
 const { incomeSources, incomeSourcesLoading, totalMonthlyIncome } =
@@ -147,12 +147,52 @@ const { loans, loansLoading, totalDebt } = loansComposable;
 const { savingsAccounts, savingsLoading, totalSavings } =
   savingsAccountsComposable;
 
-const {
-  isEditPersonModalOpen,
-  openEditPersonModal,
-  closeEditPersonModal,
-  handleEditPersonSubmit,
-} = personEditComposable;
+// EditPersonModal state - now managed by this component
+const isEditPersonModalOpen = ref(false);
+
+// Modal functions
+const openEditPersonModal = (personData: SelectPerson | null) => {
+  if (personData) {
+    isEditPersonModalOpen.value = true;
+  }
+};
+
+const closeEditPersonModal = () => {
+  isEditPersonModalOpen.value = false;
+};
+
+// Handle form submission
+const handleEditPersonSubmit = async (formData: {
+  name?: string;
+  age?: number;
+}) => {
+  if (!formData.name?.trim()) return;
+
+  try {
+    await updatePerson({
+      name: formData.name.trim(),
+      age: formData.age ?? null,
+    });
+    await refreshPerson();
+    closeEditPersonModal();
+
+    const toast = useToast();
+    toast.add({
+      title: "Person updated",
+      description: `${formData.name} has been updated successfully.`,
+      color: "success",
+    });
+  } catch (error: unknown) {
+    const toast = useToast();
+    toast.add({
+      title: "Error",
+      description:
+        (error as { data?: { message?: string } }).data?.message ||
+        "Failed to update person",
+      color: "error",
+    });
+  }
+};
 
 // SEO
 useHead({

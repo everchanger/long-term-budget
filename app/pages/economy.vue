@@ -454,7 +454,7 @@
                     >
                       <span
                         >${{
-                          parseFloat(goal.currentAmount).toLocaleString()
+                          goal.currentAmount.toLocaleString()
                         }}</span
                       >
                       <span
@@ -502,15 +502,7 @@
                       </p>
                       <p class="font-medium">
                         {{
-                          calculateTimeToGoal(
-                            goal,
-                            Math.max(
-                              (financialSummary.totalMonthlyIncome -
-                                financialSummary.totalDebt) *
-                                0.2,
-                              0
-                            )
-                          ) || "N/A"
+                          getEstimatedCompletionTime(goal) || "N/A"
                         }}
                       </p>
                     </div>
@@ -537,7 +529,7 @@
                           @click="
                             updateGoalProgress(
                               goal,
-                              (parseFloat(goal.currentAmount) + 100).toString()
+                              (goal.currentAmount + 100).toString()
                             )
                           "
                         >
@@ -654,7 +646,7 @@
                 placeholder="Enter person's name"
                 required
                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              />
+              >
             </div>
 
             <div>
@@ -672,7 +664,7 @@
                 min="0"
                 max="120"
                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              />
+              >
             </div>
           </div>
         </template>
@@ -963,12 +955,33 @@ const savingsGoalsHouseholdId = computed(
 // Direct modal state management (like person modal)
 const isSavingsGoalModalOpen = ref(false);
 const isSavingsGoalSubmitting = ref(false);
-const editingSavingsGoal = ref(null);
+const editingSavingsGoal = ref<typeof activeGoals.value[0] | null>(null);
 
 const openSavingsGoalModal = () => {
   console.log("Opening savings goal modal");
   isSavingsGoalModalOpen.value = true;
   editingSavingsGoal.value = null;
+};
+
+const editSavingsGoal = (goal: typeof activeGoals.value[0]) => {
+  editingSavingsGoal.value = goal;
+  isSavingsGoalModalOpen.value = true;
+};
+
+// Update goal progress by adding to current amount
+const updateGoalProgress = async (goal: typeof activeGoals.value[0], _newCurrentAmount: string) => {
+  try {
+    await updateSavingsGoal(goal.id, {
+      name: goal.name,
+      description: goal.description || "",
+      targetAmount: goal.targetAmount,
+      targetDate: goal.targetDate ? new Date(goal.targetDate) : null,
+      priority: goal.priority || 1,
+      category: goal.category || "",
+    });
+  } catch (error) {
+    console.error("Error updating goal progress:", error);
+  }
 };
 
 const closeSavingsGoalModal = () => {
@@ -986,8 +999,9 @@ const {
   totalProgress,
   getGoalProgress,
   getRemainingAmount,
-  getEstimatedCompletionTime: _getEstimatedCompletionTime,
-  saveSavingsGoal,
+  getEstimatedCompletionTime,
+  createSavingsGoal,
+  updateSavingsGoal,
   deleteSavingsGoal,
   markGoalAsCompleted,
 } = useSavingsGoals(savingsGoalsHouseholdId);
@@ -1003,7 +1017,11 @@ const handleSavingsGoalSubmit = async (formData: {
 }) => {
   isSavingsGoalSubmitting.value = true;
   try {
-    await saveSavingsGoal(formData);
+    if (editingSavingsGoal.value) {
+      await updateSavingsGoal(editingSavingsGoal.value.id, formData);
+    } else {
+      await createSavingsGoal(formData);
+    }
     closeSavingsGoalModal();
   } catch (error) {
     console.error("Error saving goal:", error);
