@@ -125,9 +125,9 @@ const {
 
 // Financial tabs
 const financialTabs = [
-  { value: "income", label: "Income Sources", icon: "i-heroicons-banknotes" },
-  { value: "loans", label: "Loans & Debts", icon: "i-heroicons-credit-card" },
-  { value: "savings", label: "Savings", icon: "i-heroicons-building-library" },
+  { value: "income", label: "Income Sources" },
+  { value: "loans", label: "Loans & Debts" },
+  { value: "savings", label: "Savings" },
 ];
 
 const selectedTab = ref(financialTabs[0]?.value);

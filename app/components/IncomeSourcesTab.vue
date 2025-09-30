@@ -2,7 +2,6 @@
   <div class="py-6">
     <div class="flex justify-between items-center mb-6">
       <div class="flex items-center gap-3">
-        <UIcon name="i-heroicons-banknotes" class="h-6 w-6 text-neutral-400" />
         <div>
           <h3 class="text-xl font-semibold text-neutral-900 dark:text-white">
             Income Sources

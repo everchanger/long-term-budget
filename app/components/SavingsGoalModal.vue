@@ -141,20 +141,20 @@
 
         <!-- Auto-calculation Notice -->
         <div
-          class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800"
+          class="bg-neutral-50 dark:bg-neutral-800 rounded-lg p-4 border border-neutral-200 dark:border-neutral-700"
         >
           <div class="flex items-start">
             <UIcon
               name="i-heroicons-information-circle"
-              class="h-5 w-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0"
+              class="h-5 w-5 text-neutral-500 mt-0.5 mr-3 flex-shrink-0"
             />
             <div>
               <h4
-                class="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1"
+                class="text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-1"
               >
                 Automatic Progress Tracking
               </h4>
-              <p class="text-sm text-blue-700 dark:text-blue-300">
+              <p class="text-sm text-neutral-700 dark:text-neutral-300">
                 Your progress towards this goal will be calculated automatically
                 based on your household's total savings, income, and expenses.
                 No need to manually update amounts!

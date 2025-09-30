@@ -10,7 +10,6 @@
             ${{ totalMonthlyIncome }}
           </p>
         </div>
-        <UIcon name="i-heroicons-banknotes" class="h-8 w-8 text-neutral-400" />
       </div>
     </UCard>
 
@@ -24,10 +23,6 @@
             ${{ totalSavings }}
           </p>
         </div>
-        <UIcon
-          name="i-heroicons-building-library"
-          class="h-8 w-8 text-neutral-400"
-        />
       </div>
     </UCard>
 
@@ -41,10 +36,6 @@
             ${{ totalDebt }}
           </p>
         </div>
-        <UIcon
-          name="i-heroicons-credit-card"
-          class="h-8 w-8 text-neutral-400"
-        />
       </div>
     </UCard>
   </div>

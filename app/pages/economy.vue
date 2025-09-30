@@ -39,8 +39,8 @@
                 class="font-semibold text-lg"
                 :class="
                   netWorth >= 0
-                    ? 'text-emerald-600 dark:text-emerald-400'
-                    : 'text-red-600 dark:text-red-400'
+                    ? 'text-neutral-900 dark:text-neutral-100'
+                    : 'text-neutral-700 dark:text-neutral-300'
                 "
               >
                 ${{ netWorth.toLocaleString() }}
@@ -72,17 +72,17 @@
               <div class="flex items-center justify-between">
                 <div class="flex items-center">
                   <div
-                    class="w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mr-3"
+                    class="w-8 h-8 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3"
                   >
                     <UIcon
                       name="i-heroicons-users"
-                      class="w-4 h-4 text-blue-600 dark:text-blue-400"
+                      class="w-4 h-4 text-neutral-600 dark:text-neutral-400"
                     />
                   </div>
                   <h3
                     class="text-lg font-medium text-neutral-900 dark:text-white"
                   >
-                    Family Members
+                    Members
                   </h3>
                 </div>
                 <UButton
@@ -102,17 +102,18 @@
                 <div
                   v-for="member in householdMembers"
                   :key="member.id"
-                  class="flex items-center justify-between p-6 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow"
+                  class="p-6 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div class="flex items-center">
+                  <div class="flex items-center mb-4 sm:mb-0">
                     <div
-                      class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-4"
+                      class="w-12 h-12 bg-neutral-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mr-4"
                     >
-                      <span class="text-white font-semibold">{{
-                        member.name.charAt(0).toUpperCase()
-                      }}</span>
+                      <span
+                        class="text-neutral-700 dark:text-neutral-300 font-semibold"
+                        >{{ member.name.charAt(0).toUpperCase() }}</span
+                      >
                     </div>
-                    <div>
+                    <div class="flex-grow">
                       <p
                         class="font-semibold text-lg text-neutral-900 dark:text-white"
                       >
@@ -127,13 +128,13 @@
                       </p>
                     </div>
                   </div>
-                  <div class="flex items-center space-x-3">
+                  <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
                     <UButton
                       :to="`/persons/${member.id}`"
                       size="lg"
                       variant="solid"
                       icon="i-heroicons-chart-bar"
-                      class="px-2"
+                      class="w-full sm:w-auto justify-center"
                     >
                       Manage Finances
                     </UButton>
@@ -142,6 +143,7 @@
                       variant="soft"
                       color="error"
                       icon="i-heroicons-trash"
+                      class="w-full sm:w-auto justify-center"
                       @click="openDeletePersonModal(member)"
                       >Delete</UButton
                     >
@@ -161,10 +163,10 @@
                 <h4
                   class="text-lg font-medium text-neutral-900 dark:text-white mb-2"
                 >
-                  No family members yet
+                  No members yet
                 </h4>
                 <p class="text-neutral-600 dark:text-neutral-400 mb-6">
-                  Add your first family member to get started
+                  Add your first member to get started
                 </p>
                 <UButton
                   variant="soft"
@@ -187,11 +189,11 @@
             >
               <div class="flex items-center">
                 <div
-                  class="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg flex items-center justify-center mr-3"
+                  class="w-8 h-8 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3"
                 >
                   <UIcon
                     name="i-heroicons-chart-bar"
-                    class="w-4 h-4 text-emerald-600 dark:text-emerald-400"
+                    class="w-4 h-4 text-neutral-600 dark:text-neutral-400"
                   />
                 </div>
                 <div>
@@ -201,7 +203,7 @@
                     Financial Overview
                   </h3>
                   <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                    Combined finances for all family members
+                    Combined finances for all members
                   </p>
                 </div>
               </div>
@@ -280,16 +282,16 @@
 
               <!-- Net Worth Summary -->
               <div
-                class="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/10 dark:to-blue-900/10 p-6 rounded-lg border border-emerald-200 dark:border-emerald-700"
+                class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-lg border border-neutral-200 dark:border-neutral-700"
               >
                 <div class="flex items-center justify-between">
                   <div class="flex items-center">
                     <div
-                      class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/20 rounded-xl flex items-center justify-center mr-4"
+                      class="w-12 h-12 bg-neutral-100 dark:bg-neutral-700 rounded-xl flex items-center justify-center mr-4"
                     >
                       <UIcon
                         name="i-heroicons-trophy"
-                        class="w-6 h-6 text-emerald-600 dark:text-emerald-400"
+                        class="w-6 h-6 text-neutral-600 dark:text-neutral-400"
                       />
                     </div>
                     <div>
@@ -304,12 +306,7 @@
                     </div>
                   </div>
                   <p
-                    class="text-3xl font-bold"
-                    :class="
-                      netWorth >= 0
-                        ? 'text-emerald-600 dark:text-emerald-400'
-                        : 'text-red-600 dark:text-red-400'
-                    "
+                    class="text-3xl font-bold text-neutral-900 dark:text-neutral-100"
                   >
                     ${{ netWorth.toLocaleString() }}
                   </p>
@@ -329,11 +326,11 @@
               <div class="flex items-center justify-between">
                 <div class="flex items-center">
                   <div
-                    class="w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center mr-3"
+                    class="w-8 h-8 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3"
                   >
                     <UIcon
                       name="i-heroicons-flag"
-                      class="w-4 h-4 text-purple-600 dark:text-purple-400"
+                      class="w-4 h-4 text-neutral-600 dark:text-neutral-400"
                     />
                   </div>
                   <div>
@@ -343,7 +340,7 @@
                       Savings Goals
                     </h3>
                     <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                      Track your family's financial objectives
+                      Track your financial objectives
                     </p>
                   </div>
                 </div>
@@ -362,7 +359,7 @@
               <div v-if="savingsGoalsLoading" class="text-center py-8">
                 <UIcon
                   name="i-heroicons-arrow-path"
-                  class="animate-spin h-6 w-6 mx-auto mb-2 text-purple-600"
+                  class="animate-spin h-6 w-6 mx-auto mb-2 text-neutral-600"
                 />
                 <p class="text-sm text-neutral-600 dark:text-neutral-400">
                   Loading goals...
@@ -443,7 +440,7 @@
                       class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2"
                     >
                       <div
-                        class="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                        class="bg-neutral-600 dark:bg-neutral-400 h-2 rounded-full transition-all duration-300"
                         :style="{
                           width: `${Math.min(getGoalProgress(goal), 100)}%`,
                         }"
@@ -452,11 +449,7 @@
                     <div
                       class="flex justify-between text-xs text-neutral-500 dark:text-neutral-500 mt-1"
                     >
-                      <span
-                        >${{
-                          goal.currentAmount.toLocaleString()
-                        }}</span
-                      >
+                      <span>${{ goal.currentAmount.toLocaleString() }}</span>
                       <span
                         >${{
                           parseFloat(goal.targetAmount).toLocaleString()
@@ -501,9 +494,7 @@
                         Time to Goal
                       </p>
                       <p class="font-medium">
-                        {{
-                          getEstimatedCompletionTime(goal) || "N/A"
-                        }}
+                        {{ getEstimatedCompletionTime(goal) || "N/A" }}
                       </p>
                     </div>
                   </div>
@@ -521,19 +512,7 @@
                           color="success"
                           @click="markGoalAsCompleted(goal)"
                         >
-                          > Mark Complete
-                        </UButton>
-                        <UButton
-                          size="sm"
-                          variant="soft"
-                          @click="
-                            updateGoalProgress(
-                              goal,
-                              (goal.currentAmount + 100).toString()
-                            )
-                          "
-                        >
-                          Add $100
+                          Mark Complete
                         </UButton>
                       </div>
                       <p class="text-xs text-neutral-500 dark:text-neutral-500">
@@ -546,12 +525,12 @@
 
                 <!-- Summary Stats -->
                 <div
-                  class="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 rounded-lg border border-purple-200 dark:border-purple-700"
+                  class="mt-6 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700"
                 >
                   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="text-center">
                       <p
-                        class="text-2xl font-bold text-purple-600 dark:text-purple-400"
+                        class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
                       >
                         ${{ totalTargetAmount }}
                       </p>
@@ -561,7 +540,7 @@
                     </div>
                     <div class="text-center">
                       <p
-                        class="text-2xl font-bold text-purple-600 dark:text-purple-400"
+                        class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
                       >
                         ${{ totalCurrentAmount }}
                       </p>
@@ -571,7 +550,7 @@
                     </div>
                     <div class="text-center">
                       <p
-                        class="text-2xl font-bold text-purple-600 dark:text-purple-400"
+                        class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
                       >
                         {{ totalProgress.toFixed(1) }}%
                       </p>
@@ -585,11 +564,11 @@
 
               <div v-else class="text-center py-12">
                 <div
-                  class="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4"
+                  class="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4"
                 >
                   <UIcon
                     name="i-heroicons-flag"
-                    class="w-8 h-8 text-purple-600 dark:text-purple-400"
+                    class="w-8 h-8 text-neutral-600 dark:text-neutral-400"
                   />
                 </div>
                 <h4
@@ -646,7 +625,7 @@
                 placeholder="Enter person's name"
                 required
                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              >
+              />
             </div>
 
             <div>
@@ -664,7 +643,7 @@
                 min="0"
                 max="120"
                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              >
+              />
             </div>
           </div>
         </template>
@@ -955,7 +934,7 @@ const savingsGoalsHouseholdId = computed(
 // Direct modal state management (like person modal)
 const isSavingsGoalModalOpen = ref(false);
 const isSavingsGoalSubmitting = ref(false);
-const editingSavingsGoal = ref<typeof activeGoals.value[0] | null>(null);
+const editingSavingsGoal = ref<(typeof activeGoals.value)[0] | null>(null);
 
 const openSavingsGoalModal = () => {
   console.log("Opening savings goal modal");
@@ -963,25 +942,9 @@ const openSavingsGoalModal = () => {
   editingSavingsGoal.value = null;
 };
 
-const editSavingsGoal = (goal: typeof activeGoals.value[0]) => {
+const editSavingsGoal = (goal: (typeof activeGoals.value)[0]) => {
   editingSavingsGoal.value = goal;
   isSavingsGoalModalOpen.value = true;
-};
-
-// Update goal progress by adding to current amount
-const updateGoalProgress = async (goal: typeof activeGoals.value[0], _newCurrentAmount: string) => {
-  try {
-    await updateSavingsGoal(goal.id, {
-      name: goal.name,
-      description: goal.description || "",
-      targetAmount: goal.targetAmount,
-      targetDate: goal.targetDate ? new Date(goal.targetDate) : null,
-      priority: goal.priority || 1,
-      category: goal.category || "",
-    });
-  } catch (error) {
-    console.error("Error updating goal progress:", error);
-  }
 };
 
 const closeSavingsGoalModal = () => {
