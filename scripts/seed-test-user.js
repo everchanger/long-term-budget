@@ -333,7 +333,7 @@ async function seedTestUser() {
         householdId: householdId,
         name: 'House Down Payment',
         description: 'Save for 20% down payment on a new home',
-        targetAmount: '50000',
+        targetAmount: 50000,
         priority: 3, // high priority
         category: 'house',
         savingsAccountIds: [aliceSavings.id, bobSavings.id], // Link both accounts

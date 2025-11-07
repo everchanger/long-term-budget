@@ -92,4 +92,32 @@ All entities now have complete validation schemas:
 2. ✅ **Fixed savings goals POST** - Added `.toString()` for `targetAmount`
 3. ✅ **Fixed savings goals PUT** - Added `.toString()` for `targetAmount`
 4. ✅ **Standardized all validation schemas** - All decimal fields expect numbers
-5. ✅ **All 183 tests passing** - Full type consistency verified
+5. ✅ **Fixed seed script** - Changed `targetAmount: '50000'` to `targetAmount: 50000`
+6. ✅ **Fixed frontend modals** - Convert string inputs to numbers before submission:
+   - `SavingsGoalModal.vue`: Convert `targetAmount` to number
+   - `SavingsAccountModal.vue`: Convert `currentBalance`, `interestRate`, `monthlyDeposit` to numbers
+   - `LoanModal.vue`: Convert `originalAmount`, `currentBalance`, `interestRate`, `monthlyPayment` to numbers
+   - `IncomeSourceModal.vue`: Already converting correctly ✓
+7. ✅ **All 183 tests passing** - Full type consistency verified
+
+## Common Mistakes to Avoid
+
+❌ **DON'T** send strings in request bodies:
+```javascript
+body: { targetAmount: '50000' }  // Wrong!
+```
+
+✅ **DO** send numbers in request bodies:
+```javascript
+body: { targetAmount: 50000 }    // Correct!
+```
+
+❌ **DON'T** expect numbers in responses:
+```javascript
+expect(goal.targetAmount).toBe(50000)  // Wrong!
+```
+
+✅ **DO** expect strings in responses:
+```javascript
+expect(goal.targetAmount).toBe("50000.00")  // Correct!
+```

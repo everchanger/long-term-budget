@@ -219,40 +219,30 @@
 import type {
   SelectSavingsAccount,
   SelectPerson,
+  SelectSavingsGoal,
+  InsertSavingsGoal,
 } from "~~/database/validation-schemas";
 
 interface Props {
   open?: boolean;
   loading?: boolean;
   householdId?: number;
-  editingGoal?: {
-    id: number;
-    householdId: number;
-    name: string;
-    description: string | null;
-    targetAmount: string;
-    isCompleted: boolean;
-    completedAt: Date | null;
-    priority: number | null;
-    category: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-    savingsAccountIds?: number[];
-  } | null;
+  editingGoal?: (SelectSavingsGoal & { savingsAccountIds?: number[] }) | null;
 }
 
-interface FormData {
+// Form state uses strings for HTML input compatibility
+type FormState = {
   name: string;
   description: string;
-  targetAmount: string;
+  targetAmount: string | number;
   priority: number;
   category: string;
   savingsAccountIds: number[];
-}
+};
 
 interface Emits {
   "update:open": [value: boolean];
-  submit: [data: FormData];
+  submit: [data: Omit<InsertSavingsGoal, "householdId">];
   cancel: [];
 }
 
@@ -265,7 +255,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>();
 
-const formState = reactive<FormData>({
+const formState = reactive<FormState>({
   name: "",
   description: "",
   targetAmount: "",
@@ -352,7 +342,10 @@ const handleSubmit = () => {
   emit("submit", {
     name: formState.name,
     description: formState.description,
-    targetAmount: formState.targetAmount,
+    targetAmount:
+      typeof formState.targetAmount === "string"
+        ? parseFloat(formState.targetAmount)
+        : formState.targetAmount,
     priority: formState.priority,
     category: formState.category,
     savingsAccountIds: formState.savingsAccountIds,

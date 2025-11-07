@@ -137,17 +137,31 @@
 </template>
 
 <script setup lang="ts">
-import type { SelectLoan } from "~~/database/validation-schemas";
+import type {
+  SelectLoan,
+  InsertLoan,
+} from "~~/database/validation-schemas";
 
-// Create a form submission type that matches what we're actually submitting
-type LoanFormData = {
+// Form state uses strings for HTML input compatibility
+type FormState = {
   name: string;
-  originalAmount: string;
-  currentBalance: string;
-  interestRate: string;
-  monthlyPayment: string;
+  originalAmount: string | number;
+  currentBalance: string | number;
+  interestRate: string | number;
+  monthlyPayment: string | number;
   loanType: string;
 };
+
+// Submission type - based on InsertLoan but with optional fields that have defaults
+type SubmitData = Pick<
+  InsertLoan,
+  | "name"
+  | "originalAmount"
+  | "currentBalance"
+  | "interestRate"
+  | "monthlyPayment"
+  | "loanType"
+>;
 
 interface Props {
   open?: boolean;
@@ -157,7 +171,7 @@ interface Props {
 
 interface Emits {
   "update:open": [value: boolean];
-  submit: [formData: LoanFormData];
+  submit: [formData: SubmitData];
   cancel: [];
 }
 
@@ -170,7 +184,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 // Reactive form state
-const formState = reactive({
+const formState = reactive<FormState>({
   name: "",
   originalAmount: "",
   currentBalance: "",
@@ -178,6 +192,10 @@ const formState = reactive({
   monthlyPayment: "",
   loanType: "",
 });
+
+// Helper to convert string | number to number
+const toNumber = (value: string | number): number =>
+  typeof value === "string" ? parseFloat(value) : value;
 
 // Computed properties
 const isOpen = computed({
@@ -191,9 +209,9 @@ const isFormValid = computed(() => {
   return (
     formState.name.trim() !== "" &&
     formState.originalAmount !== "" &&
-    parseFloat(formState.originalAmount) > 0 &&
+    toNumber(formState.originalAmount) > 0 &&
     formState.currentBalance !== "" &&
-    parseFloat(formState.currentBalance) >= 0
+    toNumber(formState.currentBalance) >= 0
   );
 });
 
@@ -243,12 +261,14 @@ function handleCancel() {
 function handleSubmit() {
   if (!isFormValid.value) return;
 
+  const currentBalance = formState.currentBalance || formState.originalAmount;
+
   emit("submit", {
     name: formState.name.trim(),
-    originalAmount: formState.originalAmount,
-    currentBalance: formState.currentBalance || formState.originalAmount, // Default current balance to original amount
-    interestRate: formState.interestRate,
-    monthlyPayment: formState.monthlyPayment,
+    originalAmount: toNumber(formState.originalAmount),
+    currentBalance: toNumber(currentBalance),
+    interestRate: toNumber(formState.interestRate),
+    monthlyPayment: toNumber(formState.monthlyPayment),
     loanType: formState.loanType,
   });
 }

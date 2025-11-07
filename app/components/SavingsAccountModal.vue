@@ -123,15 +123,27 @@
 </template>
 
 <script setup lang="ts">
-import type { SelectSavingsAccount } from "~~/database/validation-schemas";
+import type {
+  SelectSavingsAccount,
+  InsertSavingsAccount,
+} from "~~/database/validation-schemas";
 
-// Create a form submission type
-type SavingsAccountFormData = {
+// Form state uses strings for HTML input compatibility
+type FormState = {
   name: string;
-  currentBalance: string;
-  interestRate: string;
-  monthlyDeposit: string;
+  currentBalance: string | number;
+  interestRate: string | number;
+  monthlyDeposit: string | number;
   accountType: string;
+};
+
+// Submission data type based on InsertSavingsAccount but without personId
+type SubmitData = {
+  name: string;
+  currentBalance: number;
+  interestRate: number | null;
+  monthlyDeposit: number | null;
+  accountType?: string;
 };
 
 interface Props {
@@ -142,7 +154,7 @@ interface Props {
 
 interface Emits {
   "update:open": [value: boolean];
-  submit: [formData: SavingsAccountFormData];
+  submit: [formData: SubmitData];
   cancel: [];
 }
 
@@ -155,7 +167,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 // Reactive form state
-const formState = reactive({
+const formState = reactive<FormState>({
   name: "",
   currentBalance: "",
   interestRate: "",
@@ -171,11 +183,15 @@ const isOpen = computed({
 
 const isEditing = computed(() => !!props.savingsAccount);
 
+// Helper to convert string | number to number
+const toNumber = (value: string | number): number =>
+  typeof value === "string" ? parseFloat(value) : value;
+
 const isFormValid = computed(() => {
   return (
     formState.name.trim() !== "" &&
     formState.currentBalance !== "" &&
-    parseFloat(formState.currentBalance) >= 0
+    toNumber(formState.currentBalance) >= 0
   );
 });
 
@@ -225,9 +241,11 @@ function handleSubmit() {
 
   emit("submit", {
     name: formState.name.trim(),
-    currentBalance: formState.currentBalance,
-    interestRate: formState.interestRate,
-    monthlyDeposit: formState.monthlyDeposit,
+    currentBalance: toNumber(formState.currentBalance),
+    interestRate: formState.interestRate ? toNumber(formState.interestRate) : null,
+    monthlyDeposit: formState.monthlyDeposit
+      ? toNumber(formState.monthlyDeposit)
+      : null,
     accountType: formState.accountType,
   });
 }

@@ -83,12 +83,15 @@
 </template>
 
 <script setup lang="ts">
-import type { SelectIncomeSource } from "~~/database/validation-schemas";
+import type {
+  SelectIncomeSource,
+  InsertIncomeSource,
+} from "~~/database/validation-schemas";
 
-// Create a more flexible form submission type
-type IncomeSourceFormData = {
+// Form state uses strings for HTML input compatibility
+type FormState = {
   name: string;
-  amount: number;
+  amount: string | number;
   frequency: string;
 };
 
@@ -100,7 +103,7 @@ interface Props {
 
 interface Emits {
   "update:open": [value: boolean];
-  submit: [formData: IncomeSourceFormData];
+  submit: [formData: Omit<InsertIncomeSource, "personId">];
   cancel: [];
 }
 
@@ -113,7 +116,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 // Reactive form state
-const formState = reactive({
+const formState = reactive<FormState>({
   name: "",
   amount: "",
   frequency: "",
@@ -128,10 +131,14 @@ const isOpen = computed({
 const isEditing = computed(() => !!props.incomeSource);
 
 const isFormValid = computed(() => {
+  const amount =
+    typeof formState.amount === "string"
+      ? parseFloat(formState.amount)
+      : formState.amount;
   return (
     formState.name.trim() !== "" &&
     formState.amount !== "" &&
-    parseFloat(formState.amount) > 0 &&
+    amount > 0 &&
     formState.frequency !== ""
   );
 });
@@ -176,9 +183,14 @@ function handleCancel() {
 function handleSubmit() {
   if (!isFormValid.value) return;
 
+  const amount =
+    typeof formState.amount === "string"
+      ? parseFloat(formState.amount)
+      : formState.amount;
+
   emit("submit", {
     name: formState.name.trim(),
-    amount: parseFloat(formState.amount),
+    amount,
     frequency: formState.frequency as "monthly" | "yearly" | "weekly" | "daily",
   });
 }
