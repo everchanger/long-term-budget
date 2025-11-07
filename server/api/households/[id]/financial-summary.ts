@@ -1,3 +1,5 @@
+import { parseIdParam } from "../../../utils/api-helpers";
+
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
 
@@ -9,24 +11,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const householdId = getRouterParam(event, "id");
-  if (!householdId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Bad Request",
-      message: "Household ID is required",
-    });
-  }
-
-  // Validate that householdId is a valid number
-  const householdIdNum = parseInt(householdId);
-  if (isNaN(householdIdNum)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Bad Request",
-      message: "Household ID is required",
-    });
-  }
+  const householdIdNum = parseIdParam(event, "id", "Household ID is required");
 
   try {
     const db = useDrizzle();

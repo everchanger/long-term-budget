@@ -1,3 +1,5 @@
+import { parseIdParam } from "../../utils/api-helpers";
+
 export default defineEventHandler(async (event) => {
   // Get session from middleware
   const session = event.context.session;
@@ -9,22 +11,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const loanId = getRouterParam(event, "id");
-  if (!loanId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Loan ID is required",
-    });
-  }
-
-  // Validate that ID is a valid integer
-  const loanIdInt = parseInt(loanId);
-  if (isNaN(loanIdInt)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Loan ID is required",
-    });
-  }
+  const loanIdInt = parseIdParam(event, "id", "Loan ID is required");
 
   const db = useDrizzle();
 

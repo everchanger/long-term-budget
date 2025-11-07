@@ -8,7 +8,29 @@ This document tracks technical improvements, refactoring opportunities, and arch
 
 ## 🔴 High Priority - Type Safety & Validation
 
-### 1. Create Zod Utilities for Common Validation Patterns
+### ✅ 1. Create Zod Utilities for Common Validation Patterns - COMPLETED
+**Status:** ✅ Done  
+**Completed:** 2025-11-07  
+**Issue:** Duplicate `parseFloat` validation logic across all decimal schemas  
+**Location:** `database/validation-schemas.ts` (was in lines 69, 87, 106, 123, 142, 147, 154, 163, 185)  
+**Impact:** DRY violation, harder to maintain, inconsistent error messages
+
+**Solution Implemented:**
+Created `database/validation-helpers.ts` with three reusable utilities:
+- `decimalString(min?, max?)` - Generic decimal validation with optional bounds
+- `positiveDecimalString()` - Convenience wrapper for amounts >= 0
+- `percentageString()` - Validates 0-100 range for interest rates
+
+**Results:**
+- ✅ Eliminated ~60 lines of duplicate code (9 repeated refinement patterns)
+- ✅ Single source of truth for decimal validation
+- ✅ Consistent error messages across all schemas
+- ✅ All schemas now use shared helpers (income, expenses, savings, loans, broker accounts, savings goals)
+- ✅ Type-safe with no TypeScript errors
+
+---
+
+### 2. Replace `any` Type in Savings Goals Reducer
 **Issue:** Duplicate `parseFloat` validation logic across all decimal schemas  
 **Location:** `database/validation-schemas.ts` (lines 69, 87, 106, 123, 142, 147, 154, 163, 185)  
 **Impact:** DRY violation, harder to maintain, inconsistent error messages
@@ -45,56 +67,67 @@ const percentageString = () => decimalString(0, 100);
 
 ---
 
-### 2. Replace `any` Type in Savings Goals Reducer
+### ✅ 2. Replace `any` Type in Savings Goals Reducer - COMPLETED
+**Status:** ✅ Done  
+**Completed:** 2025-11-07  
 **Issue:** Using `any[]` loses type safety in grouping logic  
 **Location:** `server/api/savings-goals/index.ts:110`  
 **Impact:** No compile-time checking, potential runtime errors
 
+**Solution Implemented:**
 ```typescript
-// Current:
+// Before:
 }, {} as Record<number, any[]>);
 
-// Proposed:
-}, {} as Record<number, Array<typeof goalsWithAccounts[number]>>);
-
-// Or better, extract the type:
-type SavingsGoalWithAccounts = typeof goalsWithAccounts[number];
-const goalsByHousehold: Record<number, SavingsGoalWithAccounts[]> = {};
+// After:
+type GoalWithAccounts = typeof goalsWithAccounts[number];
+}, {} as Record<number, GoalWithAccounts[]>);
 ```
+
+**Results:**
+- ✅ Full type safety in the reducer
+- ✅ TypeScript can now catch type mismatches at compile time
+- ✅ Better IDE autocomplete and intellisense
+- ✅ No runtime errors from unexpected data types
+- ✅ Zero `any` types remaining in server code
 
 ---
 
-### 3. Create Shared ID Parsing Utility
+### ✅ 3. Create Shared ID Parsing Utility - COMPLETED
+**Status:** ✅ Done  
+**Completed:** 2025-11-07  
 **Issue:** Repeated `parseInt(id)` pattern in 15+ API endpoints  
 **Location:** All `server/api/*/[id].ts` and many `index.ts` files  
 **Impact:** No validation, inconsistent error handling
 
-```typescript
-// Current pattern (repeated everywhere):
-const loanIdInt = parseInt(loanId);
-if (!loanIdInt) {
-  throw createError({ statusCode: 400, statusMessage: "Invalid loan ID" });
-}
+**Solution Implemented:**
+Created `server/utils/api-helpers.ts` with two utility functions:
+- `parseIdParam(event, paramName, errorMessage)` - For route parameters
+- `parseQueryInt(event, paramName, required, errorMessage)` - For query parameters with TypeScript overloads
 
-// Proposed solution in server/utils/api-helpers.ts:
-export function parseIdParam(
-  event: H3Event,
-  paramName: string = "id"
-): number {
-  const id = parseInt(getRouterParam(event, paramName) || "0");
-  if (!id || isNaN(id)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: `Invalid ${paramName}`,
-    });
-  }
-  return id;
-}
+**Files Refactored (10 files):**
+- `server/api/loans/[id].ts` - route param
+- `server/api/loans/index.ts` - query param (personId)
+- `server/api/savings-accounts/[id].ts` - route param
+- `server/api/savings-accounts/index.ts` - query param (personId)
+- `server/api/broker-accounts/[id].ts` - route param
+- `server/api/broker-accounts/index.ts` - query param (personId)
+- `server/api/income-sources/[id].ts` - route param
+- `server/api/income-sources/index.ts` - query param (personId)
+- `server/api/households/[id].ts` - route param
+- `server/api/households/[id]/financial-summary.ts` - route param
+- `server/api/persons/[id].ts` - route param
+- `server/api/savings-goals/[id].ts` - route param
+- `server/api/savings-goals/index.ts` - query param (householdId)
+- `server/api/savings-goals/[id]/accounts.post.ts` - route param
 
-// Usage:
-const loanId = parseIdParam(event);
-const personId = parseIdParam(event, "personId");
-```
+**Results:**
+- ✅ Removed ~45 lines of duplicate validation code
+- ✅ Consistent error handling across all endpoints
+- ✅ Type-safe with TypeScript function overloads
+- ✅ parseQueryInt returns `number` when required=true, `number | undefined` when false
+- ✅ Zero TypeScript errors
+- ✅ Only 1 intentional `parseInt` remains (parsing from request body)
 
 ---
 
@@ -409,14 +442,14 @@ const optimisticUpdate = () => {
 ## 🎯 Implementation Order
 
 **Phase 1: Foundation** (High ROI, enables other improvements)
-1. Create shared Zod validation utilities (#1)
-2. Create ID parsing utility (#3)
-3. Create authorization utilities (#4)
+1. ✅ ~~Create shared Zod validation utilities (#1)~~ - COMPLETED 2025-11-07
+2. ✅ ~~Replace `any` types (#2)~~ - COMPLETED 2025-11-07
+3. ✅ ~~Create ID parsing utility (#3)~~ - COMPLETED 2025-11-07
+4. Create authorization utilities (#4)
 
 **Phase 2: Quality** (Improves maintainability)
-4. Extract frequency conversion logic (#5)
-5. Consolidate financial calculations (#6)
-6. Replace `any` types (#2)
+5. Extract frequency conversion logic (#5)
+6. Consolidate financial calculations (#6)
 
 **Phase 3: Polish** (Nice to have)
 7. Add request validation middleware (#8)

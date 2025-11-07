@@ -1,3 +1,5 @@
+import { parseIdParam } from "../../utils/api-helpers";
+
 export default defineEventHandler(async (event) => {
   // Get session from middleware
   const session = event.context.session;
@@ -9,22 +11,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const accountId = getRouterParam(event, "id");
-  if (!accountId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Account ID is required",
-    });
-  }
-
-  // Validate that ID is a valid integer
-  const accountIdInt = parseInt(accountId);
-  if (isNaN(accountIdInt)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Account ID is required",
-    });
-  }
+  const accountIdInt = parseIdParam(event, "id", "Account ID is required");
 
   const db = useDrizzle();
 

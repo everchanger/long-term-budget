@@ -1,3 +1,5 @@
+import { parseIdParam } from "../../utils/api-helpers";
+
 export default defineEventHandler(async (event) => {
   // Get session from middleware
   const session = event.context.session;
@@ -9,23 +11,11 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const id = getRouterParam(event, "id");
-
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Income source ID is required",
-    });
-  }
-
-  // Validate that ID is a valid integer
-  const incomeSourceId = parseInt(id);
-  if (isNaN(incomeSourceId)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Income source ID is required",
-    });
-  }
+  const incomeSourceId = parseIdParam(
+    event,
+    "id",
+    "Income source ID is required"
+  );
 
   const db = useDrizzle();
 

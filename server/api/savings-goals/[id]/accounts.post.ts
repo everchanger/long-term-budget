@@ -1,16 +1,10 @@
 import { eq, and } from "drizzle-orm";
+import { parseIdParam } from "../../../utils/api-helpers";
 
 export default defineEventHandler(async (event) => {
   const db = useDrizzle();
-  const goalId = getRouterParam(event, "id");
+  const goalId = parseIdParam(event, "id", "Goal ID is required");
   const body = await readBody(event);
-
-  if (!goalId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Goal ID is required",
-    });
-  }
 
   if (!body.savingsAccountId) {
     throw createError({
@@ -19,11 +13,19 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const savingsAccountId = parseInt(body.savingsAccountId, 10);
+  if (isNaN(savingsAccountId)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid savings account ID",
+    });
+  }
+
   // Verify the goal exists
   const [goal] = await db
     .select()
     .from(tables.savingsGoals)
-    .where(eq(tables.savingsGoals.id, parseInt(goalId)))
+    .where(eq(tables.savingsGoals.id, goalId))
     .limit(1);
 
   if (!goal) {
@@ -37,7 +39,7 @@ export default defineEventHandler(async (event) => {
   const [account] = await db
     .select()
     .from(tables.savingsAccounts)
-    .where(eq(tables.savingsAccounts.id, parseInt(body.savingsAccountId)))
+    .where(eq(tables.savingsAccounts.id, savingsAccountId))
     .limit(1);
 
   if (!account) {
@@ -53,11 +55,8 @@ export default defineEventHandler(async (event) => {
     .from(tables.savingsGoalAccounts)
     .where(
       and(
-        eq(tables.savingsGoalAccounts.savingsGoalId, parseInt(goalId)),
-        eq(
-          tables.savingsGoalAccounts.savingsAccountId,
-          parseInt(body.savingsAccountId)
-        )
+        eq(tables.savingsGoalAccounts.savingsGoalId, goalId),
+        eq(tables.savingsGoalAccounts.savingsAccountId, savingsAccountId)
       )
     )
     .limit(1);
@@ -71,8 +70,8 @@ export default defineEventHandler(async (event) => {
 
   // Create the link
   await db.insert(tables.savingsGoalAccounts).values({
-    savingsGoalId: parseInt(goalId),
-    savingsAccountId: parseInt(body.savingsAccountId),
+    savingsGoalId: goalId,
+    savingsAccountId: savingsAccountId,
   });
 
   return {

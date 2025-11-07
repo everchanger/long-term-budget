@@ -1,5 +1,6 @@
 import { eq, inArray, and } from "drizzle-orm";
 import { getUserPersons } from "../../utils/authorization";
+import { parseQueryInt } from "../../utils/api-helpers";
 
 export default defineEventHandler(async (event) => {
   // Get session from middleware
@@ -16,8 +17,7 @@ export default defineEventHandler(async (event) => {
   const method = getMethod(event);
 
   if (method === "GET") {
-    const query = getQuery(event);
-    const personId = query.personId as string;
+    const personId = parseQueryInt(event, "personId");
 
     if (personId) {
       // Verify that the person belongs to the authenticated user's household
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
         )
         .where(
           and(
-            eq(tables.persons.id, parseInt(personId)),
+            eq(tables.persons.id, personId),
             eq(tables.households.userId, session.user.id)
           )
         );
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
       const result = await db
         .select()
         .from(tables.savingsAccounts)
-        .where(eq(tables.savingsAccounts.personId, parseInt(personId)));
+        .where(eq(tables.savingsAccounts.personId, personId));
 
       return result;
     } else {
@@ -99,7 +99,7 @@ export default defineEventHandler(async (event) => {
       )
       .where(
         and(
-          eq(tables.persons.id, parseInt(personId)),
+          eq(tables.persons.id, personId),
           eq(tables.households.userId, session.user.id)
         )
       );
@@ -120,7 +120,7 @@ export default defineEventHandler(async (event) => {
         interestRate: interestRate || null,
         monthlyDeposit: monthlyDeposit || null,
         accountType,
-        personId: parseInt(personId),
+        personId: personId,
       })
       .returning();
 

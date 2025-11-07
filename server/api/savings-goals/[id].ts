@@ -1,6 +1,7 @@
 import { eq, and, inArray } from "drizzle-orm";
 import { updateSavingsGoalSchema } from "../../../database/validation-schemas";
 import { enrichSavingsGoalsWithProgress } from "../../utils/savingsGoalCalculations";
+import { parseIdParam } from "../../utils/api-helpers";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
@@ -14,14 +15,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDrizzle();
   const method = getMethod(event);
-  const goalId = getRouterParam(event, "id");
-
-  if (!goalId || isNaN(parseInt(goalId))) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid savings goal ID",
-    });
-  }
+  const goalId = parseIdParam(event, "id", "Invalid savings goal ID");
 
   // Verify that the savings goal belongs to the user's household
   const [goalExists] = await db
@@ -36,7 +30,7 @@ export default defineEventHandler(async (event) => {
     )
     .where(
       and(
-        eq(tables.savingsGoals.id, parseInt(goalId)),
+        eq(tables.savingsGoals.id, goalId),
         eq(tables.households.userId, session.user.id)
       )
     );
@@ -52,7 +46,7 @@ export default defineEventHandler(async (event) => {
     const [goal] = await db
       .select()
       .from(tables.savingsGoals)
-      .where(eq(tables.savingsGoals.id, parseInt(goalId)));
+      .where(eq(tables.savingsGoals.id, goalId));
 
     if (!goal) {
       throw createError({
@@ -65,7 +59,7 @@ export default defineEventHandler(async (event) => {
     const linkedAccounts = await db
       .select({ accountId: tables.savingsGoalAccounts.savingsAccountId })
       .from(tables.savingsGoalAccounts)
-      .where(eq(tables.savingsGoalAccounts.savingsGoalId, parseInt(goalId)));
+      .where(eq(tables.savingsGoalAccounts.savingsGoalId, goalId));
 
     const savingsAccountIds = linkedAccounts.map((link) => link.accountId);
 
@@ -134,7 +128,7 @@ export default defineEventHandler(async (event) => {
         }),
         updatedAt: new Date(),
       })
-      .where(eq(tables.savingsGoals.id, parseInt(goalId)))
+      .where(eq(tables.savingsGoals.id, goalId))
       .returning();
 
     // Update linked savings accounts if provided
@@ -142,13 +136,13 @@ export default defineEventHandler(async (event) => {
       // Delete existing links
       await db
         .delete(tables.savingsGoalAccounts)
-        .where(eq(tables.savingsGoalAccounts.savingsGoalId, parseInt(goalId)));
+        .where(eq(tables.savingsGoalAccounts.savingsGoalId, goalId));
 
       // Add new links
       if (savingsAccountIds.length > 0) {
         await db.insert(tables.savingsGoalAccounts).values(
           savingsAccountIds.map((accountId) => ({
-            savingsGoalId: parseInt(goalId),
+            savingsGoalId: goalId,
             savingsAccountId: accountId,
           }))
         );
@@ -161,7 +155,7 @@ export default defineEventHandler(async (event) => {
   if (method === "DELETE") {
     await db
       .delete(tables.savingsGoals)
-      .where(eq(tables.savingsGoals.id, parseInt(goalId)));
+      .where(eq(tables.savingsGoals.id, goalId));
 
     return { success: true };
   }

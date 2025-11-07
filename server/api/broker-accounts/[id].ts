@@ -1,3 +1,5 @@
+import { parseIdParam } from "../../utils/api-helpers";
+
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
 
@@ -9,24 +11,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const accountId = getRouterParam(event, "id");
-  if (!accountId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Bad Request",
-      message: "Account ID is required",
-    });
-  }
-
-  // Validate that accountId is a valid number
-  const accountIdNum = parseInt(accountId);
-  if (isNaN(accountIdNum)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Bad Request",
-      message: "Account ID is required",
-    });
-  }
+  const accountIdNum = parseIdParam(event, "id", "Account ID is required");
 
   const method = getMethod(event);
   const db = useDrizzle();

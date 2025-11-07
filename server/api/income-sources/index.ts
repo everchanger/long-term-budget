@@ -1,4 +1,5 @@
 import { getUserPersons } from "@s/utils/authorization";
+import { parseQueryInt } from "../../utils/api-helpers";
 
 export default defineEventHandler(async (event) => {
   // Get session from middleware
@@ -15,8 +16,7 @@ export default defineEventHandler(async (event) => {
 
   if (event.node.req.method === "GET") {
     // Get all income sources for a specific person
-    const query = getQuery(event);
-    const personId = query.personId as string;
+    const personId = parseQueryInt(event, "personId");
 
     if (personId) {
       // Verify person belongs to user's household
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
         )
         .where(
           and(
-            eq(tables.persons.id, parseInt(personId)),
+            eq(tables.persons.id, personId),
             eq(tables.households.userId, session.user.id)
           )
         );
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
       const incomeSources = await db
         .select()
         .from(tables.incomeSources)
-        .where(eq(tables.incomeSources.personId, parseInt(personId)))
+        .where(eq(tables.incomeSources.personId, personId))
         .orderBy(desc(tables.incomeSources.createdAt));
 
       return incomeSources;

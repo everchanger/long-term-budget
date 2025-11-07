@@ -1,3 +1,5 @@
+import { parseQueryInt } from "../../utils/api-helpers";
+
 export default defineEventHandler(async (event) => {
   // Get session from middleware
   const session = event.context.session;
@@ -12,15 +14,7 @@ export default defineEventHandler(async (event) => {
   const method = getMethod(event);
 
   if (method === "GET") {
-    const query = getQuery(event);
-    const personId = query.personId as string;
-
-    if (!personId) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Person ID is required",
-      });
-    }
+    const personId = parseQueryInt(event, "personId", true)!;
 
     // Verify that the person belongs to the authenticated user's household
     const db = useDrizzle();
@@ -33,7 +27,7 @@ export default defineEventHandler(async (event) => {
       )
       .where(
         and(
-          eq(tables.persons.id, parseInt(personId)),
+          eq(tables.persons.id, personId),
           eq(tables.households.userId, session.user.id)
         )
       );
@@ -49,7 +43,7 @@ export default defineEventHandler(async (event) => {
     const result = await db
       .select()
       .from(tables.loans)
-      .where(eq(tables.loans.personId, parseInt(personId)));
+      .where(eq(tables.loans.personId, personId));
 
     return result;
   }
@@ -93,7 +87,7 @@ export default defineEventHandler(async (event) => {
       )
       .where(
         and(
-          eq(tables.persons.id, parseInt(personId)),
+          eq(tables.persons.id, personId),
           eq(tables.households.userId, session.user.id)
         )
       );
@@ -117,7 +111,7 @@ export default defineEventHandler(async (event) => {
         loanType,
         startDate: startDate ? new Date(startDate) : new Date(),
         endDate: endDate ? new Date(endDate) : null,
-        personId: parseInt(personId),
+        personId: personId,
       })
       .returning();
 

@@ -1,6 +1,7 @@
 import { eq, and, inArray } from "drizzle-orm";
 import { insertSavingsGoalSchema } from "../../../database/validation-schemas";
 import { enrichSavingsGoalsWithProgress } from "../../utils/savingsGoalCalculations";
+import { parseQueryInt } from "../../utils/api-helpers";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
@@ -16,8 +17,7 @@ export default defineEventHandler(async (event) => {
   const method = getMethod(event);
 
   if (method === "GET") {
-    const query = getQuery(event);
-    const householdId = query.householdId as string;
+    const householdId = parseQueryInt(event, "householdId");
 
     if (householdId) {
       // Verify that the household belongs to the authenticated user
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
         .from(tables.households)
         .where(
           and(
-            eq(tables.households.id, parseInt(householdId)),
+            eq(tables.households.id, householdId),
             eq(tables.households.userId, session.user.id)
           )
         );
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
       const goals = await db
         .select()
         .from(tables.savingsGoals)
-        .where(eq(tables.savingsGoals.householdId, parseInt(householdId)))
+        .where(eq(tables.savingsGoals.householdId, householdId))
         .orderBy(tables.savingsGoals.createdAt);
 
       // Fetch linked accounts for each goal
@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
       // Enrich goals with calculated progress data
       const enrichedGoals = await enrichSavingsGoalsWithProgress(
         goalsWithAccounts,
-        parseInt(householdId),
+        householdId,
         db
       );
 
@@ -99,6 +99,9 @@ export default defineEventHandler(async (event) => {
         })
       );
 
+      // Type for goals with linked account IDs
+      type GoalWithAccounts = (typeof goalsWithAccounts)[number];
+
       // Group by household and enrich each group
       const goalsByHousehold = goalsWithAccounts.reduce((acc, goal) => {
         const householdId = goal.householdId;
@@ -107,13 +110,13 @@ export default defineEventHandler(async (event) => {
         }
         acc[householdId].push(goal);
         return acc;
-      }, {} as Record<number, any[]>);
+      }, {} as Record<number, GoalWithAccounts[]>);
 
       const enrichedResults = [];
       for (const [householdId, goals] of Object.entries(goalsByHousehold)) {
         const enrichedGoals = await enrichSavingsGoalsWithProgress(
           goals,
-          parseInt(householdId),
+          Number(householdId),
           db
         );
         enrichedResults.push(...enrichedGoals);

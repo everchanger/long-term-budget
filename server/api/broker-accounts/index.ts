@@ -1,3 +1,5 @@
+import { parseQueryInt } from "../../utils/api-helpers";
+
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
 
@@ -14,8 +16,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     if (method === "GET") {
-      const query = getQuery(event);
-      const personId = query.personId as string;
+      const personId = parseQueryInt(event, "personId");
 
       if (personId) {
         // Get broker accounts for specific person with authorization
@@ -40,7 +41,7 @@ export default defineEventHandler(async (event) => {
           )
           .where(
             and(
-              eq(tables.brokerAccounts.personId, parseInt(personId)),
+              eq(tables.brokerAccounts.personId, personId),
               eq(tables.households.userId, session.user.id)
             )
           );
@@ -96,7 +97,7 @@ export default defineEventHandler(async (event) => {
         )
         .where(
           and(
-            eq(tables.persons.id, parseInt(personId)),
+            eq(tables.persons.id, personId),
             eq(tables.households.userId, session.user.id)
           )
         );
@@ -116,7 +117,7 @@ export default defineEventHandler(async (event) => {
           brokerName,
           accountType,
           currentValue,
-          personId: parseInt(personId),
+          personId: personId,
         })
         .returning();
 

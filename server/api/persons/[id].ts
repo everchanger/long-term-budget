@@ -1,13 +1,6 @@
+import { parseIdParam } from "../../utils/api-helpers";
+
 export default defineEventHandler(async (event) => {
-  const personId = parseInt(getRouterParam(event, "id") || "0");
-
-  if (!personId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid person ID",
-    });
-  }
-
   // Get session from middleware
   const session = event.context.session;
 
@@ -17,6 +10,8 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Unauthorized",
     });
   }
+
+  const personId = parseIdParam(event, "id", "Invalid person ID");
 
   const db = useDrizzle();
 
