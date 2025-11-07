@@ -1,17 +1,17 @@
+import { verifyHouseholdAccessOrThrow } from "../../utils/authorization";
+
 export default defineEventHandler(async (event) => {
-  // Get session from middleware
   const session = event.context.session;
-
-  if (!session?.user?.id) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
-  }
-
   const db = useDrizzle();
 
   if (event.node.req.method === "GET") {
+    if (!session?.user?.id) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: "Unauthorized",
+      });
+    }
+
     try {
       // Get all persons that belong to the authenticated user's households
       const persons = await db
@@ -33,6 +33,11 @@ export default defineEventHandler(async (event) => {
 
       return persons;
     } catch (error) {
+      // Re-throw HTTP errors as-is
+      if (error && typeof error === "object" && "statusCode" in error) {
+        throw error;
+      }
+
       console.error("Database error:", error);
       throw createError({
         statusCode: 500,
@@ -54,21 +59,22 @@ export default defineEventHandler(async (event) => {
     }
 
     // Verify household exists and belongs to the user
-    const [householdExists] = await db
-      .select({ id: tables.households.id })
-      .from(tables.households)
-      .where(
-        and(
-          eq(tables.households.id, household_id),
-          eq(tables.households.userId, session.user.id)
-        )
-      );
-
-    if (!householdExists) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Household not found or access denied",
-      });
+    try {
+      await verifyHouseholdAccessOrThrow(session, household_id, db);
+    } catch (error) {
+      // Convert 404 to 400 for POST requests (invalid input)
+      if (
+        error &&
+        typeof error === "object" &&
+        "statusCode" in error &&
+        error.statusCode === 404
+      ) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Household not found or access denied",
+        });
+      }
+      throw error;
     }
 
     try {

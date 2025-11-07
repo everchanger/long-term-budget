@@ -1,25 +1,16 @@
 import { parseIdParam } from "../../utils/api-helpers";
+import { verifyPersonAccessOrThrow } from "../../utils/authorization";
 
 export default defineEventHandler(async (event) => {
-  // Get session from middleware
   const session = event.context.session;
-
-  if (!session?.user?.id) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
-  }
-
   const incomeSourceId = parseIdParam(
     event,
     "id",
     "Income source ID is required"
   );
-
   const db = useDrizzle();
 
-  // First get the income source to check if it exists
+  // Get the income source to check if it exists
   const [existingIncomeSource] = await db
     .select()
     .from(tables.incomeSources)
@@ -33,28 +24,8 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Then verify that the income source's person belongs to the authenticated user's household
-  const [personExists] = await db
-    .select({ id: tables.persons.id })
-    .from(tables.persons)
-    .innerJoin(
-      tables.households,
-      eq(tables.persons.householdId, tables.households.id)
-    )
-    .where(
-      and(
-        eq(tables.persons.id, existingIncomeSource.personId),
-        eq(tables.households.userId, session.user.id)
-      )
-    );
-
-  if (!personExists) {
-    throw createError({
-      statusCode: 403,
-      statusMessage:
-        "Access denied: Income source does not belong to your household",
-    });
-  }
+  // Verify that the income source's person belongs to the authenticated user's household
+  await verifyPersonAccessOrThrow(session, existingIncomeSource.personId, db);
 
   if (event.node.req.method === "GET") {
     // Return the income source

@@ -122,7 +122,6 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
       expect(response).toMatchObject({
         statusCode: 401,
         statusMessage: "Unauthorized",
-        message: "You must be logged in to access broker accounts",
       });
     });
 
@@ -350,7 +349,6 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
       expect(response).toMatchObject({
         statusCode: 401,
         statusMessage: "Unauthorized",
-        message: "You must be logged in to access broker accounts",
       });
     });
   });
@@ -471,7 +469,6 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
       expect(response).toMatchObject({
         statusCode: 401,
         statusMessage: "Unauthorized",
-        message: "You must be logged in to access broker accounts",
       });
     });
   });

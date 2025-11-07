@@ -1,8 +1,13 @@
 import { parseIdParam } from "../../utils/api-helpers";
+import { verifyPersonAccessOrThrow } from "../../utils/authorization";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
+  const accountIdNum = parseIdParam(event, "id", "Account ID is required");
+  const method = getMethod(event);
+  const db = useDrizzle();
 
+  // Check authentication FIRST before any database queries
   if (!session?.user?.id) {
     throw createError({
       statusCode: 401,
@@ -11,14 +16,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const accountIdNum = parseIdParam(event, "id", "Account ID is required");
-
-  const method = getMethod(event);
-  const db = useDrizzle();
-
   try {
     if (method === "GET") {
-      // Get broker account with authorization check via household ownership
+      // Get broker account
       const [brokerAccount] = await db
         .select({
           id: tables.brokerAccounts.id,
@@ -30,20 +30,8 @@ export default defineEventHandler(async (event) => {
           createdAt: tables.brokerAccounts.createdAt,
         })
         .from(tables.brokerAccounts)
-        .innerJoin(
-          tables.persons,
-          eq(tables.brokerAccounts.personId, tables.persons.id)
-        )
-        .innerJoin(
-          tables.households,
-          eq(tables.persons.householdId, tables.households.id)
-        )
-        .where(
-          and(
-            eq(tables.brokerAccounts.id, accountIdNum),
-            eq(tables.households.userId, session.user.id)
-          )
-        );
+        .where(eq(tables.brokerAccounts.id, accountIdNum))
+        .limit(1);
 
       if (!brokerAccount) {
         throw createError({
@@ -51,6 +39,23 @@ export default defineEventHandler(async (event) => {
           statusMessage: "Not Found",
           message: "Broker account not found or access denied",
         });
+      }
+
+      // Verify access to the person who owns this account
+      try {
+        await verifyPersonAccessOrThrow(session, brokerAccount.personId, db);
+      } catch (error) {
+        // Convert 403 to 404 to avoid leaking resource existence
+        if (error && typeof error === "object" && "statusCode" in error) {
+          if (error.statusCode === 403) {
+            throw createError({
+              statusCode: 404,
+              statusMessage: "Not Found",
+              message: "Broker account not found or access denied",
+            });
+          }
+        }
+        throw error;
       }
 
       return brokerAccount;
@@ -69,24 +74,15 @@ export default defineEventHandler(async (event) => {
         });
       }
 
-      // First check if the broker account exists and belongs to user's household
+      // Check if the broker account exists
       const [existingAccount] = await db
-        .select({ id: tables.brokerAccounts.id })
+        .select({
+          id: tables.brokerAccounts.id,
+          personId: tables.brokerAccounts.personId,
+        })
         .from(tables.brokerAccounts)
-        .innerJoin(
-          tables.persons,
-          eq(tables.brokerAccounts.personId, tables.persons.id)
-        )
-        .innerJoin(
-          tables.households,
-          eq(tables.persons.householdId, tables.households.id)
-        )
-        .where(
-          and(
-            eq(tables.brokerAccounts.id, accountIdNum),
-            eq(tables.households.userId, session.user.id)
-          )
-        );
+        .where(eq(tables.brokerAccounts.id, accountIdNum))
+        .limit(1);
 
       if (!existingAccount) {
         throw createError({
@@ -96,7 +92,24 @@ export default defineEventHandler(async (event) => {
         });
       }
 
-      // Update the broker account (set omitted fields to null for partial updates)
+      // Verify access to the person who owns this account
+      try {
+        await verifyPersonAccessOrThrow(session, existingAccount.personId, db);
+      } catch (error) {
+        // Convert 403 to 404 to avoid leaking resource existence
+        if (error && typeof error === "object" && "statusCode" in error) {
+          if (error.statusCode === 403) {
+            throw createError({
+              statusCode: 404,
+              statusMessage: "Not Found",
+              message: "Broker account not found or access denied",
+            });
+          }
+        }
+        throw error;
+      }
+
+      // Update the broker account
       const result = await db
         .update(tables.brokerAccounts)
         .set({
@@ -112,7 +125,7 @@ export default defineEventHandler(async (event) => {
         throw createError({
           statusCode: 404,
           statusMessage: "Not Found",
-          message: "Broker account not found or access denied",
+          message: "Broker account not found",
         });
       }
 
@@ -120,24 +133,15 @@ export default defineEventHandler(async (event) => {
     }
 
     if (method === "DELETE") {
-      // First check if the broker account exists and belongs to user's household
+      // Check if the broker account exists
       const [existingAccount] = await db
-        .select({ id: tables.brokerAccounts.id })
+        .select({
+          id: tables.brokerAccounts.id,
+          personId: tables.brokerAccounts.personId,
+        })
         .from(tables.brokerAccounts)
-        .innerJoin(
-          tables.persons,
-          eq(tables.brokerAccounts.personId, tables.persons.id)
-        )
-        .innerJoin(
-          tables.households,
-          eq(tables.persons.householdId, tables.households.id)
-        )
-        .where(
-          and(
-            eq(tables.brokerAccounts.id, accountIdNum),
-            eq(tables.households.userId, session.user.id)
-          )
-        );
+        .where(eq(tables.brokerAccounts.id, accountIdNum))
+        .limit(1);
 
       if (!existingAccount) {
         throw createError({
@@ -145,6 +149,23 @@ export default defineEventHandler(async (event) => {
           statusMessage: "Not Found",
           message: "Broker account not found or access denied",
         });
+      }
+
+      // Verify access to the person who owns this account
+      try {
+        await verifyPersonAccessOrThrow(session, existingAccount.personId, db);
+      } catch (error) {
+        // Convert 403 to 404 to avoid leaking resource existence
+        if (error && typeof error === "object" && "statusCode" in error) {
+          if (error.statusCode === 403) {
+            throw createError({
+              statusCode: 404,
+              statusMessage: "Not Found",
+              message: "Broker account not found or access denied",
+            });
+          }
+        }
+        throw error;
       }
 
       // Delete the broker account

@@ -1,24 +1,18 @@
 import { parseIdParam } from "../../utils/api-helpers";
+import { verifyHouseholdAccessOrThrow } from "../../utils/authorization";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
-
-  if (!session?.user?.id) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-      message: "You must be logged in to access households",
-    });
-  }
-
   const householdIdNum = parseIdParam(event, "id", "Household ID is required");
-
   const method = getMethod(event);
   const db = useDrizzle();
 
   try {
     if (method === "GET") {
-      // Get specific household with owner info - only if it belongs to the current user
+      // Verify access to household
+      await verifyHouseholdAccessOrThrow(session, householdIdNum, db);
+
+      // Get specific household with owner info
       const [household] = await db
         .select({
           id: tables.households.id,
@@ -29,18 +23,13 @@ export default defineEventHandler(async (event) => {
         })
         .from(tables.households)
         .leftJoin(tables.users, eq(tables.households.userId, tables.users.id))
-        .where(
-          and(
-            eq(tables.households.id, householdIdNum),
-            eq(tables.households.userId, session.user.id)
-          )
-        );
+        .where(eq(tables.households.id, householdIdNum));
 
       if (!household) {
         throw createError({
           statusCode: 404,
           statusMessage: "Not Found",
-          message: "Household not found or access denied",
+          message: "Household not found",
         });
       }
 
@@ -58,7 +47,9 @@ export default defineEventHandler(async (event) => {
     }
 
     if (method === "PUT") {
-      // Update household - only if it belongs to the current user
+      // Verify access to household
+      await verifyHouseholdAccessOrThrow(session, householdIdNum, db);
+
       const body = await readBody(event);
       const { name } = body;
 
@@ -73,19 +64,14 @@ export default defineEventHandler(async (event) => {
       const [updatedHousehold] = await db
         .update(tables.households)
         .set({ name })
-        .where(
-          and(
-            eq(tables.households.id, householdIdNum),
-            eq(tables.households.userId, session.user.id)
-          )
-        )
+        .where(eq(tables.households.id, householdIdNum))
         .returning();
 
       if (!updatedHousehold) {
         throw createError({
           statusCode: 404,
           statusMessage: "Not Found",
-          message: "Household not found or access denied",
+          message: "Household not found",
         });
       }
 

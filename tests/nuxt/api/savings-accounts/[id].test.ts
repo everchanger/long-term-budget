@@ -111,7 +111,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
         const fetchError = error as FetchError;
         expect(fetchError.status).toBe(403);
         expect(fetchError.statusText).toContain(
-          "Access denied: Savings account does not belong to your household"
+          "Access denied: Person does not belong to your household"
         );
       }
     });
@@ -211,7 +211,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
         const fetchError = error as FetchError;
         expect(fetchError.status).toBe(403);
         expect(fetchError.statusText).toContain(
-          "Access denied: Savings account does not belong to your household"
+          "Access denied: Person does not belong to your household"
         );
       }
     });
@@ -443,7 +443,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
         const fetchError = error as FetchError;
         expect(fetchError.status).toBe(403);
         expect(fetchError.statusText).toContain(
-          "Access denied: Savings account does not belong to your household"
+          "Access denied: Person does not belong to your household"
         );
       }
     });

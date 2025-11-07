@@ -1,39 +1,15 @@
 import { parseIdParam } from "../../../utils/api-helpers";
+import { verifyHouseholdAccessOrThrow } from "../../../utils/authorization";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
-
-  if (!session?.user?.id) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-      message: "You must be logged in to access financial summary",
-    });
-  }
-
   const householdIdNum = parseIdParam(event, "id", "Household ID is required");
 
   try {
     const db = useDrizzle();
 
-    // Check if household exists and belongs to the current user
-    const [household] = await db
-      .select()
-      .from(tables.households)
-      .where(
-        and(
-          eq(tables.households.id, householdIdNum),
-          eq(tables.households.userId, session.user.id)
-        )
-      );
-
-    if (!household) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: "Not Found",
-        message: "Household not found or access denied",
-      });
-    }
+    // Verify household exists and belongs to the current user
+    await verifyHouseholdAccessOrThrow(session, householdIdNum, db);
 
     // Get all persons in the household
     const householdPersons = await db

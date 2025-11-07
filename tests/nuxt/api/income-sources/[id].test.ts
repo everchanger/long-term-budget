@@ -111,7 +111,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
         const fetchError = error as FetchError;
         expect(fetchError.status).toBe(403);
         expect(fetchError.statusText).toContain(
-          "Access denied: Income source does not belong to your household"
+          "Access denied: Person does not belong to your household"
         );
       }
     });
@@ -221,7 +221,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
         const fetchError = error as FetchError;
         expect(fetchError.status).toBe(403);
         expect(fetchError.statusText).toContain(
-          "Access denied: Income source does not belong to your household"
+          "Access denied: Person does not belong to your household"
         );
       }
     });
@@ -405,7 +405,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
         const fetchError = error as FetchError;
         expect(fetchError.status).toBe(403);
         expect(fetchError.statusText).toContain(
-          "Access denied: Income source does not belong to your household"
+          "Access denied: Person does not belong to your household"
         );
       }
     });

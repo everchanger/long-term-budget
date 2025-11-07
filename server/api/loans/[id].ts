@@ -1,21 +1,12 @@
 import { parseIdParam } from "../../utils/api-helpers";
+import { verifyPersonAccessOrThrow } from "../../utils/authorization";
 
 export default defineEventHandler(async (event) => {
-  // Get session from middleware
   const session = event.context.session;
-
-  if (!session?.user?.id) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
-  }
-
   const loanIdInt = parseIdParam(event, "id", "Loan ID is required");
-
   const db = useDrizzle();
 
-  // First get the loan to check if it exists
+  // Get the loan to check if it exists
   const [existingLoan] = await db
     .select()
     .from(tables.loans)
@@ -29,27 +20,8 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Then verify that the loan's person belongs to the authenticated user's household
-  const [personExists] = await db
-    .select({ id: tables.persons.id })
-    .from(tables.persons)
-    .innerJoin(
-      tables.households,
-      eq(tables.persons.householdId, tables.households.id)
-    )
-    .where(
-      and(
-        eq(tables.persons.id, existingLoan.personId),
-        eq(tables.households.userId, session.user.id)
-      )
-    );
-
-  if (!personExists) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Access denied: Loan does not belong to your household",
-    });
-  }
+  // Verify that the loan's person belongs to the authenticated user's household
+  await verifyPersonAccessOrThrow(session, existingLoan.personId, db);
 
   const method = getMethod(event);
 

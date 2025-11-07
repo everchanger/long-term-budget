@@ -133,10 +133,32 @@ Created `server/utils/api-helpers.ts` with two utility functions:
 
 ## 🟡 Medium Priority - Code Quality & Architecture
 
-### 4. Create Shared Authorization Utilities
+### 4. Create Shared Authorization Utilities ✅
+**Status:** COMPLETED 2025-11-07  
 **Issue:** Duplicate household ownership verification in 10+ endpoints  
 **Location:** Every API endpoint checking `households.userId`  
 **Impact:** 20+ lines of repeated SQL joins and error handling
+
+**Results:**
+- Created `server/utils/authorization.ts` with modern utilities:
+  - `verifyPersonAccessOrThrow()` - Verifies person belongs to user's household
+  - `verifyHouseholdAccessOrThrow()` - Verifies household belongs to user
+  - `UserSession` type for consistent session handling
+- Refactored 9 API files to use new utilities:
+  - `households/[id].ts` (2 methods)
+  - `households/[id]/financial-summary.ts`
+  - `persons/index.ts`
+  - `loans/[id].ts`
+  - `income-sources/[id].ts`
+  - `savings-accounts/[id].ts`
+  - `broker-accounts/[id].ts` (3 methods)
+- Removed ~180 lines of duplicate authorization code
+- Consistent error handling (401 for unauthenticated, 403 for denied, 404 for not found)
+- Kept deprecated `verifyPersonAccess()` for backward compatibility
+- All utilities throw `createError` instead of returning null
+- Zero TypeScript errors after refactor
+
+**Old pattern (repeated everywhere):**
 
 ```typescript
 // Current pattern (repeated everywhere):

@@ -1,21 +1,12 @@
 import { parseIdParam } from "../../utils/api-helpers";
+import { verifyPersonAccessOrThrow } from "../../utils/authorization";
 
 export default defineEventHandler(async (event) => {
-  // Get session from middleware
   const session = event.context.session;
-
-  if (!session?.user?.id) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
-  }
-
   const accountIdInt = parseIdParam(event, "id", "Account ID is required");
-
   const db = useDrizzle();
 
-  // First get the savings account to check if it exists
+  // Get the savings account to check if it exists
   const [existingAccount] = await db
     .select()
     .from(tables.savingsAccounts)
@@ -29,28 +20,8 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Then verify that the account's person belongs to the authenticated user's household
-  const [personExists] = await db
-    .select({ id: tables.persons.id })
-    .from(tables.persons)
-    .innerJoin(
-      tables.households,
-      eq(tables.persons.householdId, tables.households.id)
-    )
-    .where(
-      and(
-        eq(tables.persons.id, existingAccount.personId),
-        eq(tables.households.userId, session.user.id)
-      )
-    );
-
-  if (!personExists) {
-    throw createError({
-      statusCode: 403,
-      statusMessage:
-        "Access denied: Savings account does not belong to your household",
-    });
-  }
+  // Verify that the account's person belongs to the authenticated user's household
+  await verifyPersonAccessOrThrow(session, existingAccount.personId, db);
 
   const method = getMethod(event);
 
