@@ -192,7 +192,7 @@ export default defineEventHandler(async (event) => {
       .values({
         name: validatedData.name,
         description: validatedData.description,
-        targetAmount: validatedData.targetAmount.toString(),
+        targetAmount: validatedData.targetAmount,
         priority: validatedData.priority || 1,
         category: validatedData.category,
         householdId: validatedData.householdId,

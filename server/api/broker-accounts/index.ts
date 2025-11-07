@@ -115,7 +115,7 @@ export default defineEventHandler(async (event) => {
           name,
           brokerName,
           accountType,
-          currentValue: currentValue.toString(),
+          currentValue,
           personId: parseInt(personId),
         })
         .returning();

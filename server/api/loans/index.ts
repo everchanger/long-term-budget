@@ -110,10 +110,10 @@ export default defineEventHandler(async (event) => {
       .insert(tables.loans)
       .values({
         name,
-        originalAmount: originalAmount.toString(),
-        currentBalance: currentBalance.toString(),
-        interestRate: interestRate.toString(),
-        monthlyPayment: monthlyPayment.toString(),
+        originalAmount,
+        currentBalance,
+        interestRate,
+        monthlyPayment,
         loanType,
         startDate: startDate ? new Date(startDate) : new Date(),
         endDate: endDate ? new Date(endDate) : null,

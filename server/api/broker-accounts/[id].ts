@@ -118,7 +118,7 @@ export default defineEventHandler(async (event) => {
           name,
           brokerName: brokerName || null,
           accountType: accountType || null,
-          currentValue: currentValue.toString(),
+          currentValue,
         })
         .where(eq(tables.brokerAccounts.id, accountIdNum))
         .returning();

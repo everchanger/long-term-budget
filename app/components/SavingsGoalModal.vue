@@ -216,11 +216,12 @@
 </template>
 
 <script setup lang="ts">
+import type { z } from "zod";
 import type {
   SelectSavingsAccount,
   SelectPerson,
   SelectSavingsGoal,
-  InsertSavingsGoal,
+  insertSavingsGoalSchema,
 } from "~~/database/validation-schemas";
 
 interface Props {
@@ -230,19 +231,18 @@ interface Props {
   editingGoal?: (SelectSavingsGoal & { savingsAccountIds?: number[] }) | null;
 }
 
-// Form state uses strings for HTML input compatibility
-type FormState = {
-  name: string;
-  description: string;
-  targetAmount: string | number;
-  priority: number;
-  category: string;
+// Form state inferred from Zod schema (omitting householdId which is added later)
+// Also includes savingsAccountIds which is handled separately in the API
+type FormState = Omit<
+  z.infer<typeof insertSavingsGoalSchema>,
+  "householdId"
+> & {
   savingsAccountIds: number[];
 };
 
 interface Emits {
   "update:open": [value: boolean];
-  submit: [data: Omit<InsertSavingsGoal, "householdId">];
+  submit: [data: FormState];
   cancel: [];
 }
 
@@ -342,10 +342,7 @@ const handleSubmit = () => {
   emit("submit", {
     name: formState.name,
     description: formState.description,
-    targetAmount:
-      typeof formState.targetAmount === "string"
-        ? parseFloat(formState.targetAmount)
-        : formState.targetAmount,
+    targetAmount: formState.targetAmount,
     priority: formState.priority,
     category: formState.category,
     savingsAccountIds: formState.savingsAccountIds,

@@ -176,7 +176,7 @@ export class TestDataBuilder {
    */
   async addIncomeSource(data?: {
     name?: string;
-    amount?: number;
+    amount?: string;
     frequency?: string;
     startDate?: Date;
     endDate?: Date;
@@ -193,7 +193,7 @@ export class TestDataBuilder {
       .values({
         personId: lastPerson.id,
         name: data?.name || "Test Salary",
-        amount: (data?.amount || 5000).toString(),
+        amount: data?.amount || "5000",
         frequency: data?.frequency || "monthly",
         startDate: data?.startDate || null,
         endDate: data?.endDate || null,
@@ -213,7 +213,7 @@ export class TestDataBuilder {
    */
   async addExpense(data?: {
     name?: string;
-    amount?: number;
+    amount?: string;
     frequency?: string;
     category?: string;
     isFixed?: boolean;
@@ -232,7 +232,7 @@ export class TestDataBuilder {
       .values({
         personId: lastPerson.id,
         name: data?.name || "Test Expense",
-        amount: (data?.amount || 1000).toString(),
+        amount: data?.amount || "1000",
         frequency: data?.frequency || "monthly",
         category: data?.category || "living",
         isFixed: data?.isFixed || false,
@@ -253,10 +253,10 @@ export class TestDataBuilder {
    */
   async addSavingsAccount(data?: {
     name?: string;
-    currentBalance?: number;
-    interestRate?: number;
+    currentBalance?: string;
+    interestRate?: string;
     accountType?: string;
-    monthlyDeposit?: number;
+    monthlyDeposit?: string;
   }): Promise<TestDataBuilder> {
     const lastPerson = this.persons[this.persons.length - 1];
     if (!lastPerson) {
@@ -269,14 +269,10 @@ export class TestDataBuilder {
       .values({
         personId: lastPerson.id,
         name: data?.name || "Test Savings",
-        currentBalance: (data?.currentBalance || 10000).toString(),
-        interestRate: data?.interestRate
-          ? data.interestRate.toString()
-          : "0.02",
+        currentBalance: data?.currentBalance || "10000",
+        interestRate: data?.interestRate || "0.02",
         accountType: data?.accountType || "savings",
-        monthlyDeposit: data?.monthlyDeposit
-          ? data.monthlyDeposit.toString()
-          : null,
+        monthlyDeposit: data?.monthlyDeposit || null,
       })
       .returning();
 
@@ -291,10 +287,10 @@ export class TestDataBuilder {
    */
   async addLoan(data?: {
     name?: string;
-    originalAmount?: number;
-    currentBalance?: number;
-    interestRate?: number;
-    monthlyPayment?: number;
+    originalAmount?: string;
+    currentBalance?: string;
+    interestRate?: string;
+    monthlyPayment?: string;
     loanType?: string;
     startDate?: Date;
     endDate?: Date;
@@ -304,10 +300,11 @@ export class TestDataBuilder {
       throw new Error("Must add a person before adding loan");
     }
 
-    const originalAmount = data?.originalAmount || 25000;
+    const originalAmount = data?.originalAmount || "25000";
     const currentBalance = data?.currentBalance || originalAmount;
-    const interestRate = data?.interestRate || 0.05;
-    const monthlyPayment = data?.monthlyPayment || originalAmount * 0.01; // Default to 1% of original
+    const interestRate = data?.interestRate || "0.05";
+    const monthlyPayment =
+      data?.monthlyPayment || (parseFloat(originalAmount) * 0.01).toString(); // Default to 1% of original
 
     // Insert into database using actual schema
     const [loan] = await db
@@ -315,10 +312,10 @@ export class TestDataBuilder {
       .values({
         personId: lastPerson.id,
         name: data?.name || "Test Loan",
-        originalAmount: originalAmount.toString(),
-        currentBalance: currentBalance.toString(),
-        interestRate: interestRate.toString(),
-        monthlyPayment: monthlyPayment.toString(),
+        originalAmount,
+        currentBalance,
+        interestRate,
+        monthlyPayment,
         loanType: data?.loanType || "personal",
         startDate: data?.startDate || new Date(),
         endDate: data?.endDate || null,
@@ -338,7 +335,7 @@ export class TestDataBuilder {
     name?: string;
     brokerName?: string;
     accountType?: string;
-    currentValue?: number;
+    currentValue?: string;
   }): Promise<TestDataBuilder> {
     const lastPerson = this.persons[this.persons.length - 1];
     if (!lastPerson) {
@@ -353,7 +350,7 @@ export class TestDataBuilder {
         name: data?.name || "Test Broker Account",
         brokerName: data?.brokerName || "Test Broker",
         accountType: data?.accountType || "investment",
-        currentValue: (data?.currentValue || 50000).toString(),
+        currentValue: data?.currentValue || "50000",
       })
       .returning();
 
@@ -369,7 +366,7 @@ export class TestDataBuilder {
   async addSavingsGoal(data?: {
     name?: string;
     description?: string;
-    targetAmount?: number;
+    targetAmount?: string;
     priority?: number;
     category?: string;
     linkedAccountIds?: number[];
@@ -385,7 +382,7 @@ export class TestDataBuilder {
         householdId: this.user.householdId,
         name: data?.name || "Test Savings Goal",
         description: data?.description || null,
-        targetAmount: (data?.targetAmount || 10000).toString(),
+        targetAmount: data?.targetAmount || "10000",
         priority: data?.priority || 1,
         category: data?.category || null,
       })

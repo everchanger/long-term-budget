@@ -130,7 +130,7 @@ export default defineEventHandler(async (event) => {
       .set({
         ...goalData,
         ...(targetAmount !== undefined && {
-          targetAmount: targetAmount.toString(),
+          targetAmount,
         }),
         updatedAt: new Date(),
       })

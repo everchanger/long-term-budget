@@ -116,9 +116,9 @@ export default defineEventHandler(async (event) => {
       .insert(tables.savingsAccounts)
       .values({
         name,
-        currentBalance: currentBalance.toString(),
-        interestRate: interestRate ? interestRate.toString() : null,
-        monthlyDeposit: monthlyDeposit ? monthlyDeposit.toString() : null,
+        currentBalance,
+        interestRate: interestRate || null,
+        monthlyDeposit: monthlyDeposit || null,
         accountType,
         personId: parseInt(personId),
       })

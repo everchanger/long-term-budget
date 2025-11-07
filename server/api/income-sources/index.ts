@@ -119,7 +119,7 @@ export default defineEventHandler(async (event) => {
       .values({
         personId: person_id,
         name,
-        amount: amount.toString(),
+        amount,
         frequency,
         startDate: start_date ? new Date(start_date) : null,
         endDate: end_date ? new Date(end_date) : null,

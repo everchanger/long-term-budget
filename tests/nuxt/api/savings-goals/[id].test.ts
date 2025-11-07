@@ -61,7 +61,7 @@ describe("/api/savings-goals/[id] integration tests", async () => {
 
     await user1.addSavingsGoal({
       name: "User1 Test Goal",
-      targetAmount: 20000,
+      targetAmount: "20000",
       priority: 2,
       category: "test",
       linkedAccountIds: [builtUser1.persons[0].savingsAccounts![0].id],
@@ -80,7 +80,7 @@ describe("/api/savings-goals/[id] integration tests", async () => {
 
     await user2.addSavingsGoal({
       name: "User2 Test Goal",
-      targetAmount: 30000,
+      targetAmount: "30000",
       priority: 3,
       linkedAccountIds: [builtUser2.persons[0].savingsAccounts![0].id],
     });
@@ -227,7 +227,7 @@ describe("/api/savings-goals/[id] integration tests", async () => {
         {
           method: "PUT",
           body: {
-            targetAmount: 25000,
+            targetAmount: "25000",
             priority: 3,
           },
         }
@@ -314,7 +314,7 @@ describe("/api/savings-goals/[id] integration tests", async () => {
           method: "POST",
           body: {
             name: "Goal to Delete",
-            targetAmount: 5000,
+            targetAmount: "5000",
             householdId: testUsers.user1.householdId,
           },
         }
@@ -356,7 +356,7 @@ describe("/api/savings-goals/[id] integration tests", async () => {
           method: "POST",
           body: {
             name: "Goal to Delete",
-            targetAmount: 5000,
+            targetAmount: "5000",
             householdId: testUsers.user1.householdId,
           },
         }

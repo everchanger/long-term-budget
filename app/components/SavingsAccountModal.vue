@@ -123,28 +123,14 @@
 </template>
 
 <script setup lang="ts">
+import type { z } from "zod";
 import type {
   SelectSavingsAccount,
-  InsertSavingsAccount,
+  insertSavingsAccountSchema,
 } from "~~/database/validation-schemas";
 
-// Form state uses strings for HTML input compatibility
-type FormState = {
-  name: string;
-  currentBalance: string | number;
-  interestRate: string | number;
-  monthlyDeposit: string | number;
-  accountType: string;
-};
-
-// Submission data type based on InsertSavingsAccount but without personId
-type SubmitData = {
-  name: string;
-  currentBalance: number;
-  interestRate: number | null;
-  monthlyDeposit: number | null;
-  accountType?: string;
-};
+// Form state inferred from Zod schema (omitting personId which is added later)
+type FormState = Omit<z.infer<typeof insertSavingsAccountSchema>, "personId">;
 
 interface Props {
   open?: boolean;
@@ -154,7 +140,7 @@ interface Props {
 
 interface Emits {
   "update:open": [value: boolean];
-  submit: [formData: SubmitData];
+  submit: [formData: FormState];
   cancel: [];
 }
 
@@ -183,15 +169,12 @@ const isOpen = computed({
 
 const isEditing = computed(() => !!props.savingsAccount);
 
-// Helper to convert string | number to number
-const toNumber = (value: string | number): number =>
-  typeof value === "string" ? parseFloat(value) : value;
-
 const isFormValid = computed(() => {
   return (
     formState.name.trim() !== "" &&
     formState.currentBalance !== "" &&
-    toNumber(formState.currentBalance) >= 0
+    !isNaN(parseFloat(formState.currentBalance)) &&
+    parseFloat(formState.currentBalance) >= 0
   );
 });
 
@@ -241,11 +224,9 @@ function handleSubmit() {
 
   emit("submit", {
     name: formState.name.trim(),
-    currentBalance: toNumber(formState.currentBalance),
-    interestRate: formState.interestRate ? toNumber(formState.interestRate) : null,
-    monthlyDeposit: formState.monthlyDeposit
-      ? toNumber(formState.monthlyDeposit)
-      : null,
+    currentBalance: formState.currentBalance,
+    interestRate: formState.interestRate || undefined,
+    monthlyDeposit: formState.monthlyDeposit || undefined,
     accountType: formState.accountType,
   });
 }

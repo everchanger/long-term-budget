@@ -83,17 +83,14 @@
 </template>
 
 <script setup lang="ts">
+import type { z } from "zod";
 import type {
   SelectIncomeSource,
-  InsertIncomeSource,
+  insertIncomeSourceSchema,
 } from "~~/database/validation-schemas";
 
-// Form state uses strings for HTML input compatibility
-type FormState = {
-  name: string;
-  amount: string | number;
-  frequency: string;
-};
+// Form state inferred from Zod schema (omitting personId which is added later)
+type FormState = Omit<z.infer<typeof insertIncomeSourceSchema>, "personId">;
 
 interface Props {
   open?: boolean;
@@ -103,7 +100,7 @@ interface Props {
 
 interface Emits {
   "update:open": [value: boolean];
-  submit: [formData: Omit<InsertIncomeSource, "personId">];
+  submit: [formData: FormState];
   cancel: [];
 }
 
@@ -119,7 +116,7 @@ const emit = defineEmits<Emits>();
 const formState = reactive<FormState>({
   name: "",
   amount: "",
-  frequency: "",
+  frequency: "monthly", // Default to a valid value instead of empty string
 });
 
 // Computed properties
@@ -131,15 +128,12 @@ const isOpen = computed({
 const isEditing = computed(() => !!props.incomeSource);
 
 const isFormValid = computed(() => {
-  const amount =
-    typeof formState.amount === "string"
-      ? parseFloat(formState.amount)
-      : formState.amount;
+  const amount = parseFloat(formState.amount);
   return (
     formState.name.trim() !== "" &&
     formState.amount !== "" &&
     amount > 0 &&
-    formState.frequency !== ""
+    formState.frequency !== undefined
   );
 });
 
@@ -150,7 +144,7 @@ watch(
     if (newIncomeSource) {
       formState.name = newIncomeSource.name;
       formState.amount = newIncomeSource.amount;
-      formState.frequency = newIncomeSource.frequency;
+      formState.frequency = newIncomeSource.frequency as FormState["frequency"];
     } else {
       resetForm();
     }
@@ -172,7 +166,7 @@ watch(
 function resetForm() {
   formState.name = "";
   formState.amount = "";
-  formState.frequency = "";
+  formState.frequency = "monthly";
 }
 
 function handleCancel() {
@@ -183,15 +177,10 @@ function handleCancel() {
 function handleSubmit() {
   if (!isFormValid.value) return;
 
-  const amount =
-    typeof formState.amount === "string"
-      ? parseFloat(formState.amount)
-      : formState.amount;
-
   emit("submit", {
     name: formState.name.trim(),
-    amount,
-    frequency: formState.frequency as "monthly" | "yearly" | "weekly" | "daily",
+    amount: formState.amount,
+    frequency: formState.frequency,
   });
 }
 </script>

@@ -200,7 +200,7 @@ async function seedTestUser() {
       body: JSON.stringify({
         person_id: alice.id,
         name: 'Software Engineer Salary',
-        amount: 5000,
+        amount: '5000',
         frequency: 'monthly',
         is_active: true,
       }),
@@ -220,7 +220,7 @@ async function seedTestUser() {
       body: JSON.stringify({
         person_id: bob.id,
         name: 'Product Manager Salary',
-        amount: 6000,
+        amount: '6000',
         frequency: 'monthly',
         is_active: true,
       }),
@@ -240,9 +240,9 @@ async function seedTestUser() {
       body: JSON.stringify({
         personId: alice.id,
         name: 'Emergency Fund',
-        currentBalance: 15000,
-        monthlyDeposit: 300,
-        interestRate: 2.5,
+        currentBalance: '15000',
+        monthlyDeposit: '300',
+        interestRate: '2.5',
         accountType: 'savings',
       }),
     });
@@ -264,9 +264,9 @@ async function seedTestUser() {
       body: JSON.stringify({
         personId: bob.id,
         name: 'Investment Account',
-        currentBalance: 25000,
-        monthlyDeposit: 500,
-        interestRate: 5.0,
+        currentBalance: '25000',
+        monthlyDeposit: '500',
+        interestRate: '5.0',
         accountType: 'investment',
       }),
     });
@@ -288,10 +288,10 @@ async function seedTestUser() {
       body: JSON.stringify({
         personId: alice.id,
         name: 'Student Loan',
-        originalAmount: 30000,
-        currentBalance: 20000,
-        interestRate: 4.5,
-        monthlyPayment: 400,
+        originalAmount: '30000',
+        currentBalance: '20000',
+        interestRate: '4.5',
+        monthlyPayment: '400',
         loanType: 'student',
       }),
     });
@@ -310,10 +310,10 @@ async function seedTestUser() {
       body: JSON.stringify({
         personId: bob.id,
         name: 'Car Loan',
-        originalAmount: 25000,
-        currentBalance: 18000,
-        interestRate: 3.9,
-        monthlyPayment: 500,
+        originalAmount: '25000',
+        currentBalance: '18000',
+        interestRate: '3.9',
+        monthlyPayment: '500',
         loanType: 'auto',
       }),
     });
@@ -333,7 +333,7 @@ async function seedTestUser() {
         householdId: householdId,
         name: 'House Down Payment',
         description: 'Save for 20% down payment on a new home',
-        targetAmount: 50000,
+        targetAmount: '50000',
         priority: 3, // high priority
         category: 'house',
         savingsAccountIds: [aliceSavings.id, bobSavings.id], // Link both accounts

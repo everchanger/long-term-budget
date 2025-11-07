@@ -64,7 +64,11 @@ export const updatePersonSchema = insertPersonSchema
 // Income Source schemas
 export const insertIncomeSourceSchema = createInsertSchema(incomeSources, {
   name: z.string().min(1, "Income source name is required"),
-  amount: z.number().min(0, "Amount must be positive"),
+  amount: z
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+      message: "Amount must be a positive number",
+    }),
   frequency: z.enum(["monthly", "yearly", "weekly", "daily"]),
   personId: z.number().positive("Person ID is required"),
 });
@@ -78,7 +82,11 @@ export const updateIncomeSourceSchema = insertIncomeSourceSchema
 // Expense schemas
 export const insertExpenseSchema = createInsertSchema(expenses, {
   name: z.string().min(1, "Expense name is required"),
-  amount: z.number().min(0, "Amount must be positive"),
+  amount: z
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+      message: "Amount must be a positive number",
+    }),
   frequency: z.enum(["monthly", "yearly", "weekly", "daily"]),
   category: z.string().min(1, "Category is required").optional(),
   personId: z.number().positive("Person ID is required"),
@@ -93,15 +101,28 @@ export const updateExpenseSchema = insertExpenseSchema
 // Savings Account schemas
 export const insertSavingsAccountSchema = createInsertSchema(savingsAccounts, {
   name: z.string().min(1, "Account name is required"),
-  currentBalance: z.number().min(0, "Balance must be non-negative"),
+  currentBalance: z
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+      message: "Current balance must be a non-negative number",
+    }),
   interestRate: z
-    .number()
-    .min(0)
-    .max(100, "Interest rate must be between 0 and 100%")
+    .string()
+    .refine(
+      (val) =>
+        !isNaN(parseFloat(val)) &&
+        parseFloat(val) >= 0 &&
+        parseFloat(val) <= 100,
+      {
+        message: "Interest rate must be between 0 and 100%",
+      }
+    )
     .optional(),
   monthlyDeposit: z
-    .number()
-    .min(0, "Monthly deposit must be non-negative")
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+      message: "Monthly deposit must be a non-negative number",
+    })
     .optional(),
   accountType: z.string().optional(),
   personId: z.number().positive("Person ID is required"),
@@ -116,14 +137,35 @@ export const updateSavingsAccountSchema = insertSavingsAccountSchema
 // Loan schemas
 export const insertLoanSchema = createInsertSchema(loans, {
   name: z.string().min(1, "Loan name is required"),
-  originalAmount: z.number().min(0, "Original amount must be non-negative"),
-  currentBalance: z.number().min(0, "Current balance must be non-negative"),
+  originalAmount: z
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+      message: "Original amount must be a non-negative number",
+    }),
+  currentBalance: z
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+      message: "Current balance must be a non-negative number",
+    }),
   interestRate: z
-    .number()
-    .min(0)
-    .max(100, "Interest rate must be between 0 and 100%"),
-  monthlyPayment: z.number().min(0, "Monthly payment must be non-negative"),
+    .string()
+    .refine(
+      (val) =>
+        !isNaN(parseFloat(val)) &&
+        parseFloat(val) >= 0 &&
+        parseFloat(val) <= 100,
+      {
+        message: "Interest rate must be between 0 and 100%",
+      }
+    ),
+  monthlyPayment: z
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+      message: "Monthly payment must be a non-negative number",
+    }),
   loanType: z.string().optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional().nullable(),
   personId: z.number().positive("Person ID is required"),
 });
 
@@ -138,7 +180,11 @@ export const insertBrokerAccountSchema = createInsertSchema(brokerAccounts, {
   name: z.string().min(1, "Account name is required"),
   brokerName: z.string().optional(),
   accountType: z.string().optional(),
-  currentValue: z.number().min(0, "Current value must be non-negative"),
+  currentValue: z
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+      message: "Current value must be a non-negative number",
+    }),
   personId: z.number().positive("Person ID is required"),
 });
 
@@ -152,7 +198,11 @@ export const updateBrokerAccountSchema = insertBrokerAccountSchema
 export const insertSavingsGoalSchema = createInsertSchema(savingsGoals, {
   name: z.string().min(1, "Goal name is required"),
   description: z.string().optional(),
-  targetAmount: z.number().min(0, "Target amount must be non-negative"),
+  targetAmount: z
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+      message: "Target amount must be a non-negative number",
+    }),
   priority: z.number().int().min(1).max(3).default(1),
   category: z.string().optional(),
   householdId: z.number().positive("Household ID is required"),

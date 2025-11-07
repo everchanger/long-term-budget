@@ -88,15 +88,11 @@ export default defineEventHandler(async (event) => {
       .update(tables.savingsAccounts)
       .set({
         name,
-        currentBalance: currentBalance.toString(),
-        interestRate: interestRate ? interestRate.toString() : null,
+        currentBalance,
+        interestRate: interestRate || null,
         accountType,
         monthlyDeposit:
-          monthlyDeposit !== undefined
-            ? monthlyDeposit !== null
-              ? monthlyDeposit.toString()
-              : null
-            : undefined,
+          monthlyDeposit !== undefined ? monthlyDeposit || null : undefined,
       })
       .where(eq(tables.savingsAccounts.id, accountIdInt))
       .returning();

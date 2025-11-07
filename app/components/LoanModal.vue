@@ -30,7 +30,7 @@
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             for="loan-amount"
           >
-            Outstanding Amount *
+            Original Loan Amount *
           </label>
           <input
             id="loan-amount"
@@ -42,6 +42,9 @@
             required
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            The total amount you originally borrowed
+          </p>
         </div>
 
         <div>
@@ -49,7 +52,7 @@
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             for="loan-current-balance"
           >
-            Current Balance
+            Current Balance (Amount Still Owed) *
           </label>
           <input
             id="loan-current-balance"
@@ -58,8 +61,12 @@
             step="0.01"
             min="0"
             placeholder="0.00"
+            required
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            How much you currently owe on this loan
+          </p>
         </div>
 
         <div>
@@ -137,30 +144,16 @@
 </template>
 
 <script setup lang="ts">
+import type { z } from "zod";
 import type {
   SelectLoan,
-  InsertLoan,
+  insertLoanSchema,
 } from "~~/database/validation-schemas";
 
-// Form state uses strings for HTML input compatibility
-type FormState = {
-  name: string;
-  originalAmount: string | number;
-  currentBalance: string | number;
-  interestRate: string | number;
-  monthlyPayment: string | number;
-  loanType: string;
-};
-
-// Submission type - based on InsertLoan but with optional fields that have defaults
-type SubmitData = Pick<
-  InsertLoan,
-  | "name"
-  | "originalAmount"
-  | "currentBalance"
-  | "interestRate"
-  | "monthlyPayment"
-  | "loanType"
+// Form state inferred from Zod schema (omitting fields not in the form: personId, startDate, endDate)
+type FormState = Omit<
+  z.infer<typeof insertLoanSchema>,
+  "personId" | "startDate" | "endDate"
 >;
 
 interface Props {
@@ -171,7 +164,7 @@ interface Props {
 
 interface Emits {
   "update:open": [value: boolean];
-  submit: [formData: SubmitData];
+  submit: [formData: FormState];
   cancel: [];
 }
 
@@ -193,10 +186,6 @@ const formState = reactive<FormState>({
   loanType: "",
 });
 
-// Helper to convert string | number to number
-const toNumber = (value: string | number): number =>
-  typeof value === "string" ? parseFloat(value) : value;
-
 // Computed properties
 const isOpen = computed({
   get: () => props.open,
@@ -209,9 +198,11 @@ const isFormValid = computed(() => {
   return (
     formState.name.trim() !== "" &&
     formState.originalAmount !== "" &&
-    toNumber(formState.originalAmount) > 0 &&
+    !isNaN(parseFloat(formState.originalAmount)) &&
+    parseFloat(formState.originalAmount) > 0 &&
     formState.currentBalance !== "" &&
-    toNumber(formState.currentBalance) >= 0
+    !isNaN(parseFloat(formState.currentBalance)) &&
+    parseFloat(formState.currentBalance) >= 0
   );
 });
 
@@ -265,10 +256,10 @@ function handleSubmit() {
 
   emit("submit", {
     name: formState.name.trim(),
-    originalAmount: toNumber(formState.originalAmount),
-    currentBalance: toNumber(currentBalance),
-    interestRate: toNumber(formState.interestRate),
-    monthlyPayment: toNumber(formState.monthlyPayment),
+    originalAmount: formState.originalAmount,
+    currentBalance,
+    interestRate: formState.interestRate,
+    monthlyPayment: formState.monthlyPayment,
     loanType: formState.loanType,
   });
 }
