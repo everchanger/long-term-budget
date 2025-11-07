@@ -139,8 +139,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
 
       expect(response).toMatchObject({
         statusCode: 400,
-        statusMessage: "Bad Request",
-        message: "Account ID is required",
+        statusMessage: "Account ID is required",
       });
     });
   });

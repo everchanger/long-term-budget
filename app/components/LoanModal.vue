@@ -254,12 +254,15 @@ function handleSubmit() {
 
   const currentBalance = formState.currentBalance || formState.originalAmount;
 
+  // Ensure all numeric fields are strings
   emit("submit", {
     name: formState.name.trim(),
-    originalAmount: formState.originalAmount,
-    currentBalance,
-    interestRate: formState.interestRate,
-    monthlyPayment: formState.monthlyPayment,
+    originalAmount: String(formState.originalAmount),
+    currentBalance: String(currentBalance),
+    interestRate: formState.interestRate ? String(formState.interestRate) : "",
+    monthlyPayment: formState.monthlyPayment
+      ? String(formState.monthlyPayment)
+      : "",
     loanType: formState.loanType,
   });
 }

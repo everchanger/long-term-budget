@@ -342,7 +342,7 @@ const handleSubmit = () => {
   emit("submit", {
     name: formState.name,
     description: formState.description,
-    targetAmount: formState.targetAmount,
+    targetAmount: String(formState.targetAmount),
     priority: formState.priority,
     category: formState.category,
     savingsAccountIds: formState.savingsAccountIds,

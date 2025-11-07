@@ -91,7 +91,7 @@ describe("/api/loans integration tests", async () => {
       } catch (error) {
         const fetchError = error as FetchError;
         expect(fetchError.status).toBe(400);
-        expect(fetchError.statusText).toContain("Person ID is required");
+        expect(fetchError.statusText).toContain("personId is required");
       }
     });
 

@@ -179,7 +179,7 @@ function handleSubmit() {
 
   emit("submit", {
     name: formState.name.trim(),
-    amount: formState.amount,
+    amount: String(formState.amount),
     frequency: formState.frequency,
   });
 }

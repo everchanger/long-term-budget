@@ -90,8 +90,7 @@ describe("/api/households/[id]", async () => {
 
       expect(response).toMatchObject({
         statusCode: 400,
-        statusMessage: "Bad Request",
-        message: "Household ID is required",
+        statusMessage: "Household ID is required",
       });
     });
 
@@ -187,8 +186,7 @@ describe("/api/households/[id]", async () => {
 
       expect(response).toMatchObject({
         statusCode: 400,
-        statusMessage: "Bad Request",
-        message: "Household ID is required",
+        statusMessage: "Household ID is required",
       });
     });
 

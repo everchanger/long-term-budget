@@ -224,9 +224,13 @@ function handleSubmit() {
 
   emit("submit", {
     name: formState.name.trim(),
-    currentBalance: formState.currentBalance,
-    interestRate: formState.interestRate || undefined,
-    monthlyDeposit: formState.monthlyDeposit || undefined,
+    currentBalance: String(formState.currentBalance),
+    interestRate: formState.interestRate
+      ? String(formState.interestRate)
+      : undefined,
+    monthlyDeposit: formState.monthlyDeposit
+      ? String(formState.monthlyDeposit)
+      : undefined,
     accountType: formState.accountType,
   });
 }
