@@ -102,6 +102,7 @@ CREATE TABLE "savings_accounts" (
 	"person_id" integer NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"current_balance" numeric(12, 2) NOT NULL,
+	"monthly_deposit" numeric(12, 2) DEFAULT '0',
 	"interest_rate" numeric(5, 4),
 	"account_type" varchar(100),
 	"created_at" timestamp DEFAULT now() NOT NULL
@@ -113,13 +114,19 @@ CREATE TABLE "savings_goals" (
 	"name" varchar(255) NOT NULL,
 	"description" text,
 	"target_amount" numeric(12, 2) NOT NULL,
-	"target_date" timestamp,
 	"is_completed" boolean DEFAULT false NOT NULL,
 	"completed_at" timestamp,
 	"priority" integer DEFAULT 1,
 	"category" varchar(100),
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "savings_goal_accounts" (
+	"savings_goal_id" integer NOT NULL,
+	"savings_account_id" integer NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "savings_goal_accounts_savings_goal_id_savings_account_id_pk" PRIMARY KEY("savings_goal_id","savings_account_id")
 );
 --> statement-breakpoint
 CREATE TABLE "loans" (
@@ -155,5 +162,7 @@ ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY
 ALTER TABLE "persons" ADD CONSTRAINT "persons_household_id_households_id_fk" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "savings_accounts" ADD CONSTRAINT "savings_accounts_person_id_persons_id_fk" FOREIGN KEY ("person_id") REFERENCES "public"."persons"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "savings_goals" ADD CONSTRAINT "savings_goals_household_id_households_id_fk" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "savings_goal_accounts" ADD CONSTRAINT "savings_goal_accounts_savings_goal_id_savings_goals_id_fk" FOREIGN KEY ("savings_goal_id") REFERENCES "public"."savings_goals"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "savings_goal_accounts" ADD CONSTRAINT "savings_goal_accounts_savings_account_id_savings_accounts_id_fk" FOREIGN KEY ("savings_account_id") REFERENCES "public"."savings_accounts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "loans" ADD CONSTRAINT "loans_person_id_persons_id_fk" FOREIGN KEY ("person_id") REFERENCES "public"."persons"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "scenarios" ADD CONSTRAINT "scenarios_household_id_households_id_fk" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE cascade ON UPDATE no action;

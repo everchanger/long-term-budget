@@ -10,6 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { households } from "./households";
+import { savingsGoalAccounts } from "./savings-goal-accounts";
 
 export const savingsGoals = pgTable("savings_goals", {
   id: serial("id").primaryKey(),
@@ -19,7 +20,6 @@ export const savingsGoals = pgTable("savings_goals", {
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   targetAmount: decimal("target_amount", { precision: 12, scale: 2 }).notNull(),
-  targetDate: timestamp("target_date"),
   isCompleted: boolean("is_completed").notNull().default(false),
   completedAt: timestamp("completed_at"),
   priority: integer("priority").default(1), // 1 = low, 2 = medium, 3 = high
@@ -28,9 +28,13 @@ export const savingsGoals = pgTable("savings_goals", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const savingsGoalsRelations = relations(savingsGoals, ({ one }) => ({
-  household: one(households, {
-    fields: [savingsGoals.householdId],
-    references: [households.id],
-  }),
-}));
+export const savingsGoalsRelations = relations(
+  savingsGoals,
+  ({ one, many }) => ({
+    household: one(households, {
+      fields: [savingsGoals.householdId],
+      references: [households.id],
+    }),
+    linkedAccounts: many(savingsGoalAccounts),
+  })
+);

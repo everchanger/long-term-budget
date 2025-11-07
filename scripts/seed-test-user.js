@@ -241,14 +241,18 @@ async function seedTestUser() {
         personId: alice.id,
         name: 'Emergency Fund',
         currentBalance: 15000,
+        monthlyDeposit: 300,
         interestRate: 2.5,
         accountType: 'savings',
       }),
     });
     
-    if (aliceSavingsResponse.ok) {
-      console.log(`  Created savings for Alice: Emergency Fund ($15,000 @ 2.5%)`);
+    if (!aliceSavingsResponse.ok) {
+      throw new Error(`Failed to create Alice's savings: ${aliceSavingsResponse.status}`);
     }
+    
+    const aliceSavings = await aliceSavingsResponse.json();
+    console.log(`  Created savings for Alice: Emergency Fund ($15,000 @ 2.5%, $300/month)`);
     
     // Create Bob's savings account
     const bobSavingsResponse = await fetch(`${API_BASE_URL}/api/savings-accounts`, {
@@ -261,14 +265,18 @@ async function seedTestUser() {
         personId: bob.id,
         name: 'Investment Account',
         currentBalance: 25000,
+        monthlyDeposit: 500,
         interestRate: 5.0,
         accountType: 'investment',
       }),
     });
     
-    if (bobSavingsResponse.ok) {
-      console.log(`  Created savings for Bob: Investment Account ($25,000 @ 5.0%)`);
+    if (!bobSavingsResponse.ok) {
+      throw new Error(`Failed to create Bob's savings: ${bobSavingsResponse.status}`);
     }
+    
+    const bobSavings = await bobSavingsResponse.json();
+    console.log(`  Created savings for Bob: Investment Account ($25,000 @ 5.0%, $500/month)`);
     
     // Create Alice's loan
     const aliceLoanResponse = await fetch(`${API_BASE_URL}/api/loans`, {
@@ -314,10 +322,7 @@ async function seedTestUser() {
       console.log(`  Created loan for Bob: Car Loan ($18,000 balance @ 3.9%)`);
     }
     
-    // Create household savings goal
-    const targetDate = new Date();
-    targetDate.setFullYear(targetDate.getFullYear() + 2); // 2 years from now
-    
+    // Create household savings goal with linked accounts
     const savingsGoalResponse = await fetch(`${API_BASE_URL}/api/savings-goals`, {
       method: 'POST',
       headers: {
@@ -329,15 +334,19 @@ async function seedTestUser() {
         name: 'House Down Payment',
         description: 'Save for 20% down payment on a new home',
         targetAmount: '50000',
-        targetDate: targetDate.toISOString(),
         priority: 3, // high priority
         category: 'house',
+        savingsAccountIds: [aliceSavings.id, bobSavings.id], // Link both accounts
       }),
     });
     
-    if (savingsGoalResponse.ok) {
-      console.log(`  Created savings goal: House Down Payment ($50,000 target by ${targetDate.toLocaleDateString()})`);
+    if (!savingsGoalResponse.ok) {
+      throw new Error(`Failed to create savings goal: ${savingsGoalResponse.status}`);
     }
+    
+    await savingsGoalResponse.json();
+    console.log(`  Created savings goal: House Down Payment ($50,000 target)`);
+    console.log(`  Linked 2 savings accounts to goal (Alice's & Bob's)`);
     
     console.log('');
     console.log('Test data created successfully!');

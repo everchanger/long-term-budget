@@ -73,7 +73,14 @@ export default defineEventHandler(async (event) => {
 
   if (method === "POST") {
     const body = await readBody(event);
-    const { name, currentBalance, interestRate, accountType, personId } = body;
+    const {
+      name,
+      currentBalance,
+      interestRate,
+      accountType,
+      personId,
+      monthlyDeposit,
+    } = body;
 
     if (!name || !currentBalance || !personId) {
       throw createError({
@@ -111,6 +118,7 @@ export default defineEventHandler(async (event) => {
         name,
         currentBalance: currentBalance.toString(),
         interestRate: interestRate ? interestRate.toString() : null,
+        monthlyDeposit: monthlyDeposit ? monthlyDeposit.toString() : null,
         accountType,
         personId: parseInt(personId),
       })

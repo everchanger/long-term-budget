@@ -231,23 +231,12 @@ export const useHouseholdFinancials = (householdId: string) => {
 
   const getSuggestedMonthlyContribution = (
     targetAmount: number,
-    currentAmount: number,
-    targetDate?: Date
+    currentAmount: number
   ) => {
     const remaining = Math.max(targetAmount - currentAmount, 0);
     if (remaining <= 0) return 0;
 
-    if (targetDate) {
-      const now = new Date();
-      const monthsToTarget = Math.max(
-        (targetDate.getFullYear() - now.getFullYear()) * 12 +
-          (targetDate.getMonth() - now.getMonth()),
-        1
-      );
-      return remaining / monthsToTarget;
-    }
-
-    // If no target date, suggest using 50% of monthly surplus
+    // Suggest using 50% of monthly surplus
     return Math.max(financialSummary.value.monthlySurplus * 0.5, 0);
   };
 

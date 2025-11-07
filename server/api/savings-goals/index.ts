@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { insertSavingsGoalSchema } from "../../../database/validation-schemas";
 import { enrichSavingsGoalsWithProgress } from "../../utils/savingsGoalCalculations";
 
@@ -44,9 +44,26 @@ export default defineEventHandler(async (event) => {
         .where(eq(tables.savingsGoals.householdId, parseInt(householdId)))
         .orderBy(tables.savingsGoals.createdAt);
 
+      // Fetch linked accounts for each goal
+      const goalsWithAccounts = await Promise.all(
+        goals.map(async (goal) => {
+          const linkedAccounts = await db
+            .select({
+              savingsAccountId: tables.savingsGoalAccounts.savingsAccountId,
+            })
+            .from(tables.savingsGoalAccounts)
+            .where(eq(tables.savingsGoalAccounts.savingsGoalId, goal.id));
+
+          return {
+            ...goal,
+            savingsAccountIds: linkedAccounts.map((la) => la.savingsAccountId),
+          };
+        })
+      );
+
       // Enrich goals with calculated progress data
       const enrichedGoals = await enrichSavingsGoalsWithProgress(
-        goals,
+        goalsWithAccounts,
         parseInt(householdId),
         db
       );
@@ -64,13 +81,31 @@ export default defineEventHandler(async (event) => {
         .where(eq(tables.households.userId, session.user.id))
         .orderBy(tables.savingsGoals.createdAt);
 
+      // Extract goals and fetch linked accounts
+      const goals = result.map((item) => item.savings_goals);
+      const goalsWithAccounts = await Promise.all(
+        goals.map(async (goal) => {
+          const linkedAccounts = await db
+            .select({
+              savingsAccountId: tables.savingsGoalAccounts.savingsAccountId,
+            })
+            .from(tables.savingsGoalAccounts)
+            .where(eq(tables.savingsGoalAccounts.savingsGoalId, goal.id));
+
+          return {
+            ...goal,
+            savingsAccountIds: linkedAccounts.map((la) => la.savingsAccountId),
+          };
+        })
+      );
+
       // Group by household and enrich each group
-      const goalsByHousehold = result.reduce((acc, item) => {
-        const householdId = item.savings_goals.householdId;
+      const goalsByHousehold = goalsWithAccounts.reduce((acc, goal) => {
+        const householdId = goal.householdId;
         if (!acc[householdId]) {
           acc[householdId] = [];
         }
-        acc[householdId].push(item.savings_goals);
+        acc[householdId].push(goal);
         return acc;
       }, {} as Record<number, any[]>);
 
@@ -91,7 +126,7 @@ export default defineEventHandler(async (event) => {
   if (method === "POST") {
     const body = await readBody(event);
 
-    // Validate using our Zod schema
+    // Validate using our Zod schema (includes savingsAccountIds)
     const validatedData = insertSavingsGoalSchema.parse(body);
 
     // Verify that the household belongs to the authenticated user
@@ -112,18 +147,61 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // If savings account IDs provided, verify they all belong to persons in this household
+    if (
+      validatedData.savingsAccountIds &&
+      validatedData.savingsAccountIds.length > 0
+    ) {
+      const accounts = await db
+        .select({
+          id: tables.savingsAccounts.id,
+          personId: tables.savingsAccounts.personId,
+        })
+        .from(tables.savingsAccounts)
+        .innerJoin(
+          tables.persons,
+          eq(tables.savingsAccounts.personId, tables.persons.id)
+        )
+        .where(
+          and(
+            eq(tables.persons.householdId, validatedData.householdId),
+            inArray(tables.savingsAccounts.id, validatedData.savingsAccountIds)
+          )
+        );
+
+      if (accounts.length !== validatedData.savingsAccountIds.length) {
+        throw createError({
+          statusCode: 400,
+          statusMessage:
+            "One or more savings accounts do not belong to this household",
+        });
+      }
+    }
+
     const [result] = await db
       .insert(tables.savingsGoals)
       .values({
         name: validatedData.name,
         description: validatedData.description,
         targetAmount: validatedData.targetAmount,
-        targetDate: validatedData.targetDate,
         priority: validatedData.priority || 1,
         category: validatedData.category,
         householdId: validatedData.householdId,
       })
       .returning();
+
+    // Link savings accounts if provided
+    if (
+      validatedData.savingsAccountIds &&
+      validatedData.savingsAccountIds.length > 0
+    ) {
+      await db.insert(tables.savingsGoalAccounts).values(
+        validatedData.savingsAccountIds.map((accountId) => ({
+          savingsGoalId: result.id,
+          savingsAccountId: accountId,
+        }))
+      );
+    }
 
     return result;
   }

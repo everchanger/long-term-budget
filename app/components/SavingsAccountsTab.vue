@@ -59,6 +59,11 @@
                 Interest Rate:
                 {{ parseFloat(account.interestRate).toFixed(2) }}%
               </p>
+              <p v-if="account.monthlyDeposit">
+                Monthly Deposit: ${{
+                  parseFloat(account.monthlyDeposit).toLocaleString()
+                }}
+              </p>
             </div>
           </div>
           <div class="flex gap-2">
@@ -136,6 +141,7 @@ const handleSavingsSubmit = async (formData: {
   name: string;
   currentBalance: string;
   interestRate: string;
+  monthlyDeposit: string;
   accountType: string;
 }) => {
   isSavingsSubmitting.value = true;

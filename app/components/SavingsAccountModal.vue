@@ -65,6 +65,27 @@
         <div>
           <label
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            for="savings-monthly-deposit"
+          >
+            Monthly Deposit
+          </label>
+          <input
+            id="savings-monthly-deposit"
+            v-model="formState.monthlyDeposit"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="0.00"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+          />
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Amount you contribute to this account each month
+          </p>
+        </div>
+
+        <div>
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             for="savings-account-type"
           >
             Account Type
@@ -109,6 +130,7 @@ type SavingsAccountFormData = {
   name: string;
   currentBalance: string;
   interestRate: string;
+  monthlyDeposit: string;
   accountType: string;
 };
 
@@ -137,6 +159,7 @@ const formState = reactive({
   name: "",
   currentBalance: "",
   interestRate: "",
+  monthlyDeposit: "",
   accountType: "",
 });
 
@@ -164,6 +187,7 @@ watch(
       formState.name = newSavingsAccount.name;
       formState.currentBalance = newSavingsAccount.currentBalance;
       formState.interestRate = newSavingsAccount.interestRate || "";
+      formState.monthlyDeposit = newSavingsAccount.monthlyDeposit || "";
       formState.accountType = newSavingsAccount.accountType || "";
     } else {
       resetForm();
@@ -187,6 +211,7 @@ function resetForm() {
   formState.name = "";
   formState.currentBalance = "";
   formState.interestRate = "";
+  formState.monthlyDeposit = "";
   formState.accountType = "";
 }
 
@@ -202,6 +227,7 @@ function handleSubmit() {
     name: formState.name.trim(),
     currentBalance: formState.currentBalance,
     interestRate: formState.interestRate,
+    monthlyDeposit: formState.monthlyDeposit,
     accountType: formState.accountType,
   });
 }

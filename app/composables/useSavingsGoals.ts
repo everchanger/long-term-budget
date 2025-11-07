@@ -100,18 +100,18 @@ export const useSavingsGoals = (householdId: MaybeRefOrGetter<string>) => {
     name: string;
     description: string;
     targetAmount: string;
-    targetDate: Date | null;
     priority: number;
     category: string;
+    savingsAccountIds: number[];
   }) => {
     const insertData: InsertSavingsGoal = {
       name: goalData.name,
       description: goalData.description,
       targetAmount: goalData.targetAmount.toString(),
-      targetDate: goalData.targetDate || undefined,
       priority: Number(goalData.priority) || 1,
       category: goalData.category,
       householdId: parseInt(toValue(householdId)),
+      savingsAccountIds: goalData.savingsAccountIds,
     };
 
     await $fetch("/api/savings-goals", {
@@ -128,18 +128,18 @@ export const useSavingsGoals = (householdId: MaybeRefOrGetter<string>) => {
       name: string;
       description: string;
       targetAmount: string;
-      targetDate: Date | null;
       priority: number;
       category: string;
+      savingsAccountIds: number[];
     }
   ) => {
     const updateData: UpdateSavingsGoal = {
       name: goalData.name,
       description: goalData.description,
       targetAmount: goalData.targetAmount.toString(),
-      targetDate: goalData.targetDate || undefined,
       priority: Number(goalData.priority) || 1,
       category: goalData.category,
+      savingsAccountIds: goalData.savingsAccountIds,
     };
 
     await $fetch(`/api/savings-goals/${goalId}`, {

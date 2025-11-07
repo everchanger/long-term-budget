@@ -1,5 +1,5 @@
 {
-  "id": "8cad8d7f-a38b-4a54-8cdb-624713e0d45f",
+  "id": "55e71027-9316-40f5-ba4a-f8dd4a186d75",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -700,6 +700,13 @@
           "primaryKey": false,
           "notNull": true
         },
+        "monthly_deposit": {
+          "name": "monthly_deposit",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
         "interest_rate": {
           "name": "interest_rate",
           "type": "numeric(5, 4)",
@@ -776,12 +783,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "target_date": {
-          "name": "target_date",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
         "is_completed": {
           "name": "is_completed",
           "type": "boolean",
@@ -840,6 +841,73 @@
         }
       },
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.savings_goal_accounts": {
+      "name": "savings_goal_accounts",
+      "schema": "",
+      "columns": {
+        "savings_goal_id": {
+          "name": "savings_goal_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "savings_account_id": {
+          "name": "savings_account_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "savings_goal_accounts_savings_goal_id_savings_goals_id_fk": {
+          "name": "savings_goal_accounts_savings_goal_id_savings_goals_id_fk",
+          "tableFrom": "savings_goal_accounts",
+          "tableTo": "savings_goals",
+          "columnsFrom": [
+            "savings_goal_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "savings_goal_accounts_savings_account_id_savings_accounts_id_fk": {
+          "name": "savings_goal_accounts_savings_account_id_savings_accounts_id_fk",
+          "tableFrom": "savings_goal_accounts",
+          "tableTo": "savings_accounts",
+          "columnsFrom": [
+            "savings_account_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "savings_goal_accounts_savings_goal_id_savings_account_id_pk": {
+          "name": "savings_goal_accounts_savings_goal_id_savings_account_id_pk",
+          "columns": [
+            "savings_goal_id",
+            "savings_account_id"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},

@@ -127,15 +127,17 @@ The seed script creates a demo user by calling the Better Auth signup API and ve
 **Seeded test data includes:**
 - **Alice** (30 years old)
   - Income: Software Engineer Salary ($5,000/month)
-  - Savings: Emergency Fund ($15,000 @ 2.5%)
+  - Savings: Emergency Fund ($15,000 @ 2.5%, $300/month deposit)
   - Debt: Student Loan ($20,000 balance @ 4.5%, $400/month)
 - **Bob** (32 years old)
   - Income: Product Manager Salary ($6,000/month)
-  - Savings: Investment Account ($25,000 @ 5.0%)
+  - Savings: Investment Account ($25,000 @ 5.0%, $500/month deposit)
   - Debt: Car Loan ($18,000 balance @ 3.9%, $500/month)
 - **Household Goal**
   - House Down Payment ($50,000 target, 2 years)
   - Current savings: $40,000 (80% of goal)
+  - Linked accounts: Both Alice's and Bob's savings accounts
+  - Combined monthly deposits: $800/month
 
 **Custom credentials via environment variables:**
 ```bash
@@ -153,6 +155,50 @@ The script will skip creation if a user with the same email already exists.
 2. For development: Run `npm run db:push` to sync changes immediately
 3. For production: Run `npm run db:generate` to create migrations, then `npm run db:migrate`
 4. Use `npm run db:studio` to inspect your database visually
+
+### Key Features
+
+#### Savings Goals with Linked Accounts
+
+When creating a savings goal, you can optionally link specific savings accounts to track progress toward that goal:
+
+```javascript
+// Create a goal with linked accounts
+POST /api/savings-goals
+{
+  "householdId": 1,
+  "name": "House Down Payment",
+  "targetAmount": "50000",
+  "savingsAccountIds": [1, 2]  // Optional: link accounts during creation
+}
+```
+
+You can also link accounts to an existing goal:
+
+```javascript
+// Add an account to an existing goal
+POST /api/savings-goals/{goalId}/accounts
+{
+  "savingsAccountId": 1
+}
+```
+
+#### Monthly Deposits for Savings Accounts
+
+Savings accounts support monthly deposit tracking, which enables calculation of how long it will take to reach savings goals:
+
+```javascript
+// Create a savings account with monthly deposits
+POST /api/savings-accounts
+{
+  "personId": 1,
+  "name": "Emergency Fund",
+  "currentBalance": 15000,
+  "monthlyDeposit": 300,  // $300 deposited per month
+  "interestRate": 2.5,
+  "accountType": "savings"
+}
+```
 
 ## Testing
 

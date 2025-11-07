@@ -103,6 +103,13 @@ export const insertSavingsAccountSchema = createInsertSchema(savingsAccounts, {
       return rate >= 0 && rate <= 100;
     }, "Interest rate must be between 0 and 100%")
     .optional(),
+  monthlyDeposit: z
+    .string()
+    .refine((val) => {
+      if (!val) return true; // Optional field
+      return parseFloat(val) >= 0;
+    }, "Monthly deposit must be non-negative")
+    .optional(),
   accountType: z.string().optional(),
   personId: z.number().positive("Person ID is required"),
 });
@@ -149,10 +156,11 @@ export const insertSavingsGoalSchema = createInsertSchema(savingsGoals, {
   targetAmount: z
     .string()
     .refine((val) => parseFloat(val) > 0, "Target amount must be positive"),
-  targetDate: z.coerce.date().optional(),
   priority: z.number().int().min(1).max(3).default(1),
   category: z.string().optional(),
   householdId: z.number().positive("Household ID is required"),
+}).extend({
+  savingsAccountIds: z.array(z.number().positive()).optional(),
 });
 
 export const selectSavingsGoalSchema = createSelectSchema(savingsGoals);

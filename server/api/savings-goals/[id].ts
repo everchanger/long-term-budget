@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { updateSavingsGoalSchema } from "../../../database/validation-schemas";
 
 export default defineEventHandler(async (event) => {
@@ -62,14 +62,63 @@ export default defineEventHandler(async (event) => {
     // Validate using our Zod schema
     const validatedData = updateSavingsGoalSchema.parse(body);
 
+    // Extract savingsAccountIds (not stored in the savings_goals table)
+    const { savingsAccountIds, ...goalData } = validatedData;
+
+    // If savings account IDs provided, verify they all belong to persons in this household
+    if (savingsAccountIds && savingsAccountIds.length > 0) {
+      const accounts = await db
+        .select({
+          id: tables.savingsAccounts.id,
+          personId: tables.savingsAccounts.personId,
+        })
+        .from(tables.savingsAccounts)
+        .innerJoin(
+          tables.persons,
+          eq(tables.savingsAccounts.personId, tables.persons.id)
+        )
+        .where(
+          and(
+            eq(tables.persons.householdId, goalExists.householdId),
+            inArray(tables.savingsAccounts.id, savingsAccountIds)
+          )
+        );
+
+      if (accounts.length !== savingsAccountIds.length) {
+        throw createError({
+          statusCode: 400,
+          statusMessage:
+            "One or more savings accounts do not belong to this household",
+        });
+      }
+    }
+
     const [result] = await db
       .update(tables.savingsGoals)
       .set({
-        ...validatedData,
+        ...goalData,
         updatedAt: new Date(),
       })
       .where(eq(tables.savingsGoals.id, parseInt(goalId)))
       .returning();
+
+    // Update linked savings accounts if provided
+    if (savingsAccountIds !== undefined) {
+      // Delete existing links
+      await db
+        .delete(tables.savingsGoalAccounts)
+        .where(eq(tables.savingsGoalAccounts.savingsGoalId, parseInt(goalId)));
+
+      // Add new links
+      if (savingsAccountIds.length > 0) {
+        await db.insert(tables.savingsGoalAccounts).values(
+          savingsAccountIds.map((accountId) => ({
+            savingsGoalId: parseInt(goalId),
+            savingsAccountId: accountId,
+          }))
+        );
+      }
+    }
 
     return result;
   }

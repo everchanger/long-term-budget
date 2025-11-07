@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import * as tables from "~~/database/schema";
 
@@ -16,7 +16,6 @@ interface EnrichedSavingsGoal {
   name: string;
   description: string | null;
   targetAmount: string;
-  targetDate: Date | null;
   isCompleted: boolean;
   completedAt: Date | null;
   priority: number | null;
@@ -162,50 +161,103 @@ export async function enrichSavingsGoalsWithProgress(
     name: string;
     description: string | null;
     targetAmount: string;
-    targetDate: Date | null;
     isCompleted: boolean;
     completedAt: Date | null;
     priority: number | null;
     category: string | null;
     createdAt: Date;
     updatedAt: Date;
+    savingsAccountIds?: number[];
   }>,
   householdId: number,
   db: NodePgDatabase<any>
 ): Promise<EnrichedSavingsGoal[]> {
   const financialData = await calculateHouseholdFinancials(householdId, db);
 
-  return goals.map((goal) => {
-    const targetAmount = parseFloat(goal.targetAmount);
+  // Get all savings accounts for the household
+  const householdPersons = await db
+    .select({ id: tables.persons.id })
+    .from(tables.persons)
+    .where(eq(tables.persons.householdId, householdId));
 
-    // For now, use total savings as current amount
-    // In the future, could implement goal-specific allocation
-    const currentAmount = financialData.totalSavings;
+  const personIds = householdPersons.map((p) => p.id);
 
-    const progressPercentage =
-      targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
-    const remainingAmount = Math.max(0, targetAmount - currentAmount);
+  return Promise.all(
+    goals.map(async (goal) => {
+      const targetAmount = parseFloat(goal.targetAmount);
 
-    let estimatedMonthsToGoal: number | null = null;
-    let estimatedCompletionDate: Date | null = null;
+      let currentAmount = 0;
+      let monthlyDeposits = 0;
 
-    if (financialData.netMonthlySavings > 0 && remainingAmount > 0) {
-      estimatedMonthsToGoal = Math.ceil(
-        remainingAmount / financialData.netMonthlySavings
-      );
-      estimatedCompletionDate = new Date();
-      estimatedCompletionDate.setMonth(
-        estimatedCompletionDate.getMonth() + estimatedMonthsToGoal
-      );
-    }
+      if (goal.savingsAccountIds && goal.savingsAccountIds.length > 0) {
+        // Calculate from specific linked accounts only
+        for (const accountId of goal.savingsAccountIds) {
+          const accounts = await db
+            .select({
+              currentBalance: tables.savingsAccounts.currentBalance,
+              monthlyDeposit: tables.savingsAccounts.monthlyDeposit,
+            })
+            .from(tables.savingsAccounts)
+            .where(eq(tables.savingsAccounts.id, accountId));
 
-    return {
-      ...goal,
-      currentAmount,
-      progressPercentage: Math.min(progressPercentage, 100),
-      remainingAmount,
-      estimatedMonthsToGoal,
-      estimatedCompletionDate,
-    };
-  });
+          if (accounts.length > 0) {
+            currentAmount += parseFloat(accounts[0].currentBalance);
+            if (accounts[0].monthlyDeposit) {
+              monthlyDeposits += parseFloat(accounts[0].monthlyDeposit);
+            }
+          }
+        }
+      } else {
+        // No specific accounts linked - use all household savings
+        if (personIds.length > 0) {
+          const allAccounts = await db
+            .select({
+              currentBalance: tables.savingsAccounts.currentBalance,
+              monthlyDeposit: tables.savingsAccounts.monthlyDeposit,
+            })
+            .from(tables.savingsAccounts)
+            .where(inArray(tables.savingsAccounts.personId, personIds));
+
+          currentAmount = allAccounts.reduce(
+            (sum, account) => sum + parseFloat(account.currentBalance),
+            0
+          );
+          monthlyDeposits = allAccounts.reduce((sum, account) => {
+            return (
+              sum +
+              (account.monthlyDeposit ? parseFloat(account.monthlyDeposit) : 0)
+            );
+          }, 0);
+        }
+      }
+
+      const progressPercentage =
+        targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
+      const remainingAmount = Math.max(0, targetAmount - currentAmount);
+
+      let estimatedMonthsToGoal: number | null = null;
+      let estimatedCompletionDate: Date | null = null;
+
+      // Use monthly deposits if available, otherwise fall back to net monthly savings
+      const monthlySavingsRate =
+        monthlyDeposits > 0 ? monthlyDeposits : financialData.netMonthlySavings;
+
+      if (monthlySavingsRate > 0 && remainingAmount > 0) {
+        estimatedMonthsToGoal = Math.ceil(remainingAmount / monthlySavingsRate);
+        estimatedCompletionDate = new Date();
+        estimatedCompletionDate.setMonth(
+          estimatedCompletionDate.getMonth() + estimatedMonthsToGoal
+        );
+      }
+
+      return {
+        ...goal,
+        currentAmount,
+        progressPercentage: Math.min(progressPercentage, 100),
+        remainingAmount,
+        estimatedMonthsToGoal,
+        estimatedCompletionDate,
+      };
+    })
+  );
 }

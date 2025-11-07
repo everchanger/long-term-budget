@@ -459,21 +459,13 @@
                   </div>
 
                   <!-- Goal Details -->
-                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                     <div>
                       <p class="text-neutral-600 dark:text-neutral-400">
                         Remaining
                       </p>
                       <p class="font-medium">
                         ${{ getRemainingAmount(goal).toLocaleString() }}
-                      </p>
-                    </div>
-                    <div v-if="goal.targetDate">
-                      <p class="text-neutral-600 dark:text-neutral-400">
-                        Target Date
-                      </p>
-                      <p class="font-medium">
-                        {{ new Date(goal.targetDate).toLocaleDateString() }}
                       </p>
                     </div>
                     <div v-if="goal.category">
@@ -595,6 +587,7 @@
       <!-- Savings Goal Modal -->
       <SavingsGoalModal
         v-model:open="isSavingsGoalModalOpen"
+        :household-id="userHousehold?.id"
         :loading="isSavingsGoalSubmitting"
         :editing-goal="editingSavingsGoal"
         @submit="handleSavingsGoalSubmit"
@@ -974,9 +967,9 @@ const handleSavingsGoalSubmit = async (formData: {
   name: string;
   description: string;
   targetAmount: string;
-  targetDate: Date | null;
   priority: number;
   category: string;
+  savingsAccountIds: number[];
 }) => {
   isSavingsGoalSubmitting.value = true;
   try {
