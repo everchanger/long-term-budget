@@ -74,7 +74,8 @@ export default defineEventHandler(async (event) => {
 
   if (method === "PUT") {
     const body = await readBody(event);
-    const { name, currentBalance, interestRate, accountType } = body;
+    const { name, currentBalance, interestRate, accountType, monthlyDeposit } =
+      body;
 
     if (!name || !currentBalance) {
       throw createError({
@@ -90,6 +91,12 @@ export default defineEventHandler(async (event) => {
         currentBalance: currentBalance.toString(),
         interestRate: interestRate ? interestRate.toString() : null,
         accountType,
+        monthlyDeposit:
+          monthlyDeposit !== undefined
+            ? monthlyDeposit !== null
+              ? monthlyDeposit.toString()
+              : null
+            : undefined,
       })
       .where(eq(tables.savingsAccounts.id, accountIdInt))
       .returning();

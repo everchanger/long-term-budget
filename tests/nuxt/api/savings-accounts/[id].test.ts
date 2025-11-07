@@ -295,6 +295,80 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
       });
       expect(updatedAccount.interestRate).toBeNull();
       expect(updatedAccount.accountType).toBeNull();
+      expect(updatedAccount.monthlyDeposit).toBeNull();
+    });
+
+    it("should update monthly deposit on savings account", async () => {
+      // Create a new savings account for this test
+      const newAccount = await authenticatedFetch<SavingsAccount>(
+        testUsers.user1,
+        "/api/savings-accounts",
+        {
+          method: "POST",
+          body: {
+            name: "Monthly Deposit Test",
+            currentBalance: 10000,
+            personId: testUsers.user1.persons[0].id,
+          },
+        }
+      );
+
+      // Update with monthly deposit
+      const updatedAccount = await authenticatedFetch<SavingsAccount>(
+        testUsers.user1,
+        `/api/savings-accounts/${newAccount.id}`,
+        {
+          method: "PUT",
+          body: {
+            name: "Monthly Deposit Test",
+            currentBalance: 10000,
+            monthlyDeposit: 250,
+          },
+        }
+      );
+
+      expect(updatedAccount).toMatchObject({
+        id: newAccount.id,
+        name: "Monthly Deposit Test",
+        currentBalance: "10000.00",
+        monthlyDeposit: "250.00",
+        personId: testUsers.user1.persons[0].id,
+      });
+    });
+
+    it("should remove monthly deposit when set to null", async () => {
+      // Create a new savings account with monthly deposit
+      const newAccount = await authenticatedFetch<SavingsAccount>(
+        testUsers.user1,
+        "/api/savings-accounts",
+        {
+          method: "POST",
+          body: {
+            name: "Remove Deposit Test",
+            currentBalance: 5000,
+            monthlyDeposit: 100,
+            personId: testUsers.user1.persons[0].id,
+          },
+        }
+      );
+
+      expect(newAccount.monthlyDeposit).toBe("100.00");
+
+      // Remove monthly deposit
+      const updatedAccount = await authenticatedFetch<SavingsAccount>(
+        testUsers.user1,
+        `/api/savings-accounts/${newAccount.id}`,
+        {
+          method: "PUT",
+          body: {
+            name: "Remove Deposit Test",
+            currentBalance: 5000,
+            monthlyDeposit: null,
+          },
+        }
+      );
+
+      expect(updatedAccount.monthlyDeposit).toBeNull();
     });
   });
 

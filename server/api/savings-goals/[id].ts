@@ -1,5 +1,6 @@
 import { eq, and, inArray } from "drizzle-orm";
 import { updateSavingsGoalSchema } from "../../../database/validation-schemas";
+import { enrichSavingsGoalsWithProgress } from "../../utils/savingsGoalCalculations";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
@@ -48,19 +49,50 @@ export default defineEventHandler(async (event) => {
   }
 
   if (method === "GET") {
-    const result = await db
+    const [goal] = await db
       .select()
       .from(tables.savingsGoals)
       .where(eq(tables.savingsGoals.id, parseInt(goalId)));
 
-    return result[0];
+    if (!goal) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Savings goal not found",
+      });
+    }
+
+    // Get linked savings account IDs
+    const linkedAccounts = await db
+      .select({ accountId: tables.savingsGoalAccounts.savingsAccountId })
+      .from(tables.savingsGoalAccounts)
+      .where(eq(tables.savingsGoalAccounts.savingsGoalId, parseInt(goalId)));
+
+    const savingsAccountIds = linkedAccounts.map((link) => link.accountId);
+
+    // Enrich with progress data
+    const enrichedGoals = await enrichSavingsGoalsWithProgress(
+      [{ ...goal, savingsAccountIds }],
+      goalExists.householdId,
+      db
+    );
+
+    return enrichedGoals[0];
   }
 
   if (method === "PUT") {
     const body = await readBody(event);
 
     // Validate using our Zod schema
-    const validatedData = updateSavingsGoalSchema.parse(body);
+    let validatedData;
+    try {
+      validatedData = updateSavingsGoalSchema.parse(body);
+    } catch (error) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Validation failed",
+        data: error,
+      });
+    }
 
     // Extract savingsAccountIds (not stored in the savings_goals table)
     const { savingsAccountIds, ...goalData } = validatedData;

@@ -10,6 +10,8 @@ import {
   savingsAccounts,
   loans,
   brokerAccounts,
+  savingsGoals,
+  savingsGoalAccounts,
 } from "../../../database/schema";
 import { db } from "../../../server/utils/drizzle";
 import { auth } from "../../../lib/auth";
@@ -254,6 +256,7 @@ export class TestDataBuilder {
     currentBalance?: number;
     interestRate?: number;
     accountType?: string;
+    monthlyDeposit?: number;
   }): Promise<TestDataBuilder> {
     const lastPerson = this.persons[this.persons.length - 1];
     if (!lastPerson) {
@@ -271,6 +274,9 @@ export class TestDataBuilder {
           ? data.interestRate.toString()
           : "0.02",
         accountType: data?.accountType || "savings",
+        monthlyDeposit: data?.monthlyDeposit
+          ? data.monthlyDeposit.toString()
+          : null,
       })
       .returning();
 
@@ -353,6 +359,47 @@ export class TestDataBuilder {
 
     if (!lastPerson.brokerAccounts) lastPerson.brokerAccounts = [];
     lastPerson.brokerAccounts.push(brokerAccount);
+
+    return this;
+  }
+
+  /**
+   * Add a savings goal to the household with optional linked accounts
+   */
+  async addSavingsGoal(data?: {
+    name?: string;
+    description?: string;
+    targetAmount?: number;
+    priority?: number;
+    category?: string;
+    linkedAccountIds?: number[];
+  }): Promise<TestDataBuilder> {
+    if (!this.user) {
+      throw new Error("Must create a user before adding savings goal");
+    }
+
+    // Insert into database using actual schema
+    const [savingsGoal] = await db
+      .insert(savingsGoals)
+      .values({
+        householdId: this.user.householdId,
+        name: data?.name || "Test Savings Goal",
+        description: data?.description || null,
+        targetAmount: (data?.targetAmount || 10000).toString(),
+        priority: data?.priority || 1,
+        category: data?.category || null,
+      })
+      .returning();
+
+    // Link savings accounts if provided
+    if (data?.linkedAccountIds && data.linkedAccountIds.length > 0) {
+      await db.insert(savingsGoalAccounts).values(
+        data.linkedAccountIds.map((accountId) => ({
+          savingsGoalId: savingsGoal.id,
+          savingsAccountId: accountId,
+        }))
+      );
+    }
 
     return this;
   }

@@ -127,7 +127,16 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
 
     // Validate using our Zod schema (includes savingsAccountIds)
-    const validatedData = insertSavingsGoalSchema.parse(body);
+    let validatedData;
+    try {
+      validatedData = insertSavingsGoalSchema.parse(body);
+    } catch (error) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Validation failed",
+        data: error,
+      });
+    }
 
     // Verify that the household belongs to the authenticated user
     const [householdExists] = await db

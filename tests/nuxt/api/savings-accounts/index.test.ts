@@ -278,6 +278,32 @@ describe("/api/savings-accounts integration tests", async () => {
       });
       expect(minimalAccount.interestRate).toBeNull();
       expect(minimalAccount.accountType).toBeNull();
+      expect(minimalAccount.monthlyDeposit).toBeNull();
+    });
+
+    it("should create savings account with monthly deposit", async () => {
+      const accountWithDeposit = await authenticatedFetch<SavingsAccount>(
+        testUsers.user1,
+        "/api/savings-accounts",
+        {
+          method: "POST",
+          body: {
+            name: "Monthly Savings",
+            currentBalance: 5000,
+            monthlyDeposit: 500,
+            interestRate: 0.03,
+            personId: testUsers.user1.persons[0].id,
+          },
+        }
+      );
+
+      expect(accountWithDeposit).toMatchObject({
+        name: "Monthly Savings",
+        currentBalance: "5000.00",
+        monthlyDeposit: "500.00",
+        interestRate: "0.0300",
+        personId: testUsers.user1.persons[0].id,
+      });
     });
   });
 });
