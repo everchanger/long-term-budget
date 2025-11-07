@@ -172,7 +172,7 @@ describe("/api/income-sources integration tests", async () => {
           body: {
             person_id: testUsers.user1.persons[0].id,
             name: "Test Income",
-            amount: "3000",
+            amount: 3000,
             frequency: "monthly",
           },
         });
@@ -211,7 +211,7 @@ describe("/api/income-sources integration tests", async () => {
           body: {
             person_id: testUsers.user2.persons[0].id, // user2's person!
             name: "Malicious Income",
-            amount: "1000",
+            amount: 1000,
             frequency: "monthly",
           },
         });
@@ -234,7 +234,7 @@ describe("/api/income-sources integration tests", async () => {
           body: {
             person_id: testUsers.user1.persons[0].id,
             name: "New Side Hustle",
-            amount: "1500",
+            amount: 1500,
             frequency: "weekly",
             start_date: "2024-01-01",
             end_date: "2024-12-31",
@@ -265,7 +265,7 @@ describe("/api/income-sources integration tests", async () => {
           body: {
             person_id: testUsers.user1.persons[1].id,
             name: "Minimal Income",
-            amount: "500",
+            amount: 500,
             frequency: "monthly",
           },
         }

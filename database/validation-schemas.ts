@@ -8,6 +8,7 @@ import { expenses } from "./schema/expenses";
 import { savingsAccounts } from "./schema/savings-accounts";
 import { savingsGoals } from "./schema/savings-goals";
 import { loans } from "./schema/loans";
+import { brokerAccounts } from "./schema/broker-accounts";
 import { scenarios } from "./schema/scenarios";
 
 // User schemas
@@ -92,23 +93,15 @@ export const updateExpenseSchema = insertExpenseSchema
 // Savings Account schemas
 export const insertSavingsAccountSchema = createInsertSchema(savingsAccounts, {
   name: z.string().min(1, "Account name is required"),
-  currentBalance: z
-    .string()
-    .refine((val) => parseFloat(val) >= 0, "Balance must be positive"),
+  currentBalance: z.number().min(0, "Balance must be non-negative"),
   interestRate: z
-    .string()
-    .refine((val) => {
-      if (!val) return true; // Optional field
-      const rate = parseFloat(val);
-      return rate >= 0 && rate <= 100;
-    }, "Interest rate must be between 0 and 100%")
+    .number()
+    .min(0)
+    .max(100, "Interest rate must be between 0 and 100%")
     .optional(),
   monthlyDeposit: z
-    .string()
-    .refine((val) => {
-      if (!val) return true; // Optional field
-      return parseFloat(val) >= 0;
-    }, "Monthly deposit must be non-negative")
+    .number()
+    .min(0, "Monthly deposit must be non-negative")
     .optional(),
   accountType: z.string().optional(),
   personId: z.number().positive("Person ID is required"),
@@ -123,22 +116,13 @@ export const updateSavingsAccountSchema = insertSavingsAccountSchema
 // Loan schemas
 export const insertLoanSchema = createInsertSchema(loans, {
   name: z.string().min(1, "Loan name is required"),
-  originalAmount: z
-    .string()
-    .refine((val) => parseFloat(val) > 0, "Original amount must be positive"),
-  currentBalance: z
-    .string()
-    .refine(
-      (val) => parseFloat(val) >= 0,
-      "Current balance must be non-negative"
-    ),
-  interestRate: z.string().refine((val) => {
-    const rate = parseFloat(val);
-    return rate >= 0 && rate <= 100;
-  }, "Interest rate must be between 0 and 100%"),
-  monthlyPayment: z
-    .string()
-    .refine((val) => parseFloat(val) > 0, "Monthly payment must be positive"),
+  originalAmount: z.number().min(0, "Original amount must be non-negative"),
+  currentBalance: z.number().min(0, "Current balance must be non-negative"),
+  interestRate: z
+    .number()
+    .min(0)
+    .max(100, "Interest rate must be between 0 and 100%"),
+  monthlyPayment: z.number().min(0, "Monthly payment must be non-negative"),
   loanType: z.string().optional(),
   personId: z.number().positive("Person ID is required"),
 });
@@ -149,13 +133,26 @@ export const updateLoanSchema = insertLoanSchema
   .partial()
   .omit({ id: true, createdAt: true, personId: true });
 
+// Broker Account schemas
+export const insertBrokerAccountSchema = createInsertSchema(brokerAccounts, {
+  name: z.string().min(1, "Account name is required"),
+  brokerName: z.string().optional(),
+  accountType: z.string().optional(),
+  currentValue: z.number().min(0, "Current value must be non-negative"),
+  personId: z.number().positive("Person ID is required"),
+});
+
+export const selectBrokerAccountSchema = createSelectSchema(brokerAccounts);
+
+export const updateBrokerAccountSchema = insertBrokerAccountSchema
+  .partial()
+  .omit({ id: true, createdAt: true, personId: true });
+
 // Savings Goals schemas
 export const insertSavingsGoalSchema = createInsertSchema(savingsGoals, {
   name: z.string().min(1, "Goal name is required"),
   description: z.string().optional(),
-  targetAmount: z
-    .string()
-    .refine((val) => parseFloat(val) > 0, "Target amount must be positive"),
+  targetAmount: z.number().min(0, "Target amount must be non-negative"),
   priority: z.number().int().min(1).max(3).default(1),
   category: z.string().optional(),
   householdId: z.number().positive("Household ID is required"),
@@ -219,6 +216,11 @@ export const schemas = {
   selectLoan: selectLoanSchema,
   updateLoan: updateLoanSchema,
 
+  // Broker account schemas
+  insertBrokerAccount: insertBrokerAccountSchema,
+  selectBrokerAccount: selectBrokerAccountSchema,
+  updateBrokerAccount: updateBrokerAccountSchema,
+
   // Savings goals schemas
   insertSavingsGoal: insertSavingsGoalSchema,
   selectSavingsGoal: selectSavingsGoalSchema,
@@ -258,6 +260,10 @@ export type UpdateSavingsAccount = z.infer<typeof updateSavingsAccountSchema>;
 export type InsertLoan = z.infer<typeof insertLoanSchema>;
 export type SelectLoan = z.infer<typeof selectLoanSchema>;
 export type UpdateLoan = z.infer<typeof updateLoanSchema>;
+
+export type InsertBrokerAccount = z.infer<typeof insertBrokerAccountSchema>;
+export type SelectBrokerAccount = z.infer<typeof selectBrokerAccountSchema>;
+export type UpdateBrokerAccount = z.infer<typeof updateBrokerAccountSchema>;
 
 export type InsertSavingsGoal = z.infer<typeof insertSavingsGoalSchema>;
 export type SelectSavingsGoal = z.infer<typeof selectSavingsGoalSchema>;

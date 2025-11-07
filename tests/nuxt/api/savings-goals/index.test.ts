@@ -211,7 +211,7 @@ describe("/api/savings-goals integration tests", async () => {
           method: "POST",
           body: {
             name: "Test Goal",
-            targetAmount: "5000",
+            targetAmount: 5000,
             householdId: testUsers.user1.householdId,
           },
         });
@@ -251,7 +251,7 @@ describe("/api/savings-goals integration tests", async () => {
           body: {
             name: "New Car Fund",
             description: "Save for a reliable used car",
-            targetAmount: "15000",
+            targetAmount: 15000,
             priority: 2,
             category: "vehicle",
             householdId: testUsers.user1.householdId,
@@ -282,7 +282,7 @@ describe("/api/savings-goals integration tests", async () => {
           method: "POST",
           body: {
             name: "Vacation Fund",
-            targetAmount: "3000",
+            targetAmount: 3000,
             priority: 1,
             category: "vacation",
             householdId: testUsers.user1.householdId,
@@ -316,7 +316,7 @@ describe("/api/savings-goals integration tests", async () => {
             method: "POST",
             body: {
               name: "Unauthorized Goal",
-              targetAmount: "5000",
+              targetAmount: 5000,
               householdId: testUsers.user2.householdId,
             },
           }
@@ -340,7 +340,7 @@ describe("/api/savings-goals integration tests", async () => {
             method: "POST",
             body: {
               name: "Invalid Link Goal",
-              targetAmount: "5000",
+              targetAmount: 5000,
               householdId: testUsers.user1.householdId,
               savingsAccountIds: [otherUserAccountId],
             },

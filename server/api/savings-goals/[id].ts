@@ -95,7 +95,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Extract savingsAccountIds (not stored in the savings_goals table)
-    const { savingsAccountIds, ...goalData } = validatedData;
+    const { savingsAccountIds, targetAmount, ...goalData } = validatedData;
 
     // If savings account IDs provided, verify they all belong to persons in this household
     if (savingsAccountIds && savingsAccountIds.length > 0) {
@@ -129,6 +129,9 @@ export default defineEventHandler(async (event) => {
       .update(tables.savingsGoals)
       .set({
         ...goalData,
+        ...(targetAmount !== undefined && {
+          targetAmount: targetAmount.toString(),
+        }),
         updatedAt: new Date(),
       })
       .where(eq(tables.savingsGoals.id, parseInt(goalId)))

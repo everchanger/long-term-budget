@@ -227,7 +227,7 @@ describe("/api/savings-goals/[id] integration tests", async () => {
         {
           method: "PUT",
           body: {
-            targetAmount: "25000",
+            targetAmount: 25000,
             priority: 3,
           },
         }
@@ -314,7 +314,7 @@ describe("/api/savings-goals/[id] integration tests", async () => {
           method: "POST",
           body: {
             name: "Goal to Delete",
-            targetAmount: "5000",
+            targetAmount: 5000,
             householdId: testUsers.user1.householdId,
           },
         }
@@ -356,7 +356,7 @@ describe("/api/savings-goals/[id] integration tests", async () => {
           method: "POST",
           body: {
             name: "Goal to Delete",
-            targetAmount: "5000",
+            targetAmount: 5000,
             householdId: testUsers.user1.householdId,
           },
         }
