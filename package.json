@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "dev:up": "./scripts/dev-up.sh",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -18,7 +19,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:seed:test-user": "tsx scripts/seed-test-user.js"
   },
   "dependencies": {
     "@nuxt/eslint": "^1.9.0",
@@ -44,6 +46,7 @@
     "@vue/test-utils": "^2.4.6",
     "dotenv": "^17.2.2",
     "happy-dom": "^18.0.1",
+    "tsx": "^4.19.2",
     "vitest": "^3.2.4"
   }
 }
