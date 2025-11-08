@@ -1,7 +1,9 @@
 import type { SelectIncomeSource } from "~~/database/validation-schemas";
-import { toMonthlyAmount } from "~~/utils/financial-calculations";
+import { useFinancialCalculations } from "./useFinancialCalculations";
 
 export const useIncomeSources = (personId: string) => {
+  const { calculateMonthlyIncome } = useFinancialCalculations();
+
   // Data fetching
   const {
     data: incomeSources,
@@ -15,12 +17,7 @@ export const useIncomeSources = (personId: string) => {
   // Computed values - business logic only
   const totalMonthlyIncome = computed(() => {
     if (!incomeSources.value) return "0.00";
-    return incomeSources.value
-      .filter((income) => income.isActive)
-      .reduce((total, income) => {
-        return total + toMonthlyAmount(income.amount, income.frequency);
-      }, 0)
-      .toFixed(2);
+    return calculateMonthlyIncome(incomeSources.value).toFixed(2);
   });
 
   // API operations only

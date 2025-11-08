@@ -271,29 +271,41 @@ Created `utils/financial-calculations.ts` with shared utilities:
 
 ---
 
-### 6. Consolidate Financial Calculation Logic
-**Issue:** Scattered calculation logic across composables  
-**Location:** `app/composables/useHouseholdFinancials.ts`  
-**Impact:** Hard to test, potential for bugs in complex calculations
+### 6. Consolidate Financial Calculation Logic ✅
+**Status:** COMPLETED 2025-11-08  
+**Issue:** Calculation logic embedded in composables, hard to test and reuse  
+**Location:** `app/composables/useHouseholdFinancials.ts`, `useIncomeSources.ts`  
+**Impact:** Hard to test in isolation, potential for bugs, code duplication
 
-```typescript
-// Create composables/useFinancialCalculations.ts:
-export function useFinancialCalculations() {
-  const calculateMonthlyIncome = (incomes: SelectIncomeSource[]) => { /* ... */ };
-  const calculateTotalDebt = (loans: SelectLoan[]) => { /* ... */ };
-  const calculateTotalSavings = (accounts: SelectSavingsAccount[]) => { /* ... */ };
-  const calculateTimeToGoal = (params: TimeToGoalParams) => { /* ... */ };
-  
-  return {
-    calculateMonthlyIncome,
-    calculateTotalDebt,
-    calculateTotalSavings,
-    calculateTimeToGoal,
-  };
-}
+**Solution Implemented:**
+Created `app/composables/useFinancialCalculations.ts` with pure calculation functions:
+- `calculateMonthlyIncome(incomes)` - Total monthly income from sources
+- `calculateMonthlyExpenses(expenses)` - Total monthly expenses
+- `calculateTotalDebt(loans)` - Sum of all loan balances
+- `calculateMonthlyDebtPayments(loans)` - Total monthly loan payments
+- `calculateTotalSavings(accounts)` - Sum of all savings accounts
+- `calculateMonthlySurplus(income, expenses, debt)` - Net monthly cash flow
+- `calculateMonthsToGoal(current, goal, savings)` - Time to reach savings goal
 
-// Benefits: Testable in isolation, reusable across components
-```
+**Refactored Files:**
+- ✅ `app/composables/useHouseholdFinancials.ts` - Removed 29 lines of inline calculations
+- ✅ `app/composables/useIncomeSources.ts` - Using shared `calculateMonthlyIncome()`
+
+**Results:**
+- ✅ Pure functions that can be tested in isolation
+- ✅ Removed ~35 lines of duplicate/embedded calculation logic
+- ✅ Single source of truth for financial calculations
+- ✅ Consistent calculation logic across entire frontend
+- ✅ Easy to add unit tests for each calculation
+- ✅ Reusable across all components and composables
+- ✅ Zero TypeScript errors
+
+**Benefits:**
+- Testable: Each function can be unit tested independently
+- Reusable: Import and use in any component/composable
+- Maintainable: Single place to fix bugs or update logic
+- Type-safe: Full TypeScript support with proper types
+- Documented: JSDoc comments for each function
 
 ---
 

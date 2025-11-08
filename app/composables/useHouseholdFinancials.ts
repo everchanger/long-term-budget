@@ -4,7 +4,7 @@ import type {
   SelectLoan,
   SelectSavingsAccount,
 } from "~~/database/validation-schemas";
-import { toMonthlyAmount } from "~~/utils/financial-calculations";
+import { useFinancialCalculations } from "./useFinancialCalculations";
 
 export interface HouseholdFinancialSummary {
   totalMonthlyIncome: number;
@@ -23,6 +23,14 @@ export interface HouseholdFinancialSummary {
 }
 
 export const useHouseholdFinancials = (householdId: string) => {
+  // Get financial calculation functions
+  const {
+    calculateMonthlyIncome,
+    calculateTotalDebt,
+    calculateTotalSavings,
+    calculateMonthlyDebtPayments,
+  } = useFinancialCalculations();
+
   // Fetch all persons for the household
   const {
     data: persons,
@@ -56,33 +64,6 @@ export const useHouseholdFinancials = (householdId: string) => {
   } = useFetch<SelectSavingsAccount[]>("/api/savings-accounts", {
     default: () => [],
   });
-
-  // Helper functions for calculations
-  const calculateMonthlyIncome = (incomes: SelectIncomeSource[]) => {
-    return incomes
-      .filter((income) => income.isActive)
-      .reduce((total, income) => {
-        return total + toMonthlyAmount(income.amount, income.frequency);
-      }, 0);
-  };
-
-  const calculateTotalDebt = (debts: SelectLoan[]) => {
-    return debts.reduce((total, loan) => {
-      return total + parseFloat(loan.currentBalance);
-    }, 0);
-  };
-
-  const calculateTotalSavings = (accounts: SelectSavingsAccount[]) => {
-    return accounts.reduce((total, account) => {
-      return total + parseFloat(account.currentBalance);
-    }, 0);
-  };
-
-  const calculateMonthlyDebtPayments = (debts: SelectLoan[]) => {
-    return debts.reduce((total, loan) => {
-      return total + parseFloat(loan.monthlyPayment);
-    }, 0);
-  };
 
   // Computed financial summary
   const financialSummary = computed<HouseholdFinancialSummary>(() => {
