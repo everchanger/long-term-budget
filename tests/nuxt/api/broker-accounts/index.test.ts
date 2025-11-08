@@ -27,7 +27,7 @@ describe("/api/broker-accounts integration tests", async () => {
             name: "Investment Account",
             brokerName: "Fidelity",
             accountType: "investment",
-            currentValue: 75000,
+            currentValue: "75000",
           })
         )
         .then((builder) => builder.addPerson("Jane", 28))
@@ -36,7 +36,7 @@ describe("/api/broker-accounts integration tests", async () => {
             name: "Retirement 401k",
             brokerName: "Vanguard",
             accountType: "retirement",
-            currentValue: 120000,
+            currentValue: "120000",
           })
         );
 
@@ -48,7 +48,7 @@ describe("/api/broker-accounts integration tests", async () => {
             name: "Trading Account",
             brokerName: "TD Ameritrade",
             accountType: "trading",
-            currentValue: 25000,
+            currentValue: "25000",
           })
         );
 
@@ -107,14 +107,14 @@ describe("/api/broker-accounts integration tests", async () => {
         .then((builder) =>
           builder.addBrokerAccount({
             name: "PersonA Investment",
-            currentValue: 40000,
+            currentValue: "40000",
           })
         )
         .then((builder) => builder.addPerson("PersonB", 32))
         .then((builder) =>
           builder.addBrokerAccount({
             name: "PersonB Trading",
-            currentValue: 15000,
+            currentValue: "15000",
           })
         )
         .then((builder) => builder.build());
@@ -198,7 +198,7 @@ describe("/api/broker-accounts integration tests", async () => {
         .then((builder) =>
           builder.addBrokerAccount({
             name: "User2 Account",
-            currentValue: 30000,
+            currentValue: "30000",
           })
         )
         .then((builder) => builder.build());
@@ -224,7 +224,7 @@ describe("/api/broker-accounts integration tests", async () => {
         name: "New Investment Account",
         brokerName: "Charles Schwab",
         accountType: "investment",
-        currentValue: 85000,
+        currentValue: "85000",
         personId: userData.persons[0].id,
       };
 
@@ -255,7 +255,7 @@ describe("/api/broker-accounts integration tests", async () => {
 
       const minimalAccount = {
         name: "Simple Account",
-        currentValue: 10000,
+        currentValue: "10000",
         personId: userData.persons[0].id,
       };
 
@@ -290,7 +290,7 @@ describe("/api/broker-accounts integration tests", async () => {
         {
           method: "POST",
           body: {
-            currentValue: 15000,
+            currentValue: "15000",
             personId: userData.persons[0].id,
           },
           ignoreResponseError: true,
@@ -333,7 +333,7 @@ describe("/api/broker-accounts integration tests", async () => {
           method: "POST",
           body: {
             name: "Test Account",
-            currentValue: 15000,
+            currentValue: "15000",
           },
           ignoreResponseError: true,
         }
@@ -352,7 +352,7 @@ describe("/api/broker-accounts integration tests", async () => {
         method: "POST",
         body: {
           name: "Test Account",
-          currentValue: 10000,
+          currentValue: "10000",
           personId: 1,
         },
         ignoreResponseError: true,
@@ -379,7 +379,7 @@ describe("/api/broker-accounts integration tests", async () => {
         method: "POST",
         body: {
           name: "Unauthorized Account",
-          currentValue: 20000,
+          currentValue: "20000",
           personId: user2.persons[0].id,
         },
         ignoreResponseError: true,

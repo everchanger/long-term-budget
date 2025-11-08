@@ -26,7 +26,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
             name: "Primary Investment",
             brokerName: "Fidelity",
             accountType: "investment",
-            currentValue: 85000,
+            currentValue: "85000",
           })
         )
         .then((builder) => builder.addPerson("Jane", 28))
@@ -35,7 +35,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
             name: "Retirement 401k",
             brokerName: "Vanguard",
             accountType: "retirement",
-            currentValue: 150000,
+            currentValue: "150000",
           })
         )
         .then((builder) => builder.build());
@@ -83,7 +83,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
         .then((builder) =>
           builder.addBrokerAccount({
             name: "User1 Account",
-            currentValue: 40000,
+            currentValue: "40000",
           })
         )
         .then((builder) => builder.build());
@@ -93,7 +93,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
         .then((builder) =>
           builder.addBrokerAccount({
             name: "User2 Account",
-            currentValue: 60000,
+            currentValue: "60000",
           })
         )
         .then((builder) => builder.build());
@@ -152,7 +152,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
             name: "Original Account",
             brokerName: "Original Broker",
             accountType: "investment",
-            currentValue: 50000,
+            currentValue: "50000",
           })
         )
         .then((builder) => builder.build());
@@ -163,7 +163,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
         name: "Updated Investment Account",
         brokerName: "Charles Schwab",
         accountType: "retirement",
-        currentValue: 75000,
+        currentValue: "75000",
       };
 
       const response = (await authenticatedFetch(
@@ -193,7 +193,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
             name: "Partial Account",
             brokerName: "Original Broker",
             accountType: "investment",
-            currentValue: 30000,
+            currentValue: "30000",
           })
         )
         .then((builder) => builder.build());
@@ -203,7 +203,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
       // Update only name and value
       const updateData = {
         name: "Updated Name Only",
-        currentValue: 35000,
+        currentValue: "35000",
       };
 
       const response = (await authenticatedFetch(
@@ -231,7 +231,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
         .then((builder) =>
           builder.addBrokerAccount({
             name: "Test Account",
-            currentValue: 20000,
+            currentValue: "20000",
           })
         )
         .then((builder) => builder.build());
@@ -285,7 +285,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Updated Name",
-            currentValue: 15000,
+            currentValue: "15000",
           },
           ignoreResponseError: true,
         }
@@ -304,7 +304,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
         .then((builder) =>
           builder.addBrokerAccount({
             name: "User1 Account",
-            currentValue: 40000,
+            currentValue: "40000",
           })
         )
         .then((builder) => builder.build());
@@ -323,7 +323,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Unauthorized Update",
-            currentValue: 99999,
+            currentValue: "99999",
           },
           ignoreResponseError: true,
         }
@@ -341,7 +341,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
         method: "PUT",
         body: {
           name: "Test",
-          currentValue: 10000,
+          currentValue: "10000",
         },
         ignoreResponseError: true,
       });
@@ -360,7 +360,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
         .then((builder) =>
           builder.addBrokerAccount({
             name: "Account to Delete",
-            currentValue: 25000,
+            currentValue: "25000",
           })
         )
         .then((builder) => builder.build());
@@ -421,7 +421,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
         .then((builder) =>
           builder.addBrokerAccount({
             name: "Account to be Protected",
-            currentValue: 50000,
+            currentValue: "50000",
           })
         )
         .then((builder) => builder.build());
@@ -483,7 +483,7 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
         .then((builder) =>
           builder.addBrokerAccount({
             name: "Method Test Account",
-            currentValue: 10000,
+            currentValue: "10000",
           })
         )
         .then((builder) => builder.build());

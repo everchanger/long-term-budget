@@ -111,6 +111,7 @@
 
 <script setup lang="ts">
 import type { SelectPerson } from "~~/database/validation-schemas";
+import type { ApiSuccessResponse } from "~~/server/utils/api-response";
 
 // Route params
 const route = useRoute();
@@ -118,10 +119,14 @@ const personId = route.params.id as string;
 
 // Person data
 const {
-  data: person,
+  data: personResponse,
   pending: personLoading,
   refresh: refreshPerson,
-} = await useFetch<SelectPerson>(`/api/persons/${personId}`);
+} = await useFetch<ApiSuccessResponse<SelectPerson>>(
+  `/api/persons/${personId}`
+);
+
+const person = computed(() => personResponse.value?.data);
 
 // Financial tabs
 const financialTabs = [

@@ -1,4 +1,5 @@
 import type { SelectIncomeSource } from "~~/database/validation-schemas";
+import type { ApiSuccessResponse } from "~~/server/utils/api-response";
 import { useFinancialCalculations } from "./useFinancialCalculations";
 
 export const useIncomeSources = (personId: string) => {
@@ -6,13 +7,18 @@ export const useIncomeSources = (personId: string) => {
 
   // Data fetching
   const {
-    data: incomeSources,
+    data: incomeSourcesResponse,
     pending: incomeSourcesLoading,
     refresh: refreshIncomeSources,
-  } = useFetch<SelectIncomeSource[]>("/api/income-sources", {
-    query: { personId },
-    default: () => [],
-  });
+  } = useFetch<ApiSuccessResponse<SelectIncomeSource[]>>(
+    "/api/income-sources",
+    {
+      query: { personId },
+      default: () => ({ data: [] }),
+    }
+  );
+
+  const incomeSources = computed(() => incomeSourcesResponse.value?.data ?? []);
 
   // Computed values - business logic only
   const totalMonthlyIncome = computed(() => {

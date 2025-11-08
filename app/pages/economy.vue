@@ -695,6 +695,8 @@
 </template>
 
 <script setup lang="ts">
+import type { ApiSuccessResponse } from "~~/server/utils/api-response";
+
 // Page metadata
 definePageMeta({
   title: "Economy",
@@ -702,6 +704,12 @@ definePageMeta({
 });
 
 // Types
+interface Household {
+  id: number;
+  name: string;
+  createdAt: string;
+}
+
 interface Person {
   id: number;
   name: string;
@@ -737,10 +745,15 @@ const personFormState = reactive({
 // Note: This is now only used for person creation, household filtering is done by the API
 
 // Fetch data
-const { data: households } = await useFetch("/api/households");
-const { data: persons, refresh: refreshPersons } = await useFetch(
-  "/api/persons"
-);
+const { data: householdsResponse } = await useFetch<
+  ApiSuccessResponse<Household[]>
+>("/api/households");
+const households = computed(() => householdsResponse.value?.data ?? []);
+
+const { data: personsResponse, refresh: refreshPersons } = await useFetch<
+  ApiSuccessResponse<Person[]>
+>("/api/persons");
+const persons = computed(() => personsResponse.value?.data ?? []);
 
 // Computed properties
 const userHousehold = computed(() => {
@@ -769,10 +782,10 @@ const financialSummary = ref<FinancialSummary | null>(null);
 const refreshFinancialSummary = async () => {
   if (userHousehold.value) {
     try {
-      const data = await $fetch<FinancialSummary>(
+      const response = await $fetch<ApiSuccessResponse<FinancialSummary>>(
         `/api/households/${userHousehold.value.id}/financial-summary`
       );
-      financialSummary.value = data;
+      financialSummary.value = response.data;
     } catch (error) {
       console.error("Failed to fetch financial summary:", error);
       financialSummary.value = null;

@@ -27,8 +27,16 @@ export default defineEventHandler(async (event) => {
   const method = getMethod(event);
 
   if (method === "GET") {
-    // Return the savings account
-    return existingAccount;
+    // Convert decimal interest rate to percentage for display
+    const converted = {
+      ...existingAccount,
+      interestRate: existingAccount.interestRate
+        ? String(
+            Math.round(Number(existingAccount.interestRate) * 100 * 100) / 100
+          )
+        : existingAccount.interestRate,
+    };
+    return successResponse(converted);
   }
 
   if (method === "PUT") {
@@ -48,7 +56,7 @@ export default defineEventHandler(async (event) => {
       .set({
         name,
         currentBalance,
-        interestRate: interestRate || null,
+        interestRate: interestRate ? String(Number(interestRate) / 100) : null, // Convert percentage to decimal
         accountType,
         monthlyDeposit:
           monthlyDeposit !== undefined ? monthlyDeposit || null : undefined,
@@ -63,7 +71,17 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return updatedAccount;
+    // Convert decimal interest rate back to percentage for response
+    const converted = {
+      ...updatedAccount,
+      interestRate: updatedAccount.interestRate
+        ? String(
+            Math.round(Number(updatedAccount.interestRate) * 100 * 100) / 100
+          )
+        : updatedAccount.interestRate,
+    };
+
+    return successResponse(converted);
   }
 
   if (method === "DELETE") {
@@ -79,7 +97,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return { message: "Savings account deleted successfully" };
+    return deleteResponse("Savings account deleted successfully");
   }
 
   throw createError({

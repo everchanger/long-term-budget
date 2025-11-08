@@ -3,6 +3,7 @@ import type {
   InsertSavingsGoal,
   UpdateSavingsGoal,
 } from "~~/database/validation-schemas";
+import type { ApiSuccessResponse } from "~~/server/utils/api-response";
 
 // Extended type for the enriched savings goal from API
 interface EnrichedSavingsGoal extends Omit<SelectSavingsGoal, "currentAmount"> {
@@ -16,13 +17,18 @@ interface EnrichedSavingsGoal extends Omit<SelectSavingsGoal, "currentAmount"> {
 export const useSavingsGoals = (householdId: MaybeRefOrGetter<string>) => {
   // Data fetching - now returns enriched goals with calculated progress
   const {
-    data: savingsGoals,
+    data: savingsGoalsResponse,
     pending: savingsGoalsLoading,
     refresh: refreshSavingsGoals,
-  } = useFetch<EnrichedSavingsGoal[]>("/api/savings-goals", {
-    query: { householdId },
-    default: () => [],
-  });
+  } = useFetch<ApiSuccessResponse<EnrichedSavingsGoal[]>>(
+    "/api/savings-goals",
+    {
+      query: { householdId },
+      default: () => ({ data: [] }),
+    }
+  );
+
+  const savingsGoals = computed(() => savingsGoalsResponse.value?.data ?? []);
 
   // Modal state removed - now managed by components that use this composable
 

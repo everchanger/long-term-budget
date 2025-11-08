@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
-import type { ApiSuccessResponse, ApiDeleteResponse } from "../../../../../server/utils/api-response";
 import type { InferSelectModel } from "drizzle-orm";
 import type { savingsAccounts } from "../../../../database/schema";
 import {
@@ -36,8 +35,8 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
       .then((b) =>
         b.addSavingsAccount({
           name: "Emergency Fund John",
-          currentBalance: 10000,
-          interestRate: 0.025,
+          currentBalance: "10000",
+          interestRate: "2.5",
           accountType: "emergency",
         })
       )
@@ -45,8 +44,8 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
       .then((b) =>
         b.addSavingsAccount({
           name: "Investment Account Jane",
-          currentBalance: 25000,
-          interestRate: 0.045,
+          currentBalance: "25000",
+          interestRate: "4.5",
           accountType: "investment",
         })
       );
@@ -56,8 +55,8 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
       .then((b) =>
         b.addSavingsAccount({
           name: "Retirement Fund Bob",
-          currentBalance: 50000,
-          interestRate: 0.035,
+          currentBalance: "50000",
+          interestRate: "3.5",
           accountType: "retirement",
         })
       );
@@ -93,7 +92,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
         id: account.id,
         name: "Emergency Fund John",
         currentBalance: "10000.00",
-        interestRate: "0.0250",
+        interestRate: "2.5",
         accountType: "emergency",
         personId: testUsers.user1.persons[0].id,
       });
@@ -155,7 +154,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Updated Account",
-            currentBalance: 15000,
+            currentBalance: "15000",
           },
         });
         expect.fail("Expected request to fail with 401");
@@ -175,8 +174,8 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Updated Investment Account",
-            currentBalance: 30000,
-            interestRate: 0.05,
+            currentBalance: "30000",
+            interestRate: "5",
             accountType: "growth",
           },
         }
@@ -186,7 +185,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
         id: account.id,
         name: "Updated Investment Account",
         currentBalance: "30000.00",
-        interestRate: "0.0500",
+        interestRate: "5",
         accountType: "growth",
         personId: testUsers.user1.persons[1].id,
       });
@@ -203,7 +202,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
             method: "PUT",
             body: {
               name: "Unauthorized Update",
-              currentBalance: 60000,
+              currentBalance: "60000",
             },
           }
         );
@@ -226,7 +225,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
             method: "PUT",
             body: {
               name: "Non-existent Account",
-              currentBalance: 5000,
+              currentBalance: "5000",
             },
           }
         );
@@ -270,7 +269,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
           method: "POST",
           body: {
             name: "Test Update Account",
-            currentBalance: 5000,
+            currentBalance: "5000",
             personId: testUsers.user1.persons[0].id,
           },
         }
@@ -283,7 +282,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Minimal Update",
-            currentBalance: 6000,
+            currentBalance: "6000",
           },
         }
       );
@@ -308,7 +307,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
           method: "POST",
           body: {
             name: "Monthly Deposit Test",
-            currentBalance: 10000,
+            currentBalance: "10000",
             personId: testUsers.user1.persons[0].id,
           },
         }
@@ -322,7 +321,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Monthly Deposit Test",
-            currentBalance: 10000,
+            currentBalance: "10000",
             monthlyDeposit: 250,
           },
         }
@@ -346,7 +345,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
           method: "POST",
           body: {
             name: "Remove Deposit Test",
-            currentBalance: 5000,
+            currentBalance: "5000",
             monthlyDeposit: 100,
             personId: testUsers.user1.persons[0].id,
           },
@@ -363,7 +362,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Remove Deposit Test",
-            currentBalance: 5000,
+            currentBalance: "5000",
             monthlyDeposit: null,
           },
         }
@@ -397,7 +396,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
           method: "POST",
           body: {
             name: "Test Delete Account",
-            currentBalance: 2000,
+            currentBalance: "2000",
             personId: testUsers.user1.persons[0].id,
           },
         }
@@ -412,6 +411,7 @@ describe("/api/savings-accounts/[id] integration tests", async () => {
       );
 
       expect(deleteResponse).toEqual({
+        success: true,
         message: "Savings account deleted successfully",
       });
 

@@ -40,18 +40,18 @@ describe("/api/households/[id]/financial-summary", async () => {
       .then((b) =>
         b.addIncomeSource({
           name: "Salary",
-          amount: 75000,
+          amount: "75000",
           frequency: "monthly",
         })
       )
       .then((b) =>
-        b.addSavingsAccount({ name: "Emergency Fund", currentBalance: 25000 })
+        b.addSavingsAccount({ name: "Emergency Fund", currentBalance: "25000" })
       )
       .then((b) =>
         b.addLoan({
           name: "Mortgage",
-          originalAmount: 300000,
-          interestRate: 0.035,
+          originalAmount: "300000",
+          interestRate: "3.5",
         })
       );
 
@@ -184,26 +184,26 @@ describe("/api/households/[id]/financial-summary", async () => {
         .then((b) =>
           b.addIncomeSource({
             name: "Job 1",
-            amount: 50000,
+            amount: "50000",
             frequency: "monthly",
           })
         )
         .then((b) =>
-          b.addSavingsAccount({ name: "Savings 1", currentBalance: 15000 })
+          b.addSavingsAccount({ name: "Savings 1", currentBalance: "15000" })
         )
         .then((b) => b.addPerson("Person Two", 32))
         .then((b) =>
           b.addIncomeSource({
             name: "Job 2",
-            amount: 45000,
+            amount: "45000",
             frequency: "monthly",
           })
         )
         .then((b) =>
           b.addLoan({
             name: "Car Loan",
-            originalAmount: 25000,
-            interestRate: 0.045,
+            originalAmount: "25000",
+            interestRate: "4.5",
           })
         )
         .then((b) => b.build());
@@ -230,7 +230,7 @@ describe("/api/households/[id]/financial-summary", async () => {
         .then((b) =>
           b.addBrokerAccount({
             name: "Investment Portfolio",
-            currentValue: 100000,
+            currentValue: "100000",
           })
         )
         .then((b) => b.build());

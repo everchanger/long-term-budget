@@ -1,15 +1,18 @@
 import type { SelectLoan } from "~~/database/validation-schemas";
+import type { ApiSuccessResponse } from "~~/server/utils/api-response";
 
 export const useLoans = (personId: string) => {
   // Data fetching
   const {
-    data: loans,
+    data: loansResponse,
     pending: loansLoading,
     refresh: refreshLoans,
-  } = useFetch<SelectLoan[]>("/api/loans", {
+  } = useFetch<ApiSuccessResponse<SelectLoan[]>>("/api/loans", {
     query: { personId },
-    default: () => [],
+    default: () => ({ data: [] }),
   });
+
+  const loans = computed(() => loansResponse.value?.data ?? []);
 
   // Computed values - business logic only
   const totalDebt = computed(() => {

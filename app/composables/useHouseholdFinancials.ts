@@ -4,6 +4,7 @@ import type {
   SelectLoan,
   SelectSavingsAccount,
 } from "~~/database/validation-schemas";
+import type { ApiSuccessResponse } from "~~/server/utils/api-response";
 import { useFinancialCalculations } from "./useFinancialCalculations";
 
 export interface HouseholdFinancialSummary {
@@ -33,37 +34,56 @@ export const useHouseholdFinancials = (householdId: string) => {
 
   // Fetch all persons for the household
   const {
-    data: persons,
+    data: personsResponse,
     pending: personsLoading,
     refresh: refreshPersons,
-  } = useFetch<SelectPerson[]>(`/api/households/${householdId}/persons`, {
-    default: () => [],
-  });
+  } = useFetch<ApiSuccessResponse<SelectPerson[]>>(
+    `/api/households/${householdId}/persons`,
+    {
+      default: () => ({ data: [] }),
+    }
+  );
+
+  const persons = computed(() => personsResponse.value?.data ?? []);
 
   // Fetch all financial data for the household
   const {
-    data: incomeSources,
+    data: incomeSourcesResponse,
     pending: incomeLoading,
     refresh: refreshIncome,
-  } = useFetch<SelectIncomeSource[]>("/api/income-sources", {
-    default: () => [],
-  });
+  } = useFetch<ApiSuccessResponse<SelectIncomeSource[]>>(
+    "/api/income-sources",
+    {
+      default: () => ({ data: [] }),
+    }
+  );
+
+  const incomeSources = computed(() => incomeSourcesResponse.value?.data ?? []);
 
   const {
-    data: loans,
+    data: loansResponse,
     pending: loansLoading,
     refresh: refreshLoans,
-  } = useFetch<SelectLoan[]>("/api/loans", {
-    default: () => [],
+  } = useFetch<ApiSuccessResponse<SelectLoan[]>>("/api/loans", {
+    default: () => ({ data: [] }),
   });
 
+  const loans = computed(() => loansResponse.value?.data ?? []);
+
   const {
-    data: savingsAccounts,
+    data: savingsAccountsResponse,
     pending: savingsLoading,
     refresh: refreshSavings,
-  } = useFetch<SelectSavingsAccount[]>("/api/savings-accounts", {
-    default: () => [],
-  });
+  } = useFetch<ApiSuccessResponse<SelectSavingsAccount[]>>(
+    "/api/savings-accounts",
+    {
+      default: () => ({ data: [] }),
+    }
+  );
+
+  const savingsAccounts = computed(
+    () => savingsAccountsResponse.value?.data ?? []
+  );
 
   // Computed financial summary
   const financialSummary = computed<HouseholdFinancialSummary>(() => {

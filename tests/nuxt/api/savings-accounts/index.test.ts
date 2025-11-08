@@ -35,8 +35,8 @@ describe("/api/savings-accounts integration tests", async () => {
       .then((b) =>
         b.addSavingsAccount({
           name: "Emergency Fund John",
-          currentBalance: 10000,
-          interestRate: 0.025,
+          currentBalance: "10000",
+          interestRate: "2.5",
           accountType: "emergency",
         })
       )
@@ -44,8 +44,8 @@ describe("/api/savings-accounts integration tests", async () => {
       .then((b) =>
         b.addSavingsAccount({
           name: "Investment Account Jane",
-          currentBalance: 25000,
-          interestRate: 0.045,
+          currentBalance: "25000",
+          interestRate: "4.5",
           accountType: "investment",
         })
       );
@@ -55,8 +55,8 @@ describe("/api/savings-accounts integration tests", async () => {
       .then((b) =>
         b.addSavingsAccount({
           name: "Retirement Fund Bob",
-          currentBalance: 50000,
-          interestRate: 0.035,
+          currentBalance: "50000",
+          interestRate: "3.5",
           accountType: "retirement",
         })
       );
@@ -122,7 +122,7 @@ describe("/api/savings-accounts integration tests", async () => {
       expect(savingsAccounts[0]).toMatchObject({
         name: "Emergency Fund John",
         currentBalance: "10000.00",
-        interestRate: "0.0250",
+        interestRate: "2.5",
         accountType: "emergency",
         personId: testUsers.user1.persons[0].id,
       });
@@ -174,7 +174,7 @@ describe("/api/savings-accounts integration tests", async () => {
           method: "POST",
           body: {
             name: "Test Account",
-            currentBalance: 5000,
+            currentBalance: "5000",
             personId: testUsers.user1.persons[0].id,
           },
         });
@@ -215,7 +215,7 @@ describe("/api/savings-accounts integration tests", async () => {
             method: "POST",
             body: {
               name: "Unauthorized Account",
-              currentBalance: 5000,
+              currentBalance: "5000",
               personId: testUsers.user2.persons[0].id, // Another user's person
             },
           }
@@ -238,8 +238,8 @@ describe("/api/savings-accounts integration tests", async () => {
           method: "POST",
           body: {
             name: "New Vacation Fund",
-            currentBalance: 3000,
-            interestRate: 0.02,
+            currentBalance: "3000",
+            interestRate: "2",
             accountType: "vacation",
             personId: testUsers.user1.persons[1].id,
           },
@@ -249,7 +249,7 @@ describe("/api/savings-accounts integration tests", async () => {
       expect(newAccount).toMatchObject({
         name: "New Vacation Fund",
         currentBalance: "3000.00",
-        interestRate: "0.0200",
+        interestRate: "2",
         accountType: "vacation",
         personId: testUsers.user1.persons[1].id,
       });
@@ -265,7 +265,7 @@ describe("/api/savings-accounts integration tests", async () => {
           method: "POST",
           body: {
             name: "Minimal Account",
-            currentBalance: 1000,
+            currentBalance: "1000",
             personId: testUsers.user1.persons[0].id,
           },
         }
@@ -289,9 +289,9 @@ describe("/api/savings-accounts integration tests", async () => {
           method: "POST",
           body: {
             name: "Monthly Savings",
-            currentBalance: 5000,
+            currentBalance: "5000",
             monthlyDeposit: 500,
-            interestRate: 0.03,
+            interestRate: "3",
             personId: testUsers.user1.persons[0].id,
           },
         }
@@ -301,7 +301,7 @@ describe("/api/savings-accounts integration tests", async () => {
         name: "Monthly Savings",
         currentBalance: "5000.00",
         monthlyDeposit: "500.00",
-        interestRate: "0.0300",
+        interestRate: "3",
         personId: testUsers.user1.persons[0].id,
       });
     });

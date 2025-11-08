@@ -44,16 +44,16 @@ describe("/api/savings-goals integration tests", async () => {
       .then((b) =>
         b.addSavingsAccount({
           name: "Alice Emergency Fund",
-          currentBalance: 5000,
-          interestRate: 0.02,
+          currentBalance: "5000",
+          interestRate: "2",
         })
       )
       .then((b) => b.addPerson("Bob Goals", 28))
       .then((b) =>
         b.addSavingsAccount({
           name: "Bob Vacation Fund",
-          currentBalance: 2000,
-          interestRate: 0.015,
+          currentBalance: "2000",
+          interestRate: "1.5",
         })
       );
 
@@ -85,8 +85,8 @@ describe("/api/savings-goals integration tests", async () => {
       .then((b) =>
         b.addSavingsAccount({
           name: "Charlie Retirement",
-          currentBalance: 15000,
-          interestRate: 0.05,
+          currentBalance: "15000",
+          interestRate: "5",
         })
       );
 

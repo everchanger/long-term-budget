@@ -53,7 +53,8 @@ async function seedTestUser() {
         });
         
         if (householdsResponse.ok) {
-          const households = await householdsResponse.json();
+          const householdsData = await householdsResponse.json();
+          const households = householdsData.data || []; // Unwrap API response
           if (households.length > 0) {
             console.log(`  Household: ${households[0].name} (ID: ${households[0].id})`);
           }
@@ -127,7 +128,8 @@ async function seedTestUser() {
       throw new Error(`Failed to fetch households: ${householdsResponse.status}`);
     }
 
-    const households = await householdsResponse.json();
+    const householdsData = await householdsResponse.json();
+    const households = householdsData.data || []; // Unwrap API response
 
     if (households.length === 0) {
       throw new Error('No household found for user - auth hook may have failed');
@@ -166,7 +168,8 @@ async function seedTestUser() {
       throw new Error(`Failed to create Alice: ${aliceResponse.status}`);
     }
     
-    const alice = await aliceResponse.json();
+    const aliceData = await aliceResponse.json();
+    const alice = aliceData.data; // Unwrap API response
     console.log(`  Created person: Alice (ID: ${alice.id})`);
     
     // Create Bob
@@ -187,7 +190,8 @@ async function seedTestUser() {
       throw new Error(`Failed to create Bob: ${bobResponse.status}`);
     }
     
-    const bob = await bobResponse.json();
+    const bobData = await bobResponse.json();
+    const bob = bobData.data; // Unwrap API response
     console.log(`  Created person: Bob (ID: ${bob.id})`);
     
     // Create Alice's income
@@ -251,7 +255,8 @@ async function seedTestUser() {
       throw new Error(`Failed to create Alice's savings: ${aliceSavingsResponse.status}`);
     }
     
-    const aliceSavings = await aliceSavingsResponse.json();
+    const aliceSavingsData = await aliceSavingsResponse.json();
+    const aliceSavings = aliceSavingsData.data; // Unwrap API response
     console.log(`  Created savings for Alice: Emergency Fund ($15,000 @ 2.5%, $300/month)`);
     
     // Create Bob's savings account
@@ -275,7 +280,8 @@ async function seedTestUser() {
       throw new Error(`Failed to create Bob's savings: ${bobSavingsResponse.status}`);
     }
     
-    const bobSavings = await bobSavingsResponse.json();
+    const bobSavingsData = await bobSavingsResponse.json();
+    const bobSavings = bobSavingsData.data; // Unwrap API response
     console.log(`  Created savings for Bob: Investment Account ($25,000 @ 5.0%, $500/month)`);
     
     // Create Alice's loan

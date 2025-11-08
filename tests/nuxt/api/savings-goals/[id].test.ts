@@ -46,14 +46,14 @@ describe("/api/savings-goals/[id] integration tests", async () => {
       .then((b) =>
         b.addSavingsAccount({
           name: "Alice Account 1",
-          currentBalance: 5000,
+          currentBalance: "5000",
         })
       )
       .then((b) => b.addPerson("Bob ID Test", 28))
       .then((b) =>
         b.addSavingsAccount({
           name: "Bob Account 1",
-          currentBalance: 3000,
+          currentBalance: "3000",
         })
       );
 
@@ -72,7 +72,7 @@ describe("/api/savings-goals/[id] integration tests", async () => {
       .then((b) =>
         b.addSavingsAccount({
           name: "Charlie Account",
-          currentBalance: 10000,
+          currentBalance: "10000",
         })
       );
 

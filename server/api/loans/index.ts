@@ -1,4 +1,4 @@
-import { successResponse, deleteResponse } from "../../utils/api-response";
+import { successResponse } from "../../utils/api-response";
 import { parseQueryInt } from "../../utils/api-helpers";
 
 export default defineEventHandler(async (event) => {
@@ -46,7 +46,15 @@ export default defineEventHandler(async (event) => {
       .from(tables.loans)
       .where(eq(tables.loans.personId, personId));
 
-    return successResponse(result);
+    // Convert decimal interest rates to percentages for display
+    const converted = result.map((loan) => ({
+      ...loan,
+      interestRate: String(
+        Math.round(Number(loan.interestRate) * 100 * 100) / 100
+      ),
+    }));
+
+    return successResponse(converted);
   }
 
   if (method === "POST") {
@@ -107,7 +115,7 @@ export default defineEventHandler(async (event) => {
         name,
         originalAmount,
         currentBalance,
-        interestRate,
+        interestRate: String(Number(interestRate) / 100), // Convert percentage to decimal
         monthlyPayment,
         loanType,
         startDate: startDate ? new Date(startDate) : new Date(),
@@ -116,7 +124,15 @@ export default defineEventHandler(async (event) => {
       })
       .returning();
 
-    return successResponse(result[0]);
+    // Convert decimal interest rate back to percentage for response
+    const converted = {
+      ...result[0],
+      interestRate: String(
+        Math.round(Number(result[0].interestRate) * 100 * 100) / 100
+      ),
+    };
+
+    return successResponse(converted);
   }
 
   throw createError({

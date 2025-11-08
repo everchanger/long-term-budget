@@ -1,15 +1,23 @@
 import type { SelectSavingsAccount } from "~~/database/validation-schemas";
+import type { ApiSuccessResponse } from "~~/server/utils/api-response";
 
 export const useSavingsAccounts = (personId: string) => {
   // Data fetching
   const {
-    data: savingsAccounts,
+    data: savingsAccountsResponse,
     pending: savingsLoading,
     refresh: refreshSavings,
-  } = useFetch<SelectSavingsAccount[]>("/api/savings-accounts", {
-    query: { personId },
-    default: () => [],
-  });
+  } = useFetch<ApiSuccessResponse<SelectSavingsAccount[]>>(
+    "/api/savings-accounts",
+    {
+      query: { personId },
+      default: () => ({ data: [] }),
+    }
+  );
+
+  const savingsAccounts = computed(
+    () => savingsAccountsResponse.value?.data ?? []
+  );
 
   // Computed values - business logic only
   const totalSavings = computed(() => {

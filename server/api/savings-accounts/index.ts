@@ -1,4 +1,4 @@
-import { successResponse, deleteResponse } from "../../utils/api-response";
+import { successResponse } from "../../utils/api-response";
 import { eq, inArray, and } from "drizzle-orm";
 import { getUserPersons } from "../../utils/authorization";
 import { parseQueryInt } from "../../utils/api-helpers";
@@ -49,7 +49,15 @@ export default defineEventHandler(async (event) => {
         .from(tables.savingsAccounts)
         .where(eq(tables.savingsAccounts.personId, personId));
 
-      return successResponse(result);
+      // Convert decimal interest rates to percentages for display
+      const converted = result.map((account) => ({
+        ...account,
+        interestRate: account.interestRate
+          ? String(Math.round(Number(account.interestRate) * 100 * 100) / 100)
+          : account.interestRate,
+      }));
+
+      return successResponse(converted);
     } else {
       // Get all savings accounts for all persons in the user's household
       const userPersons = await getUserPersons(session.user.id);
@@ -68,7 +76,15 @@ export default defineEventHandler(async (event) => {
             : inArray(tables.savingsAccounts.personId, personIds)
         );
 
-      return successResponse(result);
+      // Convert decimal interest rates to percentages for display
+      const converted = result.map((account) => ({
+        ...account,
+        interestRate: account.interestRate
+          ? String(Math.round(Number(account.interestRate) * 100 * 100) / 100)
+          : account.interestRate,
+      }));
+
+      return successResponse(converted);
     }
   }
 
@@ -118,14 +134,22 @@ export default defineEventHandler(async (event) => {
       .values({
         name,
         currentBalance,
-        interestRate: interestRate || null,
+        interestRate: interestRate ? String(Number(interestRate) / 100) : null, // Convert percentage to decimal
         monthlyDeposit: monthlyDeposit || null,
         accountType,
         personId: personId,
       })
       .returning();
 
-    return successResponse(result);
+    // Convert decimal interest rate back to percentage for response
+    const converted = {
+      ...result,
+      interestRate: result.interestRate
+        ? String(Math.round(Number(result.interestRate) * 100 * 100) / 100)
+        : result.interestRate,
+    };
+
+    return successResponse(converted);
   }
 
   throw createError({

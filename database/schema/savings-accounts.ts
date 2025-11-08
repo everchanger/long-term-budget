@@ -24,7 +24,7 @@ export const savingsAccounts = pgTable("savings_accounts", {
     precision: 12,
     scale: 2,
   }).default("0"), // monthly contribution amount
-  interestRate: decimal("interest_rate", { precision: 5, scale: 4 }), // annual interest rate
+  interestRate: decimal("interest_rate", { precision: 6, scale: 4 }), // annual interest rate as decimal (0.0450 = 4.5%)
   accountType: varchar("account_type", { length: 100 }), // savings, investment, etc.
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

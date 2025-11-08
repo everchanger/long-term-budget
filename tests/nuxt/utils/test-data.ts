@@ -270,7 +270,9 @@ export class TestDataBuilder {
         personId: lastPerson.id,
         name: data?.name || "Test Savings",
         currentBalance: data?.currentBalance || "10000",
-        interestRate: data?.interestRate || "0.02",
+        interestRate: data?.interestRate
+          ? String(Number(data.interestRate) / 100)
+          : "0.0002", // Convert percentage to decimal (default: 0.02% = 0.0002)
         accountType: data?.accountType || "savings",
         monthlyDeposit: data?.monthlyDeposit || null,
       })
@@ -302,7 +304,9 @@ export class TestDataBuilder {
 
     const originalAmount = data?.originalAmount || "25000";
     const currentBalance = data?.currentBalance || originalAmount;
-    const interestRate = data?.interestRate || "0.05";
+    const interestRate = data?.interestRate
+      ? String(Number(data.interestRate) / 100)
+      : "0.0005"; // Convert percentage to decimal (default: 0.05% = 0.0005)
     const monthlyPayment =
       data?.monthlyPayment || (parseFloat(originalAmount) * 0.01).toString(); // Default to 1% of original
 

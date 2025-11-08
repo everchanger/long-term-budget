@@ -35,10 +35,10 @@ describe("/api/loans integration tests", async () => {
       .then((b) =>
         b.addLoan({
           name: "Car Loan John",
-          originalAmount: 25000,
-          currentBalance: 20000,
-          interestRate: 0.05,
-          monthlyPayment: 450,
+          originalAmount: "25000",
+          currentBalance: "20000",
+          interestRate: "5",
+          monthlyPayment: "450",
           loanType: "car",
         })
       )
@@ -46,10 +46,10 @@ describe("/api/loans integration tests", async () => {
       .then((b) =>
         b.addLoan({
           name: "Personal Loan Jane",
-          originalAmount: 10000,
-          currentBalance: 8000,
-          interestRate: 0.08,
-          monthlyPayment: 200,
+          originalAmount: "10000",
+          currentBalance: "8000",
+          interestRate: "8",
+          monthlyPayment: "200",
           loanType: "personal",
         })
       );
@@ -59,10 +59,10 @@ describe("/api/loans integration tests", async () => {
       .then((b) =>
         b.addLoan({
           name: "Mortgage Bob",
-          originalAmount: 300000,
-          currentBalance: 280000,
-          interestRate: 0.035,
-          monthlyPayment: 1800,
+          originalAmount: "300000",
+          currentBalance: "280000",
+          interestRate: "3.5",
+          monthlyPayment: "1800",
           loanType: "mortgage",
         })
       );
@@ -138,7 +138,7 @@ describe("/api/loans integration tests", async () => {
         name: "Car Loan John",
         originalAmount: "25000.00",
         currentBalance: "20000.00",
-        interestRate: "0.0500",
+        interestRate: "5",
         monthlyPayment: "450.00",
         loanType: "car",
         personId: testUsers.user1.persons[0].id,
@@ -155,10 +155,10 @@ describe("/api/loans integration tests", async () => {
           method: "POST",
           body: {
             name: "Test Loan",
-            originalAmount: 5000,
-            currentBalance: 4000,
-            interestRate: 0.06,
-            monthlyPayment: 100,
+            originalAmount: "5000",
+            currentBalance: "4000",
+            interestRate: "6",
+            monthlyPayment: "100",
             personId: testUsers.user1.persons[0].id,
           },
         });
@@ -192,10 +192,10 @@ describe("/api/loans integration tests", async () => {
           method: "POST",
           body: {
             name: "Unauthorized Loan",
-            originalAmount: 5000,
-            currentBalance: 4000,
-            interestRate: 0.06,
-            monthlyPayment: 100,
+            originalAmount: "5000",
+            currentBalance: "4000",
+            interestRate: "6",
+            monthlyPayment: "100",
             personId: testUsers.user2.persons[0].id, // Another user's person
           },
         });
@@ -217,10 +217,10 @@ describe("/api/loans integration tests", async () => {
           method: "POST",
           body: {
             name: "New Student Loan",
-            originalAmount: 15000,
-            currentBalance: 12000,
-            interestRate: 0.045,
-            monthlyPayment: 300,
+            originalAmount: "15000",
+            currentBalance: "12000",
+            interestRate: "4.5",
+            monthlyPayment: "300",
             loanType: "student",
             personId: testUsers.user1.persons[1].id,
           },
@@ -231,7 +231,7 @@ describe("/api/loans integration tests", async () => {
         name: "New Student Loan",
         originalAmount: "15000.00",
         currentBalance: "12000.00",
-        interestRate: "0.0450",
+        interestRate: "4.5",
         monthlyPayment: "300.00",
         loanType: "student",
         personId: testUsers.user1.persons[1].id,
@@ -248,10 +248,10 @@ describe("/api/loans integration tests", async () => {
           method: "POST",
           body: {
             name: "Minimal Loan",
-            originalAmount: 5000,
-            currentBalance: 4500,
-            interestRate: 0.06,
-            monthlyPayment: 150,
+            originalAmount: "5000",
+            currentBalance: "4500",
+            interestRate: "6",
+            monthlyPayment: "150",
             personId: testUsers.user1.persons[0].id,
           },
         }
@@ -261,7 +261,7 @@ describe("/api/loans integration tests", async () => {
         name: "Minimal Loan",
         originalAmount: "5000.00",
         currentBalance: "4500.00",
-        interestRate: "0.0600",
+        interestRate: "6",
         monthlyPayment: "150.00",
         personId: testUsers.user1.persons[0].id,
       });

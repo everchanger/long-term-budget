@@ -1,313 +1,222 @@
 # TODO: Technical Debt & Improvement Opportunities
 
-*Last updated: 2025-11-07*
+*Last updated: 2025-11-08*
 
 This document tracks technical improvements, refactoring opportunities, and architectural enhancements identified by code analysis. Items are prioritized and categorized for systematic improvement.
 
 ---
 
-## 🔴 High Priority - Type Safety & Validation
+## 🔴 Critical - Architecture & Code Quality
 
-### ✅ 1. Create Zod Utilities for Common Validation Patterns - COMPLETED
-**Status:** ✅ Done  
-**Completed:** 2025-11-07  
-**Issue:** Duplicate `parseFloat` validation logic across all decimal schemas  
-**Location:** `database/validation-schemas.ts` (was in lines 69, 87, 106, 123, 142, 147, 154, 163, 185)  
-**Impact:** DRY violation, harder to maintain, inconsistent error messages
+### 1. Create Interest Rate Conversion Utilities
+**Status:** 🔴 Critical - Not Started  
+**Issue:** Interest rate conversions (percentage ↔ decimal) are scattered across multiple API endpoints with duplicated logic  
+**Location:** 
+- `server/api/savings-accounts/index.ts` (lines ~53, ~70, ~149)
+- `server/api/savings-accounts/[id].ts` (lines ~30, ~67)
+- `server/api/loans/index.ts` (lines ~50, ~120)
+- `server/api/loans/[id].ts` (lines ~30, ~82)
+- `tests/nuxt/utils/test-data.ts` (lines ~264, ~306)
 
-**Solution Implemented:**
-Created `database/validation-helpers.ts` with three reusable utilities:
-- `decimalString(min?, max?)` - Generic decimal validation with optional bounds
-- `positiveDecimalString()` - Convenience wrapper for amounts >= 0
-- `percentageString()` - Validates 0-100 range for interest rates
+**Impact:** 
+- DRY violation with ~10 duplicated conversion implementations
+- Risk of floating-point precision errors if not handled consistently
+- Harder to maintain and test conversion logic
+- Easy to introduce bugs when updating conversion logic
 
-**Results:**
-- ✅ Eliminated ~60 lines of duplicate code (9 repeated refinement patterns)
-- ✅ Single source of truth for decimal validation
-- ✅ Consistent error messages across all schemas
-- ✅ All schemas now use shared helpers (income, expenses, savings, loans, broker accounts, savings goals)
-- ✅ Type-safe with no TypeScript errors
-
----
-
-### 2. Replace `any` Type in Savings Goals Reducer
-**Issue:** Duplicate `parseFloat` validation logic across all decimal schemas  
-**Location:** `database/validation-schemas.ts` (lines 69, 87, 106, 123, 142, 147, 154, 163, 185)  
-**Impact:** DRY violation, harder to maintain, inconsistent error messages
-
+**Current Pattern (repeated everywhere):**
 ```typescript
-// Current (repeated 9+ times):
-.refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
-  message: "Amount must be a positive number",
-})
+// Percentage to decimal (for storage):
+String(Number(interestRate) / 100)
 
-// Proposed solution:
-// Create shared validation helpers
-const decimalString = (min = 0, max?: number) => 
-  z.string().refine(
-    (val) => {
-      const num = parseFloat(val);
-      return !isNaN(num) && num >= min && (max === undefined || num <= max);
-    },
-    (val) => ({
-      message: max !== undefined 
-        ? `Must be between ${min} and ${max}`
-        : `Must be at least ${min}`,
-    })
-  );
+// Decimal to percentage (for display):
+String(Math.round(Number(interestRate) * 100 * 100) / 100)
+```
 
-const percentageString = () => decimalString(0, 100);
+**Proposed Solution:**
+Create `server/utils/interest-rate.ts` with utilities:
+```typescript
+export function percentageToDecimal(rate: string | number): string {
+  return String(Number(rate) / 100);
+}
+
+export function decimalToPercentage(rate: string | number | null): string | null {
+  if (rate === null) return null;
+  return String(Math.round(Number(rate) * 100 * 100) / 100);
+}
+
+export function convertInterestRateForDisplay<T extends { interestRate: string | null }>(
+  item: T
+): T {
+  return {
+    ...item,
+    interestRate: decimalToPercentage(item.interestRate),
+  };
+}
 ```
 
 **Benefits:**
-- Single source of truth for decimal validation
-- Consistent error messages
-- Easy to add custom min/max bounds
-- Reusable across all schemas
+- Single source of truth for conversion logic
+- Consistent rounding to avoid floating-point errors
+- Easy to test conversion logic in isolation
+- Can add validation and error handling in one place
+- Type-safe with TypeScript
+- Reusable across API endpoints and test utilities
 
 ---
 
-### ✅ 2. Replace `any` Type in Savings Goals Reducer - COMPLETED
-**Status:** ✅ Done  
-**Completed:** 2025-11-07  
-**Issue:** Using `any[]` loses type safety in grouping logic  
-**Location:** `server/api/savings-goals/index.ts:110`  
-**Impact:** No compile-time checking, potential runtime errors
+### 2. Refactor TestDataBuilder to Use API Endpoints
+**Status:** 🔴 Critical - Not Started  
+**Issue:** TestDataBuilder inserts data directly into database, bypassing API logic and duplicating conversion/validation logic  
+**Location:** `tests/nuxt/utils/test-data.ts` (methods: `addSavingsAccount`, `addLoan`, `addIncomeSource`, etc.)  
+**Impact:**
+- Test data doesn't follow same code path as production
+- Duplicate conversion logic (e.g., interest rate percentage to decimal)
+- If API logic changes, tests might not catch issues
+- Harder to maintain consistency between tests and production
 
-**Solution Implemented:**
+**Current Pattern:**
 ```typescript
-// Before:
-}, {} as Record<number, any[]>);
-
-// After:
-type GoalWithAccounts = typeof goalsWithAccounts[number];
-}, {} as Record<number, GoalWithAccounts[]>);
+// Direct database insert:
+const [savingsAccount] = await db
+  .insert(savingsAccounts)
+  .values({
+    personId: lastPerson.id,
+    interestRate: data?.interestRate 
+      ? String(Number(data.interestRate) / 100) 
+      : "0.0002",
+    // ... manual conversion logic
+  })
+  .returning();
 ```
 
-**Results:**
-- ✅ Full type safety in the reducer
-- ✅ TypeScript can now catch type mismatches at compile time
-- ✅ Better IDE autocomplete and intellisense
-- ✅ No runtime errors from unexpected data types
-- ✅ Zero `any` types remaining in server code
-
----
-
-### ✅ 3. Create Shared ID Parsing Utility - COMPLETED
-**Status:** ✅ Done  
-**Completed:** 2025-11-07  
-**Issue:** Repeated `parseInt(id)` pattern in 15+ API endpoints  
-**Location:** All `server/api/*/[id].ts` and many `index.ts` files  
-**Impact:** No validation, inconsistent error handling
-
-**Solution Implemented:**
-Created `server/utils/api-helpers.ts` with two utility functions:
-- `parseIdParam(event, paramName, errorMessage)` - For route parameters
-- `parseQueryInt(event, paramName, required, errorMessage)` - For query parameters with TypeScript overloads
-
-**Files Refactored (10 files):**
-- `server/api/loans/[id].ts` - route param
-- `server/api/loans/index.ts` - query param (personId)
-- `server/api/savings-accounts/[id].ts` - route param
-- `server/api/savings-accounts/index.ts` - query param (personId)
-- `server/api/broker-accounts/[id].ts` - route param
-- `server/api/broker-accounts/index.ts` - query param (personId)
-- `server/api/income-sources/[id].ts` - route param
-- `server/api/income-sources/index.ts` - query param (personId)
-- `server/api/households/[id].ts` - route param
-- `server/api/households/[id]/financial-summary.ts` - route param
-- `server/api/persons/[id].ts` - route param
-- `server/api/savings-goals/[id].ts` - route param
-- `server/api/savings-goals/index.ts` - query param (householdId)
-- `server/api/savings-goals/[id]/accounts.post.ts` - route param
-
-**Results:**
-- ✅ Removed ~45 lines of duplicate validation code
-- ✅ Consistent error handling across all endpoints
-- ✅ Type-safe with TypeScript function overloads
-- ✅ parseQueryInt returns `number` when required=true, `number | undefined` when false
-- ✅ Zero TypeScript errors
-- ✅ Only 1 intentional `parseInt` remains (parsing from request body)
-
----
-
-## 🟡 Medium Priority - Code Quality & Architecture
-
-### 4. Create Shared Authorization Utilities ✅
-**Status:** COMPLETED 2025-11-07  
-**Issue:** Duplicate household ownership verification in 10+ endpoints  
-**Location:** Every API endpoint checking `households.userId`  
-**Impact:** 20+ lines of repeated SQL joins and error handling
-
-**Results:**
-- Created `server/utils/authorization.ts` with modern utilities:
-  - `verifyPersonAccessOrThrow()` - Verifies person belongs to user's household
-  - `verifyHouseholdAccessOrThrow()` - Verifies household belongs to user
-  - `UserSession` type for consistent session handling
-- Refactored 9 API files to use new utilities:
-  - `households/[id].ts` (2 methods)
-  - `households/[id]/financial-summary.ts`
-  - `persons/index.ts`
-  - `loans/[id].ts`
-  - `income-sources/[id].ts`
-  - `savings-accounts/[id].ts`
-  - `broker-accounts/[id].ts` (3 methods)
-- Removed ~180 lines of duplicate authorization code
-- Consistent error handling (401 for unauthenticated, 403 for denied, 404 for not found)
-- Kept deprecated `verifyPersonAccess()` for backward compatibility
-- All utilities throw `createError` instead of returning null
-- Zero TypeScript errors after refactor
-
-**Old pattern (repeated everywhere):**
-
+**Proposed Solution:**
 ```typescript
-// Current pattern (repeated everywhere):
-const [personExists] = await db
-  .select({ id: tables.persons.id })
-  .from(tables.persons)
-  .innerJoin(tables.households, eq(tables.persons.householdId, tables.households.id))
-  .where(and(
-    eq(tables.persons.id, parseInt(personId)),
-    eq(tables.households.userId, session.user.id)
-  ));
-
-if (!personExists) {
-  throw createError({
-    statusCode: 403,
-    statusMessage: "Access denied: Person does not belong to your household",
-  });
-}
-
-// Proposed solution in server/utils/authorization.ts:
-export async function verifyPersonAccess(
-  session: Session,
-  personId: number,
-  db: DrizzleDB
-): Promise<AuthorizedPerson> {
-  const [person] = await db
-    .select({
-      id: tables.persons.id,
-      name: tables.persons.name,
-      householdId: tables.persons.householdId,
-      userId: tables.households.userId,
-    })
-    .from(tables.persons)
-    .innerJoin(tables.households, eq(tables.persons.householdId, tables.households.id))
-    .where(eq(tables.persons.id, personId));
-
-  if (!person || person.userId !== session.user.id) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Access denied: Person does not belong to your household",
-    });
+async addSavingsAccount(data?: {
+  name?: string;
+  currentBalance?: string;
+  interestRate?: string;
+  // ...
+}): Promise<TestDataBuilder> {
+  const lastPerson = this.persons[this.persons.length - 1];
+  if (!lastPerson) {
+    throw new Error("Must add a person before adding savings account");
   }
 
-  return person;
+  // Use actual API endpoint instead of direct DB insert
+  const savingsAccount = await authenticatedFetch<SavingsAccount>(
+    this.user!,
+    '/api/savings-accounts',
+    {
+      method: 'POST',
+      body: {
+        personId: lastPerson.id,
+        name: data?.name || "Test Savings",
+        currentBalance: data?.currentBalance || "10000",
+        interestRate: data?.interestRate || "2", // Pass as percentage
+        accountType: data?.accountType || "savings",
+        monthlyDeposit: data?.monthlyDeposit || null,
+      }
+    }
+  );
+
+  if (!lastPerson.savingsAccounts) lastPerson.savingsAccounts = [];
+  lastPerson.savingsAccounts.push(savingsAccount);
+  
+  return this;
 }
-
-export async function verifyHouseholdAccess(
-  session: Session,
-  householdId: number,
-  db: DrizzleDB
-): Promise<Household> { /* ... */ }
-
-export async function verifyLoanAccess(
-  session: Session,
-  loanId: number,
-  db: DrizzleDB
-): Promise<AuthorizedLoan> { /* ... */ }
 ```
 
 **Benefits:**
-- Single implementation of auth logic
-- Consistent error messages
-- Returns typed entity data
-- Easy to add caching layer later
+- Tests follow exact same code path as production
+- No duplicate conversion logic
+- API changes are automatically reflected in tests
+- Better integration test coverage
+- Easier to maintain test utilities
+
+**Files to Update:**
+- `addSavingsAccount()` → POST `/api/savings-accounts`
+- `addLoan()` → POST `/api/loans`
+- `addIncomeSource()` → POST `/api/income-sources`
+- `addExpense()` → POST `/api/expenses`
+- `addBrokerAccount()` → POST `/api/broker-accounts`
 
 ---
 
-### 5. Extract Frequency Conversion Logic to Shared Utility ✅
-**Status:** COMPLETED 2025-11-08  
-**Issue:** Duplicate frequency calculation in composables and server code  
-**Location:** 5 files had duplicate switch statements for frequency conversion  
-**Impact:** Business logic duplication, potential inconsistency
+### 3. Investigate and Decide on Service Layer Architecture
+**Status:** 🔴 Critical - Investigation Required  
+**Issue:** Business logic currently lives in API route handlers, leading to potential duplication and harder testing  
+**Impact:**
+- Logic cannot be reused across multiple endpoints
+- Harder to test business logic in isolation
+- API handlers become cluttered with business logic
+- Difficult to share logic between API and other contexts (CLI, background jobs, etc.)
 
-**Files with Duplication:**
-- `app/composables/useHouseholdFinancials.ts` - 22 lines of switch logic
-- `app/composables/useIncomeSources.ts` - 15 lines of switch logic
-- `server/api/households/[id]/financial-summary.ts` - 17 lines of switch logic
-- `server/utils/savingsGoalCalculations.ts` - 30 lines of switch logic (2 occurrences)
+**Questions to Answer:**
+1. **Would it reduce duplication?**
+   - Check for duplicate logic across endpoints (e.g., financial calculations, authorization checks)
+   - Would services consolidate this logic effectively?
 
-**Solution Implemented:**
-Created `utils/financial-calculations.ts` with shared utilities:
-- `MONTHLY_MULTIPLIERS` constant with all frequency conversion factors
-- `Frequency` type for type safety
-- `isValidFrequency(value)` type guard
-- `toMonthlyAmount(amount, frequency)` - Convert any frequency to monthly
-- `fromMonthlyAmount(monthlyAmount, targetFrequency)` - Convert monthly to any frequency
-- `convertFrequency(amount, from, to)` - Convert between any two frequencies
+2. **Would it make testing easier?**
+   - Can we test services in isolation without HTTP layer?
+   - Would it improve test coverage and speed?
 
-**Refactored Files:**
-- ✅ `app/composables/useHouseholdFinancials.ts` - Using `toMonthlyAmount()`
-- ✅ `app/composables/useIncomeSources.ts` - Using `toMonthlyAmount()`
-- ✅ `server/api/households/[id]/financial-summary.ts` - Using `toMonthlyAmount()`
-- ✅ `server/utils/savingsGoalCalculations.ts` - Using `toMonthlyAmount()` (both occurrences)
+3. **Would it overcomplicate the codebase?**
+   - What's the right level of abstraction for our current scale?
+   - Is the added indirection worth the benefits?
 
-**Results:**
-- ✅ Removed ~84 lines of duplicate switch/case logic
-- ✅ Single source of truth for frequency conversions
-- ✅ Works on both frontend and backend (shared utils/ directory)
-- ✅ Type-safe with proper validation
-- ✅ Handles invalid frequencies gracefully (defaults to monthly)
-- ✅ Handles both string and number amounts
-- ✅ Zero TypeScript errors
+4. **What would the folder structure look like?**
+   - `server/services/savings-accounts.ts`?
+   - `server/services/financial-calculations.ts`?
+   - How to organize shared logic vs entity-specific logic?
 
-**Benefits:**
-- Single implementation of conversion logic
-- Consistent multipliers across entire codebase
-- Easy to add new frequencies in one place
-- Testable in isolation
-- Reusable for future features
+**Research Topics:**
+- Best practices for Nuxt 4/Nitro service layers
+- Examples from similar codebases
+- When to introduce service layer (at what scale?)
+- Alternatives to full service layer (composables, utils, etc.)
 
----
+**Proposed Proof of Concept:**
+Refactor one entity (e.g., savings accounts) to use service layer:
+```typescript
+// server/services/savings-accounts.ts
+export class SavingsAccountsService {
+  constructor(private db: DrizzleDB) {}
 
-### 6. Consolidate Financial Calculation Logic ✅
-**Status:** COMPLETED 2025-11-08  
-**Issue:** Calculation logic embedded in composables, hard to test and reuse  
-**Location:** `app/composables/useHouseholdFinancials.ts`, `useIncomeSources.ts`  
-**Impact:** Hard to test in isolation, potential for bugs, code duplication
+  async findByPerson(personId: number, userId: string) {
+    // Business logic here
+  }
 
-**Solution Implemented:**
-Created `app/composables/useFinancialCalculations.ts` with pure calculation functions:
-- `calculateMonthlyIncome(incomes)` - Total monthly income from sources
-- `calculateMonthlyExpenses(expenses)` - Total monthly expenses
-- `calculateTotalDebt(loans)` - Sum of all loan balances
-- `calculateMonthlyDebtPayments(loans)` - Total monthly loan payments
-- `calculateTotalSavings(accounts)` - Sum of all savings accounts
-- `calculateMonthlySurplus(income, expenses, debt)` - Net monthly cash flow
-- `calculateMonthsToGoal(current, goal, savings)` - Time to reach savings goal
+  async create(data: CreateSavingsAccountInput, userId: string) {
+    // Validation, conversion, authorization, DB insert
+  }
 
-**Refactored Files:**
-- ✅ `app/composables/useHouseholdFinancials.ts` - Removed 29 lines of inline calculations
-- ✅ `app/composables/useIncomeSources.ts` - Using shared `calculateMonthlyIncome()`
+  async update(id: number, data: UpdateSavingsAccountInput, userId: string) {
+    // Validation, conversion, authorization, DB update
+  }
 
-**Results:**
-- ✅ Pure functions that can be tested in isolation
-- ✅ Removed ~35 lines of duplicate/embedded calculation logic
-- ✅ Single source of truth for financial calculations
-- ✅ Consistent calculation logic across entire frontend
-- ✅ Easy to add unit tests for each calculation
-- ✅ Reusable across all components and composables
-- ✅ Zero TypeScript errors
+  async delete(id: number, userId: string) {
+    // Authorization, DB delete
+  }
+}
 
-**Benefits:**
-- Testable: Each function can be unit tested independently
-- Reusable: Import and use in any component/composable
-- Maintainable: Single place to fix bugs or update logic
-- Type-safe: Full TypeScript support with proper types
-- Documented: JSDoc comments for each function
+// server/api/savings-accounts/index.ts
+export default defineEventHandler(async (event) => {
+  const service = new SavingsAccountsService(useDrizzle());
+  // ... use service methods
+});
+```
+
+**Decision Criteria:**
+- [ ] Document pros and cons based on research
+- [ ] Implement POC with one entity
+- [ ] Measure: code duplication reduction, test coverage, maintainability
+- [ ] Make decision: full refactor, partial adoption, or keep current structure
+- [ ] Document decision and reasoning in this file
 
 ---
+
+##  Medium Priority - Code Quality & Architecture
 
 ### 7. Standardize API Response Shapes 🚧
 **Status:** INFRASTRUCTURE READY - Detailed refactor plan created  

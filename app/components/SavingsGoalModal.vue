@@ -223,6 +223,7 @@ import type {
   SelectSavingsGoal,
   insertSavingsGoalSchema,
 } from "~~/database/validation-schemas";
+import type { ApiSuccessResponse } from "~~/server/utils/api-response";
 
 interface Props {
   open?: boolean;
@@ -273,21 +274,28 @@ const isOpen = computed({
 });
 
 // Fetch available savings accounts for the household
-const { data: availableSavingsAccounts } = await useFetch<
-  SelectSavingsAccount[]
+const { data: availableSavingsAccountsResponse } = await useFetch<
+  ApiSuccessResponse<SelectSavingsAccount[]>
 >("/api/savings-accounts", {
   query: computed(() => (props.householdId ? {} : null)),
   immediate: false,
   watch: [() => props.open, () => props.householdId],
 });
 
+const availableSavingsAccounts = computed(
+  () => availableSavingsAccountsResponse.value?.data ?? []
+);
+
 // Fetch persons to show account ownership
-const { data: householdPersons } = await useFetch<SelectPerson[]>(
-  "/api/persons",
-  {
-    immediate: false,
-    watch: [() => props.open, () => props.householdId],
-  }
+const { data: householdPersonsResponse } = await useFetch<
+  ApiSuccessResponse<SelectPerson[]>
+>("/api/persons", {
+  immediate: false,
+  watch: [() => props.open, () => props.householdId],
+});
+
+const householdPersons = computed(
+  () => householdPersonsResponse.value?.data ?? []
 );
 
 // Create a lookup map for person names

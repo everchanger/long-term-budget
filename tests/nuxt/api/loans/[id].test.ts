@@ -35,10 +35,10 @@ describe("/api/loans/[id] integration tests", async () => {
       .then((b) =>
         b.addLoan({
           name: "Car Loan John",
-          originalAmount: 25000,
-          currentBalance: 20000,
-          interestRate: 0.05,
-          monthlyPayment: 450,
+          originalAmount: "25000",
+          currentBalance: "20000",
+          interestRate: "5",
+          monthlyPayment: "450",
           loanType: "car",
         })
       )
@@ -46,10 +46,10 @@ describe("/api/loans/[id] integration tests", async () => {
       .then((b) =>
         b.addLoan({
           name: "Personal Loan Jane",
-          originalAmount: 10000,
-          currentBalance: 8000,
-          interestRate: 0.08,
-          monthlyPayment: 200,
+          originalAmount: "10000",
+          currentBalance: "8000",
+          interestRate: "8",
+          monthlyPayment: "200",
           loanType: "personal",
         })
       );
@@ -59,10 +59,10 @@ describe("/api/loans/[id] integration tests", async () => {
       .then((b) =>
         b.addLoan({
           name: "Mortgage Bob",
-          originalAmount: 300000,
-          currentBalance: 280000,
-          interestRate: 0.035,
-          monthlyPayment: 1800,
+          originalAmount: "300000",
+          currentBalance: "280000",
+          interestRate: "3.5",
+          monthlyPayment: "1800",
           loanType: "mortgage",
         })
       );
@@ -99,7 +99,7 @@ describe("/api/loans/[id] integration tests", async () => {
         name: "Car Loan John",
         originalAmount: "25000.00",
         currentBalance: "20000.00",
-        interestRate: "0.0500",
+        interestRate: "5",
         monthlyPayment: "450.00",
         loanType: "car",
         personId: testUsers.user1.persons[0].id,
@@ -156,10 +156,10 @@ describe("/api/loans/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Updated Loan",
-            originalAmount: 30000,
-            currentBalance: 25000,
-            interestRate: 0.045,
-            monthlyPayment: 500,
+            originalAmount: "30000",
+            currentBalance: "25000",
+            interestRate: "4.5",
+            monthlyPayment: "500",
           },
         });
         expect.fail("Expected request to fail with 401");
@@ -179,10 +179,10 @@ describe("/api/loans/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Updated Personal Loan",
-            originalAmount: 12000,
-            currentBalance: 9000,
-            interestRate: 0.075,
-            monthlyPayment: 250,
+            originalAmount: "12000",
+            currentBalance: "9000",
+            interestRate: "7.5",
+            monthlyPayment: "250",
             loanType: "personal",
           },
         }
@@ -193,7 +193,7 @@ describe("/api/loans/[id] integration tests", async () => {
         name: "Updated Personal Loan",
         originalAmount: "12000.00",
         currentBalance: "9000.00",
-        interestRate: "0.0750",
+        interestRate: "7.5",
         monthlyPayment: "250.00",
         loanType: "personal",
         personId: testUsers.user1.persons[1].id,
@@ -211,10 +211,10 @@ describe("/api/loans/[id] integration tests", async () => {
             method: "PUT",
             body: {
               name: "Unauthorized Update",
-              originalAmount: 50000,
-              currentBalance: 45000,
-              interestRate: 0.04,
-              monthlyPayment: 800,
+              originalAmount: "50000",
+              currentBalance: "45000",
+              interestRate: "4",
+              monthlyPayment: "800",
             },
           }
         );
@@ -234,10 +234,10 @@ describe("/api/loans/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Non-existent Loan",
-            originalAmount: 5000,
-            currentBalance: 4000,
-            interestRate: 0.06,
-            monthlyPayment: 100,
+            originalAmount: "5000",
+            currentBalance: "4000",
+            interestRate: "6",
+            monthlyPayment: "100",
           },
         });
         expect.fail("Expected request to fail with 404");
@@ -280,10 +280,10 @@ describe("/api/loans/[id] integration tests", async () => {
           method: "POST",
           body: {
             name: "Test Update Loan",
-            originalAmount: 8000,
-            currentBalance: 7000,
-            interestRate: 0.055,
-            monthlyPayment: 180,
+            originalAmount: "8000",
+            currentBalance: "7000",
+            interestRate: "5.5",
+            monthlyPayment: "180",
             personId: testUsers.user1.persons[0].id,
           },
         }
@@ -296,10 +296,10 @@ describe("/api/loans/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Minimal Update",
-            originalAmount: 9000,
-            currentBalance: 8500,
-            interestRate: 0.06,
-            monthlyPayment: 200,
+            originalAmount: "9000",
+            currentBalance: "8500",
+            interestRate: "6",
+            monthlyPayment: "200",
           },
         }
       );
@@ -309,7 +309,7 @@ describe("/api/loans/[id] integration tests", async () => {
         name: "Minimal Update",
         originalAmount: "9000.00",
         currentBalance: "8500.00",
-        interestRate: "0.0600",
+        interestRate: "6",
         monthlyPayment: "200.00",
         personId: testUsers.user1.persons[0].id,
       });
@@ -340,10 +340,10 @@ describe("/api/loans/[id] integration tests", async () => {
           method: "POST",
           body: {
             name: "Test Delete Loan",
-            originalAmount: 6000,
-            currentBalance: 5000,
-            interestRate: 0.07,
-            monthlyPayment: 150,
+            originalAmount: "6000",
+            currentBalance: "5000",
+            interestRate: "7",
+            monthlyPayment: "150",
             personId: testUsers.user1.persons[0].id,
           },
         }

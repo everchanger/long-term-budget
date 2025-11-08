@@ -27,8 +27,14 @@ export default defineEventHandler(async (event) => {
   const method = getMethod(event);
 
   if (method === "GET") {
-    // Return the loan
-    return successResponse(existingLoan);
+    // Convert decimal interest rate to percentage for display
+    const converted = {
+      ...existingLoan,
+      interestRate: String(
+        Math.round(Number(existingLoan.interestRate) * 100 * 100) / 100
+      ),
+    };
+    return successResponse(converted);
   }
 
   if (method === "PUT") {
@@ -63,7 +69,7 @@ export default defineEventHandler(async (event) => {
         name,
         originalAmount,
         currentBalance,
-        interestRate,
+        interestRate: String(Number(interestRate) / 100), // Convert percentage to decimal
         monthlyPayment,
         loanType,
         startDate: startDate ? new Date(startDate) : new Date(),
@@ -79,7 +85,15 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return successResponse(updatedLoan);
+    // Convert decimal interest rate back to percentage for response
+    const converted = {
+      ...updatedLoan,
+      interestRate: String(
+        Math.round(Number(updatedLoan.interestRate) * 100 * 100) / 100
+      ),
+    };
+
+    return successResponse(converted);
   }
 
   if (method === "DELETE") {

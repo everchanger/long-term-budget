@@ -35,7 +35,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
       .then((b) =>
         b.addIncomeSource({
           name: "Salary John",
-          amount: 5000,
+          amount: "5000",
           frequency: "monthly",
         })
       )
@@ -43,7 +43,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
       .then((b) =>
         b.addIncomeSource({
           name: "Freelance Jane",
-          amount: 2000,
+          amount: "2000",
           frequency: "weekly",
         })
       );
@@ -53,7 +53,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
       .then((b) =>
         b.addIncomeSource({
           name: "Salary Bob",
-          amount: 6000,
+          amount: "6000",
           frequency: "monthly",
         })
       );
@@ -156,7 +156,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Updated Salary",
-            amount: 5500,
+            amount: "5500",
             frequency: "monthly",
           },
         });
@@ -178,7 +178,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Updated Freelance",
-            amount: 2500,
+            amount: "2500",
             frequency: "weekly",
             start_date: "2024-01-01",
             end_date: "2024-12-31",
@@ -211,7 +211,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
             method: "PUT",
             body: {
               name: "Hacked Salary",
-              amount: 100000,
+              amount: "100000",
               frequency: "monthly",
             },
           }
@@ -237,7 +237,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
             method: "PUT",
             body: {
               name: "Non-existent",
-              amount: 1000,
+              amount: "1000",
               frequency: "monthly",
             },
           }
@@ -285,7 +285,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
           body: {
             person_id: testUsers.user1.persons[0].id,
             name: "Test Update Income",
-            amount: 1000,
+            amount: "1000",
             frequency: "monthly",
           },
         }
@@ -298,7 +298,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
           method: "PUT",
           body: {
             name: "Minimal Update",
-            amount: 1200,
+            amount: "1200",
             frequency: "monthly",
           },
         }
@@ -328,7 +328,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
           body: {
             person_id: testUsers.user1.persons[0].id,
             name: "To Delete Income",
-            amount: 1000,
+            amount: "1000",
             frequency: "monthly",
           },
         }
@@ -356,7 +356,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
           body: {
             person_id: testUsers.user1.persons[0].id,
             name: "Delete Test Income",
-            amount: 1000,
+            amount: "1000",
             frequency: "monthly",
           },
         }
