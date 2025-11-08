@@ -1,5 +1,6 @@
 import { insertUserSchema } from "~~/database/validation-schemas";
 import { desc } from "drizzle-orm";
+import { successResponse } from "../../utils/api-response";
 
 export default defineEventHandler(async (event) => {
   const db = useDrizzle();
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event) => {
         .from(tables.users)
         .orderBy(desc(tables.users.createdAt));
 
-      return users;
+      return successResponse(users);
     }
 
     if (event.node.req.method === "POST") {
@@ -38,7 +39,7 @@ export default defineEventHandler(async (event) => {
         });
 
       setResponseStatus(event, 201);
-      return newUser;
+      return successResponse(newUser);
     }
 
     throw createError({

@@ -449,10 +449,11 @@ export async function setupTestUsers() {
 
 /**
  * Authenticated $fetch wrapper that automatically includes session cookie
+ * Automatically unwraps ApiSuccessResponse.data for GET/POST/PUT requests
  * @param user - TestUser with sessionCookie for authentication
  * @param url - API endpoint to call
  * @param options - Additional fetch options (method, body, etc.)
- * @returns Promise with the API response
+ * @returns Promise with the unwrapped API response data (or raw response for DELETE)
  */
 export async function authenticatedFetch<T = unknown>(
   user: TestUser,
@@ -461,11 +462,19 @@ export async function authenticatedFetch<T = unknown>(
 ): Promise<T> {
   const cookieHeader = `better-auth.session_token=${user.sessionCookie}`;
 
-  return $fetch<T>(url, {
+  const response = await $fetch<unknown>(url, {
     ...options,
     headers: {
       ...options.headers,
       cookie: cookieHeader,
     },
   });
+
+  // Unwrap ApiSuccessResponse for GET/POST/PUT (response has .data property)
+  // Return raw response for DELETE (response has .success property)
+  if (response && typeof response === "object" && "data" in response) {
+    return response.data as T;
+  }
+
+  return response as T;
 }

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
+import type { ApiSuccessResponse, ApiDeleteResponse } from "../../../../../server/utils/api-response";
 import type { InferSelectModel } from "drizzle-orm";
 import type { savingsAccounts } from "../../../../database/schema";
 import {

@@ -1,5 +1,6 @@
 import { parseIdParam } from "../../utils/api-helpers";
 import { verifyHouseholdAccessOrThrow } from "../../utils/authorization";
+import { successResponse } from "../../utils/api-response";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
@@ -40,10 +41,10 @@ export default defineEventHandler(async (event) => {
         .where(eq(tables.persons.householdId, householdIdNum))
         .orderBy(tables.persons.createdAt);
 
-      return {
+      return successResponse({
         ...household,
         persons,
-      };
+      });
     }
 
     if (method === "PUT") {
@@ -75,7 +76,7 @@ export default defineEventHandler(async (event) => {
         });
       }
 
-      return updatedHousehold;
+      return successResponse(updatedHousehold);
     }
 
     throw createError({

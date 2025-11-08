@@ -1,3 +1,4 @@
+import { successResponse, deleteResponse } from "../../utils/api-response";
 import { parseIdParam } from "../../utils/api-helpers";
 import { verifyPersonAccessOrThrow } from "../../utils/authorization";
 
@@ -27,7 +28,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === "GET") {
     // Return the loan
-    return existingLoan;
+    return successResponse(existingLoan);
   }
 
   if (method === "PUT") {
@@ -78,7 +79,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return updatedLoan;
+    return successResponse(updatedLoan);
   }
 
   if (method === "DELETE") {
@@ -94,7 +95,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return { message: "Loan deleted successfully" };
+    return deleteResponse("Loan deleted successfully");
   }
 
   throw createError({

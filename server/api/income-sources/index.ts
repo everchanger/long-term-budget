@@ -1,5 +1,6 @@
 import { getUserPersons } from "@s/utils/authorization";
 import { parseQueryInt } from "../../utils/api-helpers";
+import { successResponse } from "../../utils/api-response";
 
 export default defineEventHandler(async (event) => {
   // Get session from middleware
@@ -48,13 +49,13 @@ export default defineEventHandler(async (event) => {
         .where(eq(tables.incomeSources.personId, personId))
         .orderBy(desc(tables.incomeSources.createdAt));
 
-      return incomeSources;
+      return successResponse(incomeSources);
     }
 
     // Get all income sources for all persons in user's households
     const userPersons = await getUserPersons(session.user.id);
     if (userPersons.length === 0) {
-      return [];
+      return successResponse([]);
     }
 
     const personIds = userPersons.map((p) => p.id);
@@ -68,7 +69,7 @@ export default defineEventHandler(async (event) => {
       )
       .orderBy(desc(tables.incomeSources.createdAt));
 
-    return incomeSources;
+    return successResponse(incomeSources);
   }
 
   if (event.node.req.method === "POST") {
@@ -127,7 +128,7 @@ export default defineEventHandler(async (event) => {
       })
       .returning();
 
-    return newIncomeSource;
+    return successResponse(newIncomeSource);
   }
 
   throw createError({

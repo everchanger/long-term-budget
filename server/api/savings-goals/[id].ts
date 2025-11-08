@@ -1,3 +1,4 @@
+import { successResponse, deleteResponse } from "../../utils/api-response";
 import { eq, and, inArray } from "drizzle-orm";
 import { updateSavingsGoalSchema } from "../../../database/validation-schemas";
 import { enrichSavingsGoalsWithProgress } from "../../utils/savingsGoalCalculations";
@@ -70,7 +71,7 @@ export default defineEventHandler(async (event) => {
       db
     );
 
-    return enrichedGoals[0];
+    return successResponse(enrichedGoals[0]);
   }
 
   if (method === "PUT") {
@@ -149,7 +150,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    return result;
+    return successResponse(result);
   }
 
   if (method === "DELETE") {
@@ -157,7 +158,7 @@ export default defineEventHandler(async (event) => {
       .delete(tables.savingsGoals)
       .where(eq(tables.savingsGoals.id, goalId));
 
-    return { success: true };
+    return deleteResponse("Savings goal deleted successfully");
   }
 
   throw createError({

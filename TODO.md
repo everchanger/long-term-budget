@@ -309,39 +309,63 @@ Created `app/composables/useFinancialCalculations.ts` with pure calculation func
 
 ---
 
-### 7. Standardize API Response Shapes
+### 7. Standardize API Response Shapes 🚧
+**Status:** INFRASTRUCTURE READY - Detailed refactor plan created  
 **Issue:** Inconsistent response structures across endpoints  
-**Location:** Various API endpoints return arrays, objects, or mixed types  
-**Impact:** Frontend needs different handling per endpoint
+**Location:** All ~40 API endpoint methods  
+**Impact:** Frontend needs different handling per endpoint, harder to maintain
 
+**Current Problems:**
+- GET endpoints return raw data (arrays/objects)
+- DELETE endpoints mix `{ message: "..." }` and `{ success: true }`
+- No metadata support for pagination
+- Each endpoint requires different frontend handling
+- TypeScript types are inconsistent
+
+**Infrastructure Completed:**
+- ✅ Created `server/utils/api-response.ts` with standardization utilities
+- ✅ Helper functions: `successResponse()`, `deleteResponse()`, `paginatedResponse()`
+- ✅ TypeScript interfaces: `ApiSuccessResponse<T>`, `ApiDeleteResponse`
+- ✅ Type guards: `isSuccessResponse()`, `isErrorResponse()`
+- ✅ Detailed refactor plan: `api-refactor.md`
+
+**Refactor Plan Created:**
+📄 See `api-refactor.md` for complete implementation guide covering:
+- **Phase 1:** Infrastructure (✅ Complete)
+- **Phase 2:** Backend refactor (~40 endpoint methods)
+- **Phase 3:** Frontend refactor (composables & components)
+- **Phase 4:** Test updates (183 tests)
+- **Phase 5:** Validation & documentation
+- **Time Estimate:** 7-10 hours total
+- **Strategy:** Big bang approach (all at once) since app not live yet
+- **Examples:** Before/after code transformations
+- **Rollback Plan:** Feature branch safety net
+
+**New Standard Format:**
 ```typescript
-// Proposed standard in server/utils/api-response.ts:
-export interface ApiSuccessResponse<T> {
-  data: T;
-  meta?: {
-    page?: number;
-    pageSize?: number;
-    total?: number;
-  };
-}
+// Success responses:
+{ data: T, meta?: { page?, pageSize?, total?, ... } }
 
-export interface ApiErrorResponse {
-  error: {
-    message: string;
-    code: string;
-    details?: Record<string, unknown>;
-  };
-}
+// Delete responses:
+{ success: true, message?: string }
 
-// Helper functions:
-export function successResponse<T>(data: T, meta?: ApiSuccessResponse<T>['meta']) {
-  return { data, ...(meta && { meta }) };
-}
-
-export function errorResponse(message: string, code: string, details?: Record<string, unknown>) {
-  return { error: { message, code, details } };
-}
+// Error responses (unchanged):
+{ statusCode, statusMessage, message, ... }
 ```
+
+**Benefits After Refactor:**
+- Consistent API response format across all endpoints
+- Type-safe frontend with proper TypeScript inference
+- Future-proof for pagination and metadata
+- Better developer experience
+- Self-documenting API
+
+**Next Steps:**
+1. Review `api-refactor.md`
+2. Create feature branch: `refactor/standardize-api-responses`
+3. Execute phases 2-5 as outlined in plan
+4. Run full test suite
+5. Merge when all 183 tests pass
 
 ---
 

@@ -268,6 +268,7 @@ describe("/api/persons/[id] integration tests", async () => {
       );
 
       expect(result).toEqual({
+        success: true,
         message: "Person deleted successfully",
       });
 

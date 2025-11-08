@@ -1,3 +1,4 @@
+import { successResponse } from "../../utils/api-response";
 import { parseQueryInt } from "../../utils/api-helpers";
 
 export default defineEventHandler(async (event) => {
@@ -46,7 +47,7 @@ export default defineEventHandler(async (event) => {
             )
           );
 
-        return result;
+        return successResponse(result);
       } else {
         // Get all broker accounts for all persons in the user's household
         const result = await db
@@ -70,7 +71,7 @@ export default defineEventHandler(async (event) => {
           )
           .where(eq(tables.households.userId, session.user.id));
 
-        return result;
+        return successResponse(result);
       }
     }
 
@@ -121,7 +122,7 @@ export default defineEventHandler(async (event) => {
         })
         .returning();
 
-      return result[0];
+      return successResponse(result[0]);
     }
 
     throw createError({

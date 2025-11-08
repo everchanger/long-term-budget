@@ -5,9 +5,6 @@ import {
   authenticatedFetch,
   type TestUser,
 } from "../../utils/test-data";
-import { db } from "../../../../server/utils/drizzle";
-import { households } from "../../../../database/schema";
-import { eq } from "drizzle-orm";
 
 interface Household {
   id: number;

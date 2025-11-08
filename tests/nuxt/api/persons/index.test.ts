@@ -95,7 +95,9 @@ describe("/api/persons integration tests", async () => {
       const user2Persons = await authenticatedFetch<Person[]>(
         testUsers.user2,
         "/api/persons"
-      ); // Verify each user gets different data
+      );
+
+      // Verify each user gets different data
       expect(user1Persons).toHaveLength(2);
       expect(user2Persons).toHaveLength(2);
 
@@ -116,14 +118,14 @@ describe("/api/persons integration tests", async () => {
       );
 
       // Make request as this user
-      const emptyUserPersons = await authenticatedFetch<Person[]>(
+      const persons = await authenticatedFetch<Person[]>(
         emptyUser,
         "/api/persons"
       );
 
       // Should get empty array
-      expect(emptyUserPersons).toEqual([]);
-      expect(emptyUserPersons).toHaveLength(0);
+      expect(persons).toEqual([]);
+      expect(persons).toHaveLength(0);
     });
   });
 
@@ -168,7 +170,8 @@ describe("/api/persons integration tests", async () => {
     });
 
     it("should allow creating person in own household", async () => {
-      const newPerson = await authenticatedFetch<Person>(
+      // Create person in user1's household
+      const response = await authenticatedFetch<Person>(
         testUsers.user1,
         "/api/persons",
         {
@@ -181,13 +184,13 @@ describe("/api/persons integration tests", async () => {
         }
       );
 
-      expect(newPerson).toMatchObject({
+      expect(response).toMatchObject({
         name: "New Person",
         age: 30,
         householdId: testUsers.user1.householdId,
       });
-      expect(newPerson.id).toBeDefined();
-      expect(newPerson.createdAt).toBeDefined();
+      expect(response.id).toBeDefined();
+      expect(response.createdAt).toBeDefined();
     });
   });
 });

@@ -1,5 +1,6 @@
 import { parseIdParam } from "../../utils/api-helpers";
 import { verifyPersonAccessOrThrow } from "../../utils/authorization";
+import { successResponse, deleteResponse } from "../../utils/api-response";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
@@ -29,7 +30,7 @@ export default defineEventHandler(async (event) => {
 
   if (event.node.req.method === "GET") {
     // Return the income source
-    return existingIncomeSource;
+    return successResponse(existingIncomeSource);
   }
 
   if (event.node.req.method === "PUT") {
@@ -64,7 +65,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return updatedIncomeSource;
+    return successResponse(updatedIncomeSource);
   }
 
   if (event.node.req.method === "DELETE") {
@@ -81,7 +82,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return { message: "Income source deleted successfully" };
+    return deleteResponse("Income source deleted successfully");
   }
 
   throw createError({

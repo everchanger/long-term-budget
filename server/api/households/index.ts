@@ -1,3 +1,5 @@
+import { successResponse } from "../../utils/api-response";
+
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
 
@@ -28,7 +30,7 @@ export default defineEventHandler(async (event) => {
       .innerJoin(tables.users, eq(tables.households.userId, tables.users.id))
       .where(eq(tables.households.userId, session.user.id));
 
-    return userHouseholds;
+    return successResponse(userHouseholds);
   } catch (error) {
     // If it's already an H3 error, re-throw it
     if (error && typeof error === "object" && "statusCode" in error) {

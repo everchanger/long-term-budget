@@ -370,7 +370,10 @@ describe("/api/savings-goals/[id] integration tests", async () => {
         }
       );
 
-      expect(response).toEqual({ success: true });
+      expect(response).toEqual({
+        success: true,
+        message: "Savings goal deleted successfully",
+      });
 
       // Verify goal was deleted
       try {

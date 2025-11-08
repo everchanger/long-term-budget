@@ -1,3 +1,4 @@
+import { successResponse, deleteResponse } from "../../utils/api-response";
 import { parseIdParam } from "../../utils/api-helpers";
 import { verifyPersonAccessOrThrow } from "../../utils/authorization";
 
@@ -58,7 +59,7 @@ export default defineEventHandler(async (event) => {
         throw error;
       }
 
-      return brokerAccount;
+      return successResponse(brokerAccount);
     }
 
     if (method === "PUT") {
@@ -129,7 +130,7 @@ export default defineEventHandler(async (event) => {
         });
       }
 
-      return result[0];
+      return successResponse(result[0]);
     }
 
     if (method === "DELETE") {
@@ -173,7 +174,7 @@ export default defineEventHandler(async (event) => {
         .delete(tables.brokerAccounts)
         .where(eq(tables.brokerAccounts.id, accountIdNum));
 
-      return { success: true };
+      return deleteResponse("Broker account deleted successfully");
     }
 
     throw createError({

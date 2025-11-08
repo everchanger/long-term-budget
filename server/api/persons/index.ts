@@ -1,4 +1,5 @@
 import { verifyHouseholdAccessOrThrow } from "../../utils/authorization";
+import { successResponse } from "../../utils/api-response";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
@@ -31,7 +32,7 @@ export default defineEventHandler(async (event) => {
         .where(eq(tables.households.userId, session.user.id))
         .orderBy(tables.persons.name);
 
-      return persons;
+      return successResponse(persons);
     } catch (error) {
       // Re-throw HTTP errors as-is
       if (error && typeof error === "object" && "statusCode" in error) {
@@ -87,7 +88,7 @@ export default defineEventHandler(async (event) => {
         })
         .returning();
 
-      return newPerson;
+      return successResponse(newPerson);
     } catch (error) {
       // Re-throw known errors
       if (error && typeof error === "object" && "statusCode" in error) {

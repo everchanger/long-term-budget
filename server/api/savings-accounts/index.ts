@@ -1,3 +1,4 @@
+import { successResponse, deleteResponse } from "../../utils/api-response";
 import { eq, inArray, and } from "drizzle-orm";
 import { getUserPersons } from "../../utils/authorization";
 import { parseQueryInt } from "../../utils/api-helpers";
@@ -48,13 +49,13 @@ export default defineEventHandler(async (event) => {
         .from(tables.savingsAccounts)
         .where(eq(tables.savingsAccounts.personId, personId));
 
-      return result;
+      return successResponse(result);
     } else {
       // Get all savings accounts for all persons in the user's household
       const userPersons = await getUserPersons(session.user.id);
 
       if (userPersons.length === 0) {
-        return [];
+        return successResponse([]);
       }
 
       const personIds = userPersons.map((p) => p.id);
@@ -67,7 +68,7 @@ export default defineEventHandler(async (event) => {
             : inArray(tables.savingsAccounts.personId, personIds)
         );
 
-      return result;
+      return successResponse(result);
     }
   }
 
@@ -124,7 +125,7 @@ export default defineEventHandler(async (event) => {
       })
       .returning();
 
-    return result;
+    return successResponse(result);
   }
 
   throw createError({

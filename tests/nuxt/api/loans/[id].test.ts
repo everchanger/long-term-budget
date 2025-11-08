@@ -349,15 +349,15 @@ describe("/api/loans/[id] integration tests", async () => {
         }
       );
 
-      const deleteResponse = await authenticatedFetch<{ message: string }>(
-        testUsers.user1,
-        `/api/loans/${newLoan.id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const deleteResponse = await authenticatedFetch<{
+        success: boolean;
+        message: string;
+      }>(testUsers.user1, `/api/loans/${newLoan.id}`, {
+        method: "DELETE",
+      });
 
       expect(deleteResponse).toEqual({
+        success: true,
         message: "Loan deleted successfully",
       });
 

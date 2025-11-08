@@ -1,3 +1,5 @@
+import { successResponse } from "../utils/api-response";
+
 export default defineEventHandler(async (_event) => {
   try {
     const db = useDrizzle();
@@ -14,12 +16,12 @@ export default defineEventHandler(async (_event) => {
       .select({ count: count() })
       .from(tables.scenarios);
 
-    return {
+    return successResponse({
       users: usersCount.count,
       households: householdsCount.count,
       persons: personsCount.count,
       scenarios: scenariosCount.count,
-    };
+    });
   } catch (error) {
     console.error("Error fetching stats:", error);
     throw createError({

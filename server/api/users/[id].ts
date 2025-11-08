@@ -1,4 +1,5 @@
 import { updateUserSchema } from "~~/database/validation-schemas";
+import { successResponse, deleteResponse } from "../../utils/api-response";
 
 export default defineEventHandler(async (event) => {
   const userId = getRouterParam(event, "id");
@@ -32,7 +33,7 @@ export default defineEventHandler(async (event) => {
         });
       }
 
-      return user;
+      return successResponse(user);
     }
 
     if (event.node.req.method === "PUT") {
@@ -60,7 +61,7 @@ export default defineEventHandler(async (event) => {
         });
       }
 
-      return updatedUser;
+      return successResponse(updatedUser);
     }
 
     if (event.node.req.method === "DELETE") {
@@ -78,7 +79,7 @@ export default defineEventHandler(async (event) => {
       }
 
       setResponseStatus(event, 204);
-      return { message: "User deleted successfully" };
+      return deleteResponse("User deleted successfully");
     }
 
     throw createError({

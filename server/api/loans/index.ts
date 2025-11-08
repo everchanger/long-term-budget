@@ -1,3 +1,4 @@
+import { successResponse, deleteResponse } from "../../utils/api-response";
 import { parseQueryInt } from "../../utils/api-helpers";
 
 export default defineEventHandler(async (event) => {
@@ -45,7 +46,7 @@ export default defineEventHandler(async (event) => {
       .from(tables.loans)
       .where(eq(tables.loans.personId, personId));
 
-    return result;
+    return successResponse(result);
   }
 
   if (method === "POST") {
@@ -115,7 +116,7 @@ export default defineEventHandler(async (event) => {
       })
       .returning();
 
-    return result[0];
+    return successResponse(result[0]);
   }
 
   throw createError({

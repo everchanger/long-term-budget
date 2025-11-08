@@ -1,6 +1,7 @@
 import { parseIdParam } from "../../../utils/api-helpers";
 import { verifyHouseholdAccessOrThrow } from "../../../utils/authorization";
 import { toMonthlyAmount } from "../../../../utils/financial-calculations";
+import { successResponse } from "../../../utils/api-response";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
@@ -136,7 +137,7 @@ export default defineEventHandler(async (event) => {
         )})`
       );
 
-    return {
+    return successResponse({
       totalMonthlyIncome: Math.round(totalMonthlyIncome * 100) / 100,
       totalAnnualIncome: Math.round(totalMonthlyIncome * 12 * 100) / 100,
       totalSavings: Math.round(totalSavings * 100) / 100,
@@ -147,7 +148,7 @@ export default defineEventHandler(async (event) => {
       loansCount: loansCount[0]?.count || 0,
       savingsAccountsCount: savingsAccountsCount[0]?.count || 0,
       investmentAccountsCount: investmentAccountsCount[0]?.count || 0,
-    };
+    });
   } catch (error) {
     // Re-throw HTTP errors as-is
     if (error && typeof error === "object" && "statusCode" in error) {

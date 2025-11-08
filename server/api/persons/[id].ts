@@ -1,4 +1,5 @@
 import { parseIdParam } from "../../utils/api-helpers";
+import { successResponse, deleteResponse } from "../../utils/api-response";
 
 export default defineEventHandler(async (event) => {
   // Get session from middleware
@@ -45,7 +46,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return person;
+    return successResponse(person);
   }
 
   if (event.node.req.method === "PUT") {
@@ -95,7 +96,7 @@ export default defineEventHandler(async (event) => {
         createdAt: tables.persons.createdAt,
       });
 
-    return updatedPerson;
+    return successResponse(updatedPerson);
   }
 
   if (event.node.req.method === "DELETE") {
@@ -124,7 +125,7 @@ export default defineEventHandler(async (event) => {
     // Delete the person
     await db.delete(tables.persons).where(eq(tables.persons.id, personId));
 
-    return { message: "Person deleted successfully" };
+    return deleteResponse("Person deleted successfully");
   }
 
   throw createError({

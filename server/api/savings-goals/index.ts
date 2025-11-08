@@ -1,3 +1,4 @@
+import { successResponse, deleteResponse } from "../../utils/api-response";
 import { eq, and, inArray } from "drizzle-orm";
 import { insertSavingsGoalSchema } from "../../../database/validation-schemas";
 import { enrichSavingsGoalsWithProgress } from "../../utils/savingsGoalCalculations";
@@ -68,7 +69,7 @@ export default defineEventHandler(async (event) => {
         db
       );
 
-      return enrichedGoals;
+      return successResponse(enrichedGoals);
     } else {
       // Get all savings goals for all households of the user
       const result = await db
@@ -122,7 +123,7 @@ export default defineEventHandler(async (event) => {
         enrichedResults.push(...enrichedGoals);
       }
 
-      return enrichedResults;
+      return successResponse(enrichedResults);
     }
   }
 
@@ -215,7 +216,7 @@ export default defineEventHandler(async (event) => {
       );
     }
 
-    return result;
+    return successResponse(result);
   }
 
   throw createError({

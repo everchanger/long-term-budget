@@ -1,3 +1,4 @@
+import { successResponse } from "../../../utils/api-response";
 import { eq, and } from "drizzle-orm";
 import { parseIdParam } from "../../../utils/api-helpers";
 
@@ -74,8 +75,8 @@ export default defineEventHandler(async (event) => {
     savingsAccountId: savingsAccountId,
   });
 
-  return {
+  return successResponse({
     success: true,
     message: "Savings account linked to goal",
-  };
+  });
 });

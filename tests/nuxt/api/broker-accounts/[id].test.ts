@@ -373,7 +373,10 @@ describe("/api/broker-accounts/[id] integration tests", async () => {
         { method: "DELETE" }
       );
 
-      expect(response).toEqual({ success: true });
+      expect(response).toEqual({
+        success: true,
+        message: "Broker account deleted successfully",
+      });
 
       // Verify the broker account is actually deleted
       const getResponse = await authenticatedFetch(
