@@ -4,6 +4,7 @@ import type {
   SelectLoan,
   SelectSavingsAccount,
 } from "~~/database/validation-schemas";
+import { toMonthlyAmount } from "~~/utils/financial-calculations";
 
 export interface HouseholdFinancialSummary {
   totalMonthlyIncome: number;
@@ -61,21 +62,7 @@ export const useHouseholdFinancials = (householdId: string) => {
     return incomes
       .filter((income) => income.isActive)
       .reduce((total, income) => {
-        const amount = parseFloat(income.amount);
-        switch (income.frequency) {
-          case "monthly":
-            return total + amount;
-          case "yearly":
-            return total + amount / 12;
-          case "weekly":
-            return total + amount * 4.33;
-          case "bi-weekly":
-            return total + amount * 2.17;
-          case "daily":
-            return total + amount * 30;
-          default:
-            return total;
-        }
+        return total + toMonthlyAmount(income.amount, income.frequency);
       }, 0);
   };
 

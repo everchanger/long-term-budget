@@ -1,4 +1,5 @@
 import type { SelectIncomeSource } from "~~/database/validation-schemas";
+import { toMonthlyAmount } from "~~/utils/financial-calculations";
 
 export const useIncomeSources = (personId: string) => {
   // Data fetching
@@ -17,19 +18,7 @@ export const useIncomeSources = (personId: string) => {
     return incomeSources.value
       .filter((income) => income.isActive)
       .reduce((total, income) => {
-        const amount = parseFloat(income.amount);
-        switch (income.frequency) {
-          case "monthly":
-            return total + amount;
-          case "yearly":
-            return total + amount / 12;
-          case "weekly":
-            return total + amount * 4.33;
-          case "bi-weekly":
-            return total + amount * 2.17;
-          default:
-            return total;
-        }
+        return total + toMonthlyAmount(income.amount, income.frequency);
       }, 0)
       .toFixed(2);
   });

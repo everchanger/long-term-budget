@@ -1,5 +1,6 @@
 import { parseIdParam } from "../../../utils/api-helpers";
 import { verifyHouseholdAccessOrThrow } from "../../../utils/authorization";
+import { toMonthlyAmount } from "../../../../utils/financial-calculations";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
@@ -53,22 +54,7 @@ export default defineEventHandler(async (event) => {
 
     for (const income of incomeResult) {
       incomeSourcesCount++;
-      const amount = parseFloat(income.amount);
-
-      switch (income.frequency) {
-        case "monthly":
-          totalMonthlyIncome += amount;
-          break;
-        case "yearly":
-          totalMonthlyIncome += amount / 12;
-          break;
-        case "weekly":
-          totalMonthlyIncome += amount * 4.33;
-          break;
-        case "bi-weekly":
-          totalMonthlyIncome += amount * 2.17;
-          break;
-      }
+      totalMonthlyIncome += toMonthlyAmount(income.amount, income.frequency);
     }
 
     // Calculate total debt from loans

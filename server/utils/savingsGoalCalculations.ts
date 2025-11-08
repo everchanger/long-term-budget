@@ -1,6 +1,7 @@
 import { eq, and, inArray } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import * as tables from "~~/database/schema";
+import { toMonthlyAmount } from "../../utils/financial-calculations";
 
 interface FinancialData {
   totalSavings: number;
@@ -81,20 +82,13 @@ export async function calculateHouseholdFinancials(
     );
 
   const monthlyIncome = incomeSourcesData.reduce((sum, income) => {
-    const amount = parseFloat(income.amount);
-    switch (income.frequency?.toLowerCase()) {
-      case "weekly":
-        return sum + (amount * 52) / 12;
-      case "monthly":
-        return sum + amount;
-      case "yearly":
-      case "annual":
-        return sum + amount / 12;
-      case "bi-weekly":
-        return sum + (amount * 26) / 12;
-      default:
-        return sum + amount;
-    }
+    return (
+      sum +
+      toMonthlyAmount(
+        income.amount,
+        income.frequency?.toLowerCase() || "monthly"
+      )
+    );
   }, 0);
 
   // Calculate monthly expenses
@@ -112,20 +106,13 @@ export async function calculateHouseholdFinancials(
     );
 
   const monthlyExpenses = expensesData.reduce((sum, expense) => {
-    const amount = parseFloat(expense.amount);
-    switch (expense.frequency?.toLowerCase()) {
-      case "weekly":
-        return sum + (amount * 52) / 12;
-      case "monthly":
-        return sum + amount;
-      case "yearly":
-      case "annual":
-        return sum + amount / 12;
-      case "bi-weekly":
-        return sum + (amount * 26) / 12;
-      default:
-        return sum + amount;
-    }
+    return (
+      sum +
+      toMonthlyAmount(
+        expense.amount,
+        expense.frequency?.toLowerCase() || "monthly"
+      )
+    );
   }, 0);
 
   // Calculate monthly loan payments

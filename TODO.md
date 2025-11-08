@@ -226,38 +226,48 @@ export async function verifyLoanAccess(
 
 ---
 
-### 5. Extract Frequency Conversion Logic to Shared Utility
-**Issue:** Duplicate frequency calculation in composables and potentially elsewhere  
-**Location:** `app/composables/useHouseholdFinancials.ts:53-74`  
+### 5. Extract Frequency Conversion Logic to Shared Utility ✅
+**Status:** COMPLETED 2025-11-08  
+**Issue:** Duplicate frequency calculation in composables and server code  
+**Location:** 5 files had duplicate switch statements for frequency conversion  
 **Impact:** Business logic duplication, potential inconsistency
 
-```typescript
-// Create utils/financial-calculations.ts:
-export const MONTHLY_MULTIPLIERS = {
-  monthly: 1,
-  yearly: 1 / 12,
-  weekly: 4.33,
-  'bi-weekly': 2.17,
-  daily: 30,
-} as const;
+**Files with Duplication:**
+- `app/composables/useHouseholdFinancials.ts` - 22 lines of switch logic
+- `app/composables/useIncomeSources.ts` - 15 lines of switch logic
+- `server/api/households/[id]/financial-summary.ts` - 17 lines of switch logic
+- `server/utils/savingsGoalCalculations.ts` - 30 lines of switch logic (2 occurrences)
 
-export type Frequency = keyof typeof MONTHLY_MULTIPLIERS;
+**Solution Implemented:**
+Created `utils/financial-calculations.ts` with shared utilities:
+- `MONTHLY_MULTIPLIERS` constant with all frequency conversion factors
+- `Frequency` type for type safety
+- `isValidFrequency(value)` type guard
+- `toMonthlyAmount(amount, frequency)` - Convert any frequency to monthly
+- `fromMonthlyAmount(monthlyAmount, targetFrequency)` - Convert monthly to any frequency
+- `convertFrequency(amount, from, to)` - Convert between any two frequencies
 
-export function toMonthlyAmount(
-  amount: string | number,
-  frequency: Frequency
-): number {
-  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-  return numAmount * MONTHLY_MULTIPLIERS[frequency];
-}
+**Refactored Files:**
+- ✅ `app/composables/useHouseholdFinancials.ts` - Using `toMonthlyAmount()`
+- ✅ `app/composables/useIncomeSources.ts` - Using `toMonthlyAmount()`
+- ✅ `server/api/households/[id]/financial-summary.ts` - Using `toMonthlyAmount()`
+- ✅ `server/utils/savingsGoalCalculations.ts` - Using `toMonthlyAmount()` (both occurrences)
 
-export function fromMonthlyAmount(
-  monthlyAmount: number,
-  targetFrequency: Frequency
-): number {
-  return monthlyAmount / MONTHLY_MULTIPLIERS[targetFrequency];
-}
-```
+**Results:**
+- ✅ Removed ~84 lines of duplicate switch/case logic
+- ✅ Single source of truth for frequency conversions
+- ✅ Works on both frontend and backend (shared utils/ directory)
+- ✅ Type-safe with proper validation
+- ✅ Handles invalid frequencies gracefully (defaults to monthly)
+- ✅ Handles both string and number amounts
+- ✅ Zero TypeScript errors
+
+**Benefits:**
+- Single implementation of conversion logic
+- Consistent multipliers across entire codebase
+- Easy to add new frequencies in one place
+- Testable in isolation
+- Reusable for future features
 
 ---
 
