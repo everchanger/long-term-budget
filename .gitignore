@@ -24,3 +24,6 @@ nuxt-test.log
 .env.*
 !.env.example
 !.env.test
+
+# Test output
+playwright-report/*

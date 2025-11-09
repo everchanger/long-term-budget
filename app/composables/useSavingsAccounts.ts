@@ -41,8 +41,12 @@ export const useSavingsAccounts = (personId: string) => {
     const payload = {
       name: data.name.trim(),
       currentBalance: parseFloat(data.currentBalance),
-      interestRate: data.interestRate ? parseFloat(data.interestRate) : undefined,
-      monthlyDeposit: data.monthlyDeposit ? parseFloat(data.monthlyDeposit) : undefined,
+      interestRate: data.interestRate
+        ? parseFloat(data.interestRate)
+        : undefined,
+      monthlyDeposit: data.monthlyDeposit
+        ? parseFloat(data.monthlyDeposit)
+        : undefined,
       accountType: data.accountType || null,
       personId: parseInt(personId),
     };
@@ -68,8 +72,12 @@ export const useSavingsAccounts = (personId: string) => {
     const payload = {
       name: data.name.trim(),
       currentBalance: parseFloat(data.currentBalance),
-      interestRate: data.interestRate ? parseFloat(data.interestRate) : undefined,
-      monthlyDeposit: data.monthlyDeposit ? parseFloat(data.monthlyDeposit) : undefined,
+      interestRate: data.interestRate
+        ? parseFloat(data.interestRate)
+        : undefined,
+      monthlyDeposit: data.monthlyDeposit
+        ? parseFloat(data.monthlyDeposit)
+        : undefined,
       accountType: data.accountType || null,
       personId: parseInt(personId),
     };

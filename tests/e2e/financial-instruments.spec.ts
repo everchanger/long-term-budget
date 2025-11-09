@@ -192,15 +192,9 @@ test.describe("Financial Instruments Management", () => {
       page.getByRole("heading", { name: "Edit Savings Account" })
     ).not.toBeVisible();
 
-    // Reload the page to ensure fresh data
-    await page.reload({ waitUntil: "domcontentloaded" });
-
-    // Navigate back to savings tab
-    await page.getByRole("tab", { name: "Savings" }).click();
-
-    // Verify the monthly deposit was updated
-    await expect(page.getByText(/Monthly Deposit:\s*\$\s*400/)).toBeVisible({
-      timeout: 10000,
+    // Verify the monthly deposit was updated to $400
+    await expect(page.getByText("Monthly Deposit: $400")).toBeVisible({
+      timeout: 5000,
     });
   });
 
@@ -312,11 +306,10 @@ test.describe("Financial Instruments Management", () => {
       ),
       page.getByTestId("savings-modal-submit-button").click(),
     ]);
-    // Reload to get fresh data
-    await page.reload({ waitUntil: "domcontentloaded" });
-    await page.getByRole("tab", { name: "Savings" }).click();
-    await expect(page.getByText(/Monthly Deposit:\s*\$\s*400/)).toBeVisible({
-      timeout: 10000,
+
+    // Verify the monthly deposit was updated to $400
+    await expect(page.getByText("Monthly Deposit: $400")).toBeVisible({
+      timeout: 5000,
     });
 
     // Step 3: Update Loan
@@ -333,8 +326,6 @@ test.describe("Financial Instruments Management", () => {
       ),
       page.getByTestId("loan-modal-submit-button").click(),
     ]);
-    await page.reload({ waitUntil: "domcontentloaded" });
-    await page.getByRole("tab", { name: "Loans & Debts" }).click();
     await expect(page.getByText(/Monthly Payment.*450/)).toBeVisible({
       timeout: 10000,
     });
