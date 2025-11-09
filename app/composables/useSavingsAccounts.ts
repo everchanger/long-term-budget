@@ -34,13 +34,15 @@ export const useSavingsAccounts = (personId: string) => {
   const createSavingsAccount = async (data: {
     name: string;
     currentBalance: string;
-    interestRate: string;
+    interestRate?: string;
+    monthlyDeposit?: string;
     accountType: string;
   }) => {
     const payload = {
       name: data.name.trim(),
       currentBalance: parseFloat(data.currentBalance),
-      interestRate: parseFloat(data.interestRate) || 0,
+      interestRate: data.interestRate ? parseFloat(data.interestRate) : undefined,
+      monthlyDeposit: data.monthlyDeposit ? parseFloat(data.monthlyDeposit) : undefined,
       accountType: data.accountType || null,
       personId: parseInt(personId),
     };
@@ -58,14 +60,16 @@ export const useSavingsAccounts = (personId: string) => {
     data: {
       name: string;
       currentBalance: string;
-      interestRate: string;
+      interestRate?: string;
+      monthlyDeposit?: string;
       accountType: string;
     }
   ) => {
     const payload = {
       name: data.name.trim(),
       currentBalance: parseFloat(data.currentBalance),
-      interestRate: parseFloat(data.interestRate) || 0,
+      interestRate: data.interestRate ? parseFloat(data.interestRate) : undefined,
+      monthlyDeposit: data.monthlyDeposit ? parseFloat(data.monthlyDeposit) : undefined,
       accountType: data.accountType || null,
       personId: parseInt(personId),
     };

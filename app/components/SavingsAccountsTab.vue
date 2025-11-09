@@ -71,6 +71,7 @@
               size="sm"
               variant="ghost"
               icon="i-heroicons-pencil"
+              :data-testid="`savings-${account.id}-edit-button`"
               @click="editSavings(account)"
             />
             <UButton
@@ -78,6 +79,7 @@
               variant="ghost"
               color="error"
               icon="i-heroicons-trash"
+              :data-testid="`savings-${account.id}-delete-button`"
               @click="deleteSavings(account)"
             />
           </div>
@@ -140,8 +142,8 @@ const editSavings = (account: SelectSavingsAccount) => {
 const handleSavingsSubmit = async (formData: {
   name: string;
   currentBalance: string;
-  interestRate: string;
-  monthlyDeposit: string;
+  interestRate?: string;
+  monthlyDeposit?: string;
   accountType: string;
 }) => {
   isSavingsSubmitting.value = true;

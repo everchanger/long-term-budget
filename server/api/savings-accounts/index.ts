@@ -1,6 +1,9 @@
 import { successResponse } from "../../utils/api-response";
-import { eq, inArray, and } from "drizzle-orm";
-import { getUserPersons } from "../../utils/authorization";
+import { eq, inArray } from "drizzle-orm";
+import {
+  getUserPersons,
+  verifyPersonAccessOrThrow,
+} from "../../utils/authorization";
 import { parseQueryInt } from "../../utils/api-helpers";
 
 export default defineEventHandler(async (event) => {
@@ -22,27 +25,7 @@ export default defineEventHandler(async (event) => {
 
     if (personId) {
       // Verify that the person belongs to the authenticated user's household
-      const [personExists] = await db
-        .select({ id: tables.persons.id })
-        .from(tables.persons)
-        .innerJoin(
-          tables.households,
-          eq(tables.persons.householdId, tables.households.id)
-        )
-        .where(
-          and(
-            eq(tables.persons.id, personId),
-            eq(tables.households.userId, session.user.id)
-          )
-        );
-
-      if (!personExists) {
-        throw createError({
-          statusCode: 403,
-          statusMessage:
-            "Access denied: Person does not belong to your household",
-        });
-      }
+      await verifyPersonAccessOrThrow(session, personId, db);
 
       const result = await db
         .select()
@@ -107,27 +90,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Verify that the person belongs to the authenticated user's household
-    const [personExists] = await db
-      .select({ id: tables.persons.id })
-      .from(tables.persons)
-      .innerJoin(
-        tables.households,
-        eq(tables.persons.householdId, tables.households.id)
-      )
-      .where(
-        and(
-          eq(tables.persons.id, personId),
-          eq(tables.households.userId, session.user.id)
-        )
-      );
-
-    if (!personExists) {
-      throw createError({
-        statusCode: 403,
-        statusMessage:
-          "Access denied: Person does not belong to your household",
-      });
-    }
+    await verifyPersonAccessOrThrow(session, personId, db);
 
     const [result] = await db
       .insert(tables.savingsAccounts)

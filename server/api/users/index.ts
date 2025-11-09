@@ -4,9 +4,10 @@ import { successResponse } from "../../utils/api-response";
 
 export default defineEventHandler(async (event) => {
   const db = useDrizzle();
+  const method = getMethod(event);
 
   try {
-    if (event.node.req.method === "GET") {
+    if (method === "GET") {
       // Get all users
       const users = await db
         .select({
@@ -21,7 +22,7 @@ export default defineEventHandler(async (event) => {
       return successResponse(users);
     }
 
-    if (event.node.req.method === "POST") {
+    if (method === "POST") {
       // Create a new user
       const body = await readBody(event);
 

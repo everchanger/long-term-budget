@@ -14,8 +14,21 @@ export default defineEventHandler(async (event) => {
 
     // Add session to event context so API routes can access it
     event.context.session = session;
-  } catch {
-    // Log the error but don't throw - let individual routes handle auth requirements
+
+    // Log session structure in development for debugging
+    if (process.env.NODE_ENV === "development" && session) {
+      console.debug("Session structure:", {
+        hasUser: !!session.user,
+        userId: session.user?.id,
+        hasSession: !!session.session,
+      });
+    }
+  } catch (error) {
+    // Log the error in development for debugging
+    if (process.env.NODE_ENV === "development") {
+      console.debug("Auth middleware error:", error);
+    }
+    // Let individual routes handle auth requirements
     event.context.session = null;
   }
 });

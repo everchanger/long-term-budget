@@ -135,6 +135,7 @@
                       variant="solid"
                       icon="i-heroicons-chart-bar"
                       class="w-full sm:w-auto justify-center"
+                      :data-testid="`person-${member.id}-manage-button`"
                     >
                       Manage Finances
                     </UButton>

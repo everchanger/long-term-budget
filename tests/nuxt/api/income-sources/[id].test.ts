@@ -180,9 +180,9 @@ describe("/api/income-sources/[id] integration tests", async () => {
             name: "Updated Freelance",
             amount: "2500",
             frequency: "weekly",
-            start_date: "2024-01-01",
-            end_date: "2024-12-31",
-            is_active: true,
+            startDate: "2024-01-01",
+            endDate: "2024-12-31",
+            isActive: true,
           },
         }
       );
@@ -283,7 +283,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
         {
           method: "POST",
           body: {
-            person_id: testUsers.user1.persons[0].id,
+            personId: testUsers.user1.persons[0].id,
             name: "Test Update Income",
             amount: "1000",
             frequency: "monthly",
@@ -326,7 +326,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
         {
           method: "POST",
           body: {
-            person_id: testUsers.user1.persons[0].id,
+            personId: testUsers.user1.persons[0].id,
             name: "To Delete Income",
             amount: "1000",
             frequency: "monthly",
@@ -354,7 +354,7 @@ describe("/api/income-sources/[id] integration tests", async () => {
         {
           method: "POST",
           body: {
-            person_id: testUsers.user1.persons[0].id,
+            personId: testUsers.user1.persons[0].id,
             name: "Delete Test Income",
             amount: "1000",
             frequency: "monthly",

@@ -70,6 +70,7 @@
               size="sm"
               variant="ghost"
               icon="i-heroicons-pencil"
+              :data-testid="`loan-${loan.id}-edit-button`"
               @click="editLoan(loan)"
             />
             <UButton
@@ -77,6 +78,7 @@
               variant="ghost"
               color="error"
               icon="i-heroicons-trash"
+              :data-testid="`loan-${loan.id}-delete-button`"
               @click="deleteLoan(loan)"
             />
           </div>

@@ -15,8 +15,9 @@ export default defineEventHandler(async (event) => {
   const personId = parseIdParam(event, "id", "Invalid person ID");
 
   const db = useDrizzle();
+  const method = getMethod(event);
 
-  if (event.node.req.method === "GET") {
+  if (method === "GET") {
     // Get person and verify ownership through household
     const [person] = await db
       .select({
@@ -49,7 +50,7 @@ export default defineEventHandler(async (event) => {
     return successResponse(person);
   }
 
-  if (event.node.req.method === "PUT") {
+  if (method === "PUT") {
     // Update person - first verify ownership through household
     const body = await readBody(event);
     const { name, age } = body;
@@ -99,7 +100,7 @@ export default defineEventHandler(async (event) => {
     return successResponse(updatedPerson);
   }
 
-  if (event.node.req.method === "DELETE") {
+  if (method === "DELETE") {
     // Verify person belongs to user's household before deleting
     const [personExists] = await db
       .select({ id: tables.persons.id })

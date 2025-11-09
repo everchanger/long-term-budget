@@ -160,7 +160,7 @@ async function seedTestUser() {
       body: JSON.stringify({
         name: 'Alice',
         age: 30,
-        household_id: householdId,
+        householdId: householdId,
       }),
     });
     
@@ -182,7 +182,7 @@ async function seedTestUser() {
       body: JSON.stringify({
         name: 'Bob',
         age: 32,
-        household_id: householdId,
+        householdId: householdId,
       }),
     });
     
@@ -202,11 +202,11 @@ async function seedTestUser() {
         'Cookie': `better-auth.session_token=${sessionCookie}`,
       },
       body: JSON.stringify({
-        person_id: alice.id,
+        personId: alice.id,
         name: 'Software Engineer Salary',
         amount: '5000',
         frequency: 'monthly',
-        is_active: true,
+        isActive: true,
       }),
     });
     
@@ -222,11 +222,11 @@ async function seedTestUser() {
         'Cookie': `better-auth.session_token=${sessionCookie}`,
       },
       body: JSON.stringify({
-        person_id: bob.id,
+        personId: bob.id,
         name: 'Product Manager Salary',
         amount: '6000',
         frequency: 'monthly',
-        is_active: true,
+        isActive: true,
       }),
     });
     

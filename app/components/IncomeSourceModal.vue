@@ -40,6 +40,7 @@
             min="0"
             placeholder="0.00"
             required
+            data-testid="income-amount-input"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
         </div>
@@ -73,6 +74,7 @@
         <UButton
           :loading="loading"
           :disabled="!isFormValid"
+          data-testid="income-modal-submit-button"
           @click="handleSubmit"
         >
           {{ isEditing ? "Update" : "Add" }}

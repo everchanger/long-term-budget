@@ -387,7 +387,8 @@ describe("/api/broker-accounts integration tests", async () => {
 
       expect(response).toMatchObject({
         statusCode: 403,
-        statusMessage: "Forbidden",
+        statusMessage:
+          "Access denied: Person does not belong to your household",
         message: "Access denied: Person does not belong to your household",
       });
     });

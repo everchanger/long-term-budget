@@ -68,6 +68,7 @@
               size="sm"
               variant="ghost"
               icon="i-heroicons-pencil"
+              :data-testid="`income-${income.id}-edit-button`"
               @click="editIncome(income)"
             />
             <UButton
@@ -75,6 +76,7 @@
               variant="ghost"
               color="error"
               icon="i-heroicons-trash"
+              :data-testid="`income-${income.id}-delete-button`"
               @click="deleteIncome(income)"
             />
           </div>

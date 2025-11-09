@@ -12,9 +12,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDrizzle();
+  const method = getMethod(event);
 
   try {
-    if (event.node.req.method === "GET") {
+    if (method === "GET") {
       // Get specific user
       const [user] = await db
         .select({
@@ -36,7 +37,7 @@ export default defineEventHandler(async (event) => {
       return successResponse(user);
     }
 
-    if (event.node.req.method === "PUT") {
+    if (method === "PUT") {
       // Update user
       const body = await readBody(event);
 
@@ -64,7 +65,7 @@ export default defineEventHandler(async (event) => {
       return successResponse(updatedUser);
     }
 
-    if (event.node.req.method === "DELETE") {
+    if (method === "DELETE") {
       // Delete user
       const [deletedUser] = await db
         .delete(tables.users)

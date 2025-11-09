@@ -1,5 +1,6 @@
 import { successResponse } from "../../utils/api-response";
 import { parseQueryInt } from "../../utils/api-helpers";
+import { verifyPersonAccessOrThrow } from "../../utils/authorization";
 
 export default defineEventHandler(async (event) => {
   // Get session from middleware
@@ -19,27 +20,7 @@ export default defineEventHandler(async (event) => {
 
     // Verify that the person belongs to the authenticated user's household
     const db = useDrizzle();
-    const [personExists] = await db
-      .select({ id: tables.persons.id })
-      .from(tables.persons)
-      .innerJoin(
-        tables.households,
-        eq(tables.persons.householdId, tables.households.id)
-      )
-      .where(
-        and(
-          eq(tables.persons.id, personId),
-          eq(tables.households.userId, session.user.id)
-        )
-      );
-
-    if (!personExists) {
-      throw createError({
-        statusCode: 403,
-        statusMessage:
-          "Access denied: Person does not belong to your household",
-      });
-    }
+    await verifyPersonAccessOrThrow(session, personId, db);
 
     const result = await db
       .select()
@@ -87,27 +68,7 @@ export default defineEventHandler(async (event) => {
 
     // Verify that the person belongs to the authenticated user's household
     const db = useDrizzle();
-    const [personExists] = await db
-      .select({ id: tables.persons.id })
-      .from(tables.persons)
-      .innerJoin(
-        tables.households,
-        eq(tables.persons.householdId, tables.households.id)
-      )
-      .where(
-        and(
-          eq(tables.persons.id, personId),
-          eq(tables.households.userId, session.user.id)
-        )
-      );
-
-    if (!personExists) {
-      throw createError({
-        statusCode: 403,
-        statusMessage:
-          "Access denied: Person does not belong to your household",
-      });
-    }
+    await verifyPersonAccessOrThrow(session, personId, db);
 
     const result = await db
       .insert(tables.loans)

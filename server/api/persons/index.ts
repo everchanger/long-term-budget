@@ -4,8 +4,9 @@ import { successResponse } from "../../utils/api-response";
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
   const db = useDrizzle();
+  const method = getMethod(event);
 
-  if (event.node.req.method === "GET") {
+  if (method === "GET") {
     if (!session?.user?.id) {
       throw createError({
         statusCode: 401,
@@ -47,21 +48,21 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  if (event.node.req.method === "POST") {
+  if (method === "POST") {
     // Create a new person
     const body = await readBody(event);
-    const { name, age, household_id } = body;
+    const { name, age, householdId } = body;
 
-    if (!name || !household_id) {
+    if (!name || !householdId) {
       throw createError({
         statusCode: 400,
-        statusMessage: "Name and household_id are required",
+        statusMessage: "Name and householdId are required",
       });
     }
 
     // Verify household exists and belongs to the user
     try {
-      await verifyHouseholdAccessOrThrow(session, household_id, db);
+      await verifyHouseholdAccessOrThrow(session, householdId, db);
     } catch (error) {
       // Convert 404 to 400 for POST requests (invalid input)
       if (
@@ -84,7 +85,7 @@ export default defineEventHandler(async (event) => {
         .values({
           name,
           age: age || null,
-          householdId: household_id,
+          householdId,
         })
         .returning();
 

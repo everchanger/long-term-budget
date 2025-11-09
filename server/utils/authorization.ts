@@ -2,12 +2,10 @@
 // Type Definitions
 // ============================================================================
 
-/** User session type for authorization checks */
-export type UserSession = {
-  user?: {
-    id?: string;
-  };
-};
+import type { Session } from "~~/lib/auth";
+
+/** User session type for authorization checks - matches Better-Auth structure */
+export type UserSession = Session;
 
 export interface AuthorizedPerson {
   id: number;

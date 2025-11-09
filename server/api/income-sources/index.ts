@@ -1,4 +1,7 @@
-import { getUserPersons } from "@s/utils/authorization";
+import {
+  getUserPersons,
+  verifyPersonAccessOrThrow,
+} from "@s/utils/authorization";
 import { parseQueryInt } from "../../utils/api-helpers";
 import { successResponse } from "../../utils/api-response";
 
@@ -14,34 +17,15 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDrizzle();
+  const method = getMethod(event);
 
-  if (event.node.req.method === "GET") {
+  if (method === "GET") {
     // Get all income sources for a specific person
     const personId = parseQueryInt(event, "personId");
 
     if (personId) {
       // Verify person belongs to user's household
-      const [personExists] = await db
-        .select({ id: tables.persons.id })
-        .from(tables.persons)
-        .innerJoin(
-          tables.households,
-          eq(tables.persons.householdId, tables.households.id)
-        )
-        .where(
-          and(
-            eq(tables.persons.id, personId),
-            eq(tables.households.userId, session.user.id)
-          )
-        );
-
-      if (!personExists) {
-        throw createError({
-          statusCode: 403,
-          statusMessage:
-            "Access denied: Person does not belong to your household",
-        });
-      }
+      await verifyPersonAccessOrThrow(session, personId, db);
 
       const incomeSources = await db
         .select()
@@ -72,59 +56,32 @@ export default defineEventHandler(async (event) => {
     return successResponse(incomeSources);
   }
 
-  if (event.node.req.method === "POST") {
+  if (method === "POST") {
     // Create a new income source
     const body = await readBody(event);
-    const {
-      person_id,
-      name,
-      amount,
-      frequency,
-      start_date,
-      end_date,
-      is_active,
-    } = body;
+    const { personId, name, amount, frequency, startDate, endDate, isActive } =
+      body;
 
-    if (!name || !amount || !frequency || !person_id) {
+    if (!name || !amount || !frequency || !personId) {
       throw createError({
         statusCode: 400,
-        statusMessage: "Name, amount, frequency, and person_id are required",
+        statusMessage: "Name, amount, frequency, and personId are required",
       });
     }
 
     // Verify person belongs to user's household
-    const [personExists] = await db
-      .select({ id: tables.persons.id })
-      .from(tables.persons)
-      .innerJoin(
-        tables.households,
-        eq(tables.persons.householdId, tables.households.id)
-      )
-      .where(
-        and(
-          eq(tables.persons.id, person_id),
-          eq(tables.households.userId, session.user.id)
-        )
-      );
-
-    if (!personExists) {
-      throw createError({
-        statusCode: 403,
-        statusMessage:
-          "Access denied: Person does not belong to your household",
-      });
-    }
+    await verifyPersonAccessOrThrow(session, personId, db);
 
     const [newIncomeSource] = await db
       .insert(tables.incomeSources)
       .values({
-        personId: person_id,
+        personId,
         name,
         amount,
         frequency,
-        startDate: start_date ? new Date(start_date) : null,
-        endDate: end_date ? new Date(end_date) : null,
-        isActive: is_active ?? true,
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null,
+        isActive: isActive ?? true,
       })
       .returning();
 

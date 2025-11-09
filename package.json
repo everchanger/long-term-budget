@@ -13,6 +13,10 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "test:e2e": "./scripts/e2e-tests.sh",
+    "test:e2e:playwright": "npm run dev:up && playwright test",
+    "test:e2e:playwright:report": "playwright test",
+    "test:e2e:playwright:ui": "playwright test --ui",
+    "test:e2e:playwright:debug": "playwright test --debug",
     "test:unit": "vitest run --project unit",
     "test:db:setup": "node scripts/test-db-setup.js",
     "test:db:teardown": "node scripts/test-db-teardown.js",
@@ -43,6 +47,7 @@
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.2",
     "@nuxt/test-utils": "^3.19.2",
+    "@playwright/test": "^1.56.1",
     "@vue/test-utils": "^2.4.6",
     "dotenv": "^17.2.2",
     "happy-dom": "^18.0.1",

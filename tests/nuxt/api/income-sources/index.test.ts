@@ -170,7 +170,7 @@ describe("/api/income-sources integration tests", async () => {
         await $fetch("/api/income-sources", {
           method: "POST",
           body: {
-            person_id: testUsers.user1.persons[0].id,
+            personId: testUsers.user1.persons[0].id,
             name: "Test Income",
             amount: "3000",
             frequency: "monthly",
@@ -190,7 +190,7 @@ describe("/api/income-sources integration tests", async () => {
           method: "POST",
           body: {
             // Missing required fields
-            person_id: testUsers.user1.persons[0].id,
+            personId: testUsers.user1.persons[0].id,
           },
         });
         expect.fail("Should have thrown 400 error");
@@ -198,7 +198,7 @@ describe("/api/income-sources integration tests", async () => {
         const fetchError = error as FetchError;
         expect(fetchError.status).toBe(400);
         expect(fetchError.statusText).toContain(
-          "Name, amount, frequency, and person_id are required"
+          "Name, amount, frequency, and personId are required"
         );
       }
     });
@@ -209,7 +209,7 @@ describe("/api/income-sources integration tests", async () => {
         await authenticatedFetch(testUsers.user1, "/api/income-sources", {
           method: "POST",
           body: {
-            person_id: testUsers.user2.persons[0].id, // user2's person!
+            personId: testUsers.user2.persons[0].id, // user2's person!
             name: "Malicious Income",
             amount: "1000",
             frequency: "monthly",
@@ -232,13 +232,13 @@ describe("/api/income-sources integration tests", async () => {
         {
           method: "POST",
           body: {
-            person_id: testUsers.user1.persons[0].id,
+            personId: testUsers.user1.persons[0].id,
             name: "New Side Hustle",
             amount: "1500",
             frequency: "weekly",
-            start_date: "2024-01-01",
-            end_date: "2024-12-31",
-            is_active: true,
+            startDate: "2024-01-01",
+            endDate: "2024-12-31",
+            isActive: true,
           },
         }
       );
@@ -263,7 +263,7 @@ describe("/api/income-sources integration tests", async () => {
         {
           method: "POST",
           body: {
-            person_id: testUsers.user1.persons[1].id,
+            personId: testUsers.user1.persons[1].id,
             name: "Minimal Income",
             amount: "500",
             frequency: "monthly",

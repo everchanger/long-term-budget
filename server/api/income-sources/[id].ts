@@ -28,15 +28,17 @@ export default defineEventHandler(async (event) => {
   // Verify that the income source's person belongs to the authenticated user's household
   await verifyPersonAccessOrThrow(session, existingIncomeSource.personId, db);
 
-  if (event.node.req.method === "GET") {
+  const method = getMethod(event);
+
+  if (method === "GET") {
     // Return the income source
     return successResponse(existingIncomeSource);
   }
 
-  if (event.node.req.method === "PUT") {
+  if (method === "PUT") {
     // Update income source
     const body = await readBody(event);
-    const { name, amount, frequency, start_date, end_date, is_active } = body;
+    const { name, amount, frequency, startDate, endDate, isActive } = body;
 
     if (!name || !amount || !frequency) {
       throw createError({
@@ -51,9 +53,9 @@ export default defineEventHandler(async (event) => {
         name,
         amount: amount.toString(),
         frequency,
-        startDate: start_date ? new Date(start_date) : null,
-        endDate: end_date ? new Date(end_date) : null,
-        isActive: is_active ?? true,
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null,
+        isActive: isActive ?? true,
       })
       .where(eq(tables.incomeSources.id, incomeSourceId))
       .returning();
@@ -68,7 +70,7 @@ export default defineEventHandler(async (event) => {
     return successResponse(updatedIncomeSource);
   }
 
-  if (event.node.req.method === "DELETE") {
+  if (method === "DELETE") {
     // Delete income source
     const [deletedIncomeSource] = await db
       .delete(tables.incomeSources)
