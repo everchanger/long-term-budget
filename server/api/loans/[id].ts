@@ -1,6 +1,10 @@
 import { successResponse, deleteResponse } from "../../utils/api-response";
 import { parseIdParam } from "../../utils/api-helpers";
 import { verifyPersonAccessOrThrow } from "../../utils/authorization";
+import {
+  percentageToDecimal,
+  convertInterestRateForDisplay,
+} from "../../utils/interest-rate";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
@@ -28,12 +32,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === "GET") {
     // Convert decimal interest rate to percentage for display
-    const converted = {
-      ...existingLoan,
-      interestRate: String(
-        Math.round(Number(existingLoan.interestRate) * 100 * 100) / 100
-      ),
-    };
+    const converted = convertInterestRateForDisplay(existingLoan);
     return successResponse(converted);
   }
 
@@ -69,7 +68,7 @@ export default defineEventHandler(async (event) => {
         name,
         originalAmount,
         currentBalance,
-        interestRate: String(Number(interestRate) / 100), // Convert percentage to decimal
+        interestRate: percentageToDecimal(interestRate), // Convert percentage to decimal
         monthlyPayment,
         loanType,
         startDate: startDate ? new Date(startDate) : new Date(),
@@ -86,12 +85,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Convert decimal interest rate back to percentage for response
-    const converted = {
-      ...updatedLoan,
-      interestRate: String(
-        Math.round(Number(updatedLoan.interestRate) * 100 * 100) / 100
-      ),
-    };
+    const converted = convertInterestRateForDisplay(updatedLoan);
 
     return successResponse(converted);
   }

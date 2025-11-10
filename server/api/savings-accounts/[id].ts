@@ -1,6 +1,10 @@
 import { successResponse, deleteResponse } from "../../utils/api-response";
 import { parseIdParam } from "../../utils/api-helpers";
 import { verifyPersonAccessOrThrow } from "../../utils/authorization";
+import {
+  percentageToDecimal,
+  convertInterestRateForDisplay,
+} from "../../utils/interest-rate";
 
 export default defineEventHandler(async (event) => {
   const session = event.context.session;
@@ -28,14 +32,7 @@ export default defineEventHandler(async (event) => {
 
   if (method === "GET") {
     // Convert decimal interest rate to percentage for display
-    const converted = {
-      ...existingAccount,
-      interestRate: existingAccount.interestRate
-        ? String(
-            Math.round(Number(existingAccount.interestRate) * 100 * 100) / 100
-          )
-        : existingAccount.interestRate,
-    };
+    const converted = convertInterestRateForDisplay(existingAccount);
     return successResponse(converted);
   }
 
@@ -56,7 +53,7 @@ export default defineEventHandler(async (event) => {
       .set({
         name,
         currentBalance,
-        interestRate: interestRate ? String(Number(interestRate) / 100) : null, // Convert percentage to decimal
+        interestRate: interestRate ? percentageToDecimal(interestRate) : null, // Convert percentage to decimal
         accountType,
         monthlyDeposit:
           monthlyDeposit !== undefined ? monthlyDeposit || null : undefined,
@@ -72,14 +69,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Convert decimal interest rate back to percentage for response
-    const converted = {
-      ...updatedAccount,
-      interestRate: updatedAccount.interestRate
-        ? String(
-            Math.round(Number(updatedAccount.interestRate) * 100 * 100) / 100
-          )
-        : updatedAccount.interestRate,
-    };
+    const converted = convertInterestRateForDisplay(updatedAccount);
 
     return successResponse(converted);
   }

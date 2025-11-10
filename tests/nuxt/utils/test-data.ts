@@ -15,6 +15,7 @@ import {
 } from "../../../database/schema";
 import { db } from "../../../server/utils/drizzle";
 import { auth } from "../../../lib/auth";
+import { percentageToDecimal } from "../../../server/utils/interest-rate";
 
 // Infer types from Drizzle schemas
 type User = InferSelectModel<typeof users>;
@@ -271,7 +272,7 @@ export class TestDataBuilder {
         name: data?.name || "Test Savings",
         currentBalance: data?.currentBalance || "10000",
         interestRate: data?.interestRate
-          ? String(Number(data.interestRate) / 100)
+          ? percentageToDecimal(data.interestRate)
           : "0.0002", // Convert percentage to decimal (default: 0.02% = 0.0002)
         accountType: data?.accountType || "savings",
         monthlyDeposit: data?.monthlyDeposit || null,
@@ -305,7 +306,7 @@ export class TestDataBuilder {
     const originalAmount = data?.originalAmount || "25000";
     const currentBalance = data?.currentBalance || originalAmount;
     const interestRate = data?.interestRate
-      ? String(Number(data.interestRate) / 100)
+      ? percentageToDecimal(data.interestRate)
       : "0.0005"; // Convert percentage to decimal (default: 0.05% = 0.0005)
     const monthlyPayment =
       data?.monthlyPayment || (parseFloat(originalAmount) * 0.01).toString(); // Default to 1% of original

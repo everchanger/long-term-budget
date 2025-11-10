@@ -5,6 +5,10 @@ import {
   verifyPersonAccessOrThrow,
 } from "../../utils/authorization";
 import { parseQueryInt } from "../../utils/api-helpers";
+import {
+  percentageToDecimal,
+  convertInterestRateForDisplay,
+} from "../../utils/interest-rate";
 
 export default defineEventHandler(async (event) => {
   // Get session from middleware
@@ -33,12 +37,7 @@ export default defineEventHandler(async (event) => {
         .where(eq(tables.savingsAccounts.personId, personId));
 
       // Convert decimal interest rates to percentages for display
-      const converted = result.map((account) => ({
-        ...account,
-        interestRate: account.interestRate
-          ? String(Math.round(Number(account.interestRate) * 100 * 100) / 100)
-          : account.interestRate,
-      }));
+      const converted = result.map(convertInterestRateForDisplay);
 
       return successResponse(converted);
     } else {
@@ -60,12 +59,7 @@ export default defineEventHandler(async (event) => {
         );
 
       // Convert decimal interest rates to percentages for display
-      const converted = result.map((account) => ({
-        ...account,
-        interestRate: account.interestRate
-          ? String(Math.round(Number(account.interestRate) * 100 * 100) / 100)
-          : account.interestRate,
-      }));
+      const converted = result.map(convertInterestRateForDisplay);
 
       return successResponse(converted);
     }
@@ -97,7 +91,7 @@ export default defineEventHandler(async (event) => {
       .values({
         name,
         currentBalance,
-        interestRate: interestRate ? String(Number(interestRate) / 100) : null, // Convert percentage to decimal
+        interestRate: interestRate ? percentageToDecimal(interestRate) : null, // Convert percentage to decimal
         monthlyDeposit: monthlyDeposit || null,
         accountType,
         personId: personId,
@@ -105,12 +99,7 @@ export default defineEventHandler(async (event) => {
       .returning();
 
     // Convert decimal interest rate back to percentage for response
-    const converted = {
-      ...result,
-      interestRate: result.interestRate
-        ? String(Math.round(Number(result.interestRate) * 100 * 100) / 100)
-        : result.interestRate,
-    };
+    const converted = convertInterestRateForDisplay(result);
 
     return successResponse(converted);
   }
