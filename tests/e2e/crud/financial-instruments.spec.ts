@@ -1,13 +1,12 @@
-import { test, expect, createTestData, cleanupTestData } from "./fixtures";
+import { test, expect, createTestData, cleanupTestData } from "../fixtures";
 
 /**
- * E2E tests for financial instruments management
+ * E2E tests for financial instruments CRUD operations
  *
- * Tests the complete flow of managing income sources, savings accounts,
- * and loans for household members using proper Playwright patterns.
+ * Tests creating, reading, updating, and deleting income sources, savings accounts, and loans
  */
 
-test.describe("Financial Instruments Management", () => {
+test.describe("Financial Instruments CRUD", () => {
   test("should successfully navigate to Economy page and view financial overview", async ({
     authenticatedPage: page,
   }) => {
@@ -26,7 +25,90 @@ test.describe("Financial Instruments Management", () => {
     await expect(page.getByText("Total Debt")).toBeVisible();
   });
 
-  test("should update person's income source", async ({
+  // ===== INCOME SOURCE TESTS =====
+
+  test("should create a new income source", async ({
+    page,
+    request,
+    sessionCookie,
+  }) => {
+    const testData = await createTestData(request, sessionCookie);
+
+    try {
+      // Navigate to person's page
+      await page.goto(`/persons/${testData.person.id}`);
+      await page.waitForLoadState("networkidle");
+
+      // Should be on Income Sources tab by default
+      await expect(
+        page.getByRole("tab", { name: "Income Sources", selected: true })
+      ).toBeVisible();
+
+      // Click "Add Income Source" button
+      await page.getByTestId("add-income-button").click();
+
+      // Wait for modal to open
+      await expect(
+        page.getByRole("heading", { name: /add income source/i })
+      ).toBeVisible();
+
+      // Fill in income details
+      await page.getByTestId("income-source-input").fill("New Salary");
+      await page.getByTestId("income-amount-input").fill("6000");
+      // Select frequency
+      await page.selectOption("#income-frequency", "monthly");
+
+      // Submit form
+      await page.getByTestId("income-modal-submit-button").click();
+
+      // Wait for modal to close
+      await expect(
+        page.getByRole("heading", { name: /add income source/i })
+      ).not.toBeVisible();
+
+      // Verify new income source appears in the list (use heading to avoid toast notification)
+      await expect(
+        page.getByRole("heading", { name: "New Salary", exact: true })
+      ).toBeVisible();
+      await expect(
+        page.getByText("$6000.00 monthly", { exact: true })
+      ).toBeVisible();
+    } finally {
+      await cleanupTestData(request, sessionCookie, testData.person.id);
+    }
+  });
+
+  test("should delete an income source", async ({
+    page,
+    request,
+    sessionCookie,
+  }) => {
+    const testData = await createTestData(request, sessionCookie);
+
+    try {
+      // Navigate to person's page
+      await page.goto(`/persons/${testData.person.id}`);
+      await page.waitForLoadState("networkidle");
+
+      // Verify income exists
+      await page.waitForSelector(
+        `[data-testid="income-${testData.income.id}-edit-button"]`
+      );
+      await expect(page.getByText("$5000.00 monthly")).toBeVisible();
+
+      // Click delete button for income
+      await page
+        .getByTestId(`income-${testData.income.id}-delete-button`)
+        .click();
+
+      // Verify income is removed (no confirmation dialog - deletes immediately)
+      await expect(page.getByText("$5000.00 monthly")).not.toBeVisible();
+    } finally {
+      await cleanupTestData(request, sessionCookie, testData.person.id);
+    }
+  });
+
+  test("should update an income source", async ({
     page,
     request,
     sessionCookie,
@@ -89,7 +171,98 @@ test.describe("Financial Instruments Management", () => {
     }
   });
 
-  test("should update person's savings account", async ({
+  // ===== SAVINGS ACCOUNT TESTS =====
+
+  test("should create a new savings account", async ({
+    page,
+    request,
+    sessionCookie,
+  }) => {
+    const testData = await createTestData(request, sessionCookie);
+
+    try {
+      // Navigate to person's page
+      await page.goto(`/persons/${testData.person.id}`);
+      await page.waitForLoadState("networkidle");
+
+      // Click Savings tab
+      await page.getByRole("tab", { name: "Savings" }).click();
+
+      // Click "Add Savings Account" button
+      await page.getByTestId("add-savings-button").click();
+
+      // Wait for modal to open
+      await expect(
+        page.getByRole("heading", { name: /add savings account/i })
+      ).toBeVisible();
+
+      // Fill in savings account details
+      await page.getByTestId("savings-name-input").fill("New Savings");
+      await page.getByTestId("savings-current-balance-input").fill("10000.00");
+      await page.getByTestId("savings-monthly-deposit-input").fill("500.00");
+      await page.getByTestId("savings-interest-rate-input").fill("2.5");
+
+      // Submit form
+      await Promise.all([
+        page.waitForResponse(
+          (response) =>
+            response.url().includes("/api/savings-accounts") &&
+            response.status() === 200
+        ),
+        page.getByTestId("savings-modal-submit-button").click(),
+      ]);
+
+      // Wait for modal to close
+      await expect(
+        page.getByRole("heading", { name: /add savings account/i })
+      ).not.toBeVisible();
+
+      // Verify new savings account appears
+      await expect(
+        page.getByRole("heading", { name: "New Savings" })
+      ).toBeVisible();
+      await expect(page.getByText(/\$10,?000/)).toBeVisible();
+    } finally {
+      await cleanupTestData(request, sessionCookie, testData.person.id);
+    }
+  });
+
+  test("should delete a savings account", async ({
+    page,
+    request,
+    sessionCookie,
+  }) => {
+    const testData = await createTestData(request, sessionCookie);
+
+    try {
+      // Navigate to person's page
+      await page.goto(`/persons/${testData.person.id}`);
+      await page.waitForLoadState("networkidle");
+
+      // Click Savings tab
+      await page.getByRole("tab", { name: "Savings" }).click();
+
+      // Wait for savings account to load
+      await page.waitForSelector(
+        `[data-testid="savings-${testData.savings.id}-delete-button"]`
+      );
+      await expect(page.getByText("Test Savings")).toBeVisible();
+
+      // Click delete button
+      await page
+        .getByTestId(`savings-${testData.savings.id}-delete-button`)
+        .click();
+
+      // Verify savings account is removed (no confirmation dialog)
+      await expect(
+        page.getByRole("heading", { name: "Test Savings" })
+      ).not.toBeVisible();
+    } finally {
+      await cleanupTestData(request, sessionCookie, testData.person.id);
+    }
+  });
+
+  test("should update a savings account", async ({
     page,
     request,
     sessionCookie,
@@ -154,11 +327,89 @@ test.describe("Financial Instruments Management", () => {
     }
   });
 
-  test("should update person's loan", async ({
-    page,
-    request,
-    sessionCookie,
-  }) => {
+  // ===== LOAN TESTS =====
+
+  test("should create a new loan", async ({ page, request, sessionCookie }) => {
+    const testData = await createTestData(request, sessionCookie);
+
+    try {
+      // Navigate to person's page
+      await page.goto(`/persons/${testData.person.id}`);
+      await page.waitForLoadState("networkidle");
+
+      // Click Loans & Debts tab
+      await page.getByRole("tab", { name: "Loans & Debts" }).click();
+
+      // Click "Add Loan" button
+      await page.getByTestId("add-loan-button").click();
+
+      // Wait for modal to open
+      await expect(
+        page.getByRole("heading", { name: /add loan/i })
+      ).toBeVisible();
+
+      // Fill in loan details
+      await page.getByTestId("loan-name-input").fill("New Loan");
+      await page.getByTestId("loan-principal-input").fill("30000.00");
+      // Current balance is also required (ID: loan-current-balance)
+      await page.locator("#loan-current-balance").fill("30000.00");
+      await page.getByTestId("loan-monthly-payment-input").fill("500.00");
+      await page.getByTestId("loan-interest-rate-input").fill("3.5");
+
+      // Submit form
+      await Promise.all([
+        page.waitForResponse(
+          (response) =>
+            response.url().includes("/api/loans") && response.status() === 200
+        ),
+        page.getByTestId("loan-modal-submit-button").click(),
+      ]);
+
+      // Wait for modal to close
+      await expect(
+        page.getByRole("heading", { name: /add loan/i })
+      ).not.toBeVisible();
+
+      // Verify new loan appears
+      await expect(
+        page.getByRole("heading", { name: "New Loan" })
+      ).toBeVisible();
+      await expect(page.getByText(/\$30,?000/)).toBeVisible();
+    } finally {
+      await cleanupTestData(request, sessionCookie, testData.person.id);
+    }
+  });
+
+  test("should delete a loan", async ({ page, request, sessionCookie }) => {
+    const testData = await createTestData(request, sessionCookie);
+
+    try {
+      // Navigate to person's page
+      await page.goto(`/persons/${testData.person.id}`);
+      await page.waitForLoadState("networkidle");
+
+      // Click Loans & Debts tab
+      await page.getByRole("tab", { name: "Loans & Debts" }).click();
+
+      // Wait for loan to load
+      await page.waitForSelector(
+        `[data-testid="loan-${testData.loan.id}-delete-button"]`
+      );
+      await expect(page.getByText("Test Loan")).toBeVisible();
+
+      // Click delete button
+      await page.getByTestId(`loan-${testData.loan.id}-delete-button`).click();
+
+      // Verify loan is removed (no confirmation dialog)
+      await expect(
+        page.getByRole("heading", { name: "Test Loan" })
+      ).not.toBeVisible();
+    } finally {
+      await cleanupTestData(request, sessionCookie, testData.person.id);
+    }
+  });
+
+  test("should update a loan", async ({ page, request, sessionCookie }) => {
     const testData = await createTestData(request, sessionCookie);
 
     try {
@@ -215,6 +466,8 @@ test.describe("Financial Instruments Management", () => {
       await cleanupTestData(request, sessionCookie, testData.person.id);
     }
   });
+
+  // ===== FULL FLOW TEST =====
 
   test("should complete full flow: modify all financial instruments", async ({
     page,

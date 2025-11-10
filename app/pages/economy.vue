@@ -90,6 +90,7 @@
                   size="sm"
                   variant="soft"
                   icon="i-heroicons-plus"
+                  data-testid="add-person-button"
                   @click="openAddPersonModal"
                 >
                   Add Member
@@ -145,6 +146,7 @@
                       color="error"
                       icon="i-heroicons-trash"
                       class="w-full sm:w-auto justify-center"
+                      :data-testid="`person-${member.id}-delete-button`"
                       @click="openDeletePersonModal(member)"
                       >Delete</UButton
                     >
@@ -172,6 +174,7 @@
                 <UButton
                   variant="soft"
                   icon="i-heroicons-plus"
+                  data-testid="add-person-button"
                   @click="openAddPersonModal"
                 >
                   Add First Member
@@ -618,6 +621,7 @@
                 type="text"
                 placeholder="Enter person's name"
                 required
+                data-testid="person-name-input"
                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
@@ -636,6 +640,7 @@
                 placeholder="Enter age (optional)"
                 min="0"
                 max="120"
+                data-testid="person-age-input"
                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
@@ -648,6 +653,7 @@
             <UButton
               :loading="isPersonSubmitting"
               :disabled="!isPersonFormValid"
+              data-testid="person-modal-submit-button"
               @click="handlePersonSubmit"
             >
               {{ editingPerson ? "Update" : "Add" }} Member
@@ -684,6 +690,7 @@
             <UButton
               color="error"
               :loading="isDeletingPerson"
+              data-testid="confirm-delete-person-button"
               @click="confirmPersonDelete"
             >
               Delete Member
@@ -859,7 +866,7 @@ async function handlePersonSubmit() {
     const payload = {
       name: personFormState.name.trim(),
       age: personFormState.age,
-      household_id: userHousehold.value.id,
+      householdId: userHousehold.value.id,
     };
 
     if (editingPerson.value) {

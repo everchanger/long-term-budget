@@ -21,6 +21,7 @@
             type="text"
             placeholder="e.g., Emergency Fund, High Yield Savings, etc."
             required
+            data-testid="savings-name-input"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
         </div>
@@ -40,6 +41,7 @@
             min="0"
             placeholder="0.00"
             required
+            data-testid="savings-current-balance-input"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
         </div>
@@ -58,6 +60,7 @@
             step="0.01"
             min="0"
             placeholder="2.50"
+            data-testid="savings-interest-rate-input"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
         </div>

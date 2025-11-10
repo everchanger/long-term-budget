@@ -11,7 +11,11 @@
           </p>
         </div>
       </div>
-      <UButton icon="i-heroicons-plus" @click="openSavingsModal">
+      <UButton
+        icon="i-heroicons-plus"
+        data-testid="add-savings-button"
+        @click="openSavingsModal"
+      >
         Add Savings Account
       </UButton>
     </div>
@@ -33,7 +37,12 @@
       <p class="text-neutral-600 dark:text-neutral-400 mb-4">
         Add {{ personName }}'s first savings account to start tracking balances.
       </p>
-      <UButton variant="soft" icon="i-heroicons-plus" @click="openSavingsModal">
+      <UButton
+        variant="soft"
+        icon="i-heroicons-plus"
+        data-testid="add-savings-button"
+        @click="openSavingsModal"
+      >
         Add Savings Account
       </UButton>
     </div>

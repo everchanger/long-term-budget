@@ -36,8 +36,8 @@ export const useIncomeSources = (personId: string) => {
       name: data.name.trim(),
       amount: data.amount,
       frequency: data.frequency,
-      person_id: parseInt(personId),
-      is_active: true,
+      personId: parseInt(personId),
+      isActive: true,
     };
 
     await $fetch("/api/income-sources", {
@@ -60,8 +60,8 @@ export const useIncomeSources = (personId: string) => {
       name: data.name.trim(),
       amount: data.amount,
       frequency: data.frequency,
-      person_id: parseInt(personId),
-      is_active: true,
+      personId: parseInt(personId),
+      isActive: true,
     };
 
     await $fetch(`/api/income-sources/${id}`, {

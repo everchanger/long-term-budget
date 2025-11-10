@@ -11,7 +11,11 @@
           </p>
         </div>
       </div>
-      <UButton icon="i-heroicons-plus" @click="openLoanModal">
+      <UButton
+        icon="i-heroicons-plus"
+        data-testid="add-loan-button"
+        @click="openLoanModal"
+      >
         Add Loan
       </UButton>
     </div>
@@ -33,7 +37,12 @@
       <p class="text-gray-600 dark:text-gray-400 mb-4">
         Add loans and debts to track payments and balances.
       </p>
-      <UButton variant="soft" icon="i-heroicons-plus" @click="openLoanModal">
+      <UButton
+        variant="soft"
+        icon="i-heroicons-plus"
+        data-testid="add-loan-button"
+        @click="openLoanModal"
+      >
         Add Loan
       </UButton>
     </div>

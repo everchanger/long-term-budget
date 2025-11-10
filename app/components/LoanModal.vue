@@ -21,6 +21,7 @@
             type="text"
             placeholder="e.g., Mortgage, Credit Card, etc."
             required
+            data-testid="loan-name-input"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
         </div>
@@ -40,6 +41,7 @@
             min="0"
             placeholder="0.00"
             required
+            data-testid="loan-principal-input"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -83,6 +85,7 @@
             step="0.01"
             min="0"
             placeholder="5.00"
+            data-testid="loan-interest-rate-input"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
         </div>

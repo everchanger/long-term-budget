@@ -11,7 +11,11 @@
           </p>
         </div>
       </div>
-      <UButton icon="i-heroicons-plus" @click="openIncomeModal">
+      <UButton
+        icon="i-heroicons-plus"
+        data-testid="add-income-button"
+        @click="openIncomeModal"
+      >
         Add Income Source
       </UButton>
     </div>
@@ -33,7 +37,12 @@
       <p class="text-neutral-600 dark:text-neutral-400 mb-4">
         Add {{ personName }}'s first income source to get started.
       </p>
-      <UButton variant="soft" icon="i-heroicons-plus" @click="openIncomeModal">
+      <UButton
+        variant="soft"
+        icon="i-heroicons-plus"
+        data-testid="add-income-button"
+        @click="openIncomeModal"
+      >
         Add Income Source
       </UButton>
     </div>
@@ -135,16 +144,22 @@ const editIncome = (income: SelectIncomeSource) => {
 // Handle form submission
 const handleIncomeSubmit = async (formData: {
   name: string;
-  amount: number;
+  amount: string;
   frequency: string;
 }) => {
   isIncomeSubmitting.value = true;
 
   try {
+    const parsedData = {
+      name: formData.name,
+      amount: parseFloat(formData.amount),
+      frequency: formData.frequency,
+    };
+
     if (editingIncomeSource.value) {
-      await updateIncomeSource(editingIncomeSource.value.id, formData);
+      await updateIncomeSource(editingIncomeSource.value.id, parsedData);
     } else {
-      await createIncomeSource(formData);
+      await createIncomeSource(parsedData);
     }
 
     closeIncomeModal();
