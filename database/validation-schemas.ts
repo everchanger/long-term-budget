@@ -11,6 +11,8 @@ import { savingsGoals } from "./schema/savings-goals";
 import { loans } from "./schema/loans";
 import { brokerAccounts } from "./schema/broker-accounts";
 import { scenarios } from "./schema/scenarios";
+import { budgets } from "./schema/budgets";
+import { budgetExpenses } from "./schema/budget-expenses";
 
 // User schemas
 export const insertUserSchema = createInsertSchema(users, {
@@ -265,3 +267,56 @@ export type UpdateSavingsGoal = z.infer<typeof updateSavingsGoalSchema>;
 export type InsertScenario = z.infer<typeof insertScenarioSchema>;
 export type SelectScenario = z.infer<typeof selectScenarioSchema>;
 export type UpdateScenario = z.infer<typeof updateScenarioSchema>;
+
+// Budget schemas
+export const insertBudgetSchema = createInsertSchema(budgets, {
+  name: z
+    .string()
+    .min(1, "Budget name is required")
+    .min(2, "Name must be at least 2 characters"),
+  householdId: z.number().positive("Household ID is required"),
+});
+
+export const selectBudgetSchema = createSelectSchema(budgets);
+
+export const updateBudgetSchema = insertBudgetSchema
+  .partial()
+  .omit({ id: true, createdAt: true, updatedAt: true, householdId: true });
+
+// Budget expense categories
+export const budgetExpenseCategories = [
+  "housing",
+  "utilities",
+  "transportation",
+  "food",
+  "healthcare",
+  "insurance",
+  "debt",
+  "entertainment",
+  "personal",
+  "other",
+] as const;
+
+export type BudgetExpenseCategory = (typeof budgetExpenseCategories)[number];
+
+// Budget Expense schemas
+export const insertBudgetExpenseSchema = createInsertSchema(budgetExpenses, {
+  name: z.string().min(1, "Expense name is required"),
+  amount: positiveDecimalString(),
+  budgetId: z.number().positive("Budget ID is required"),
+  category: z.enum(budgetExpenseCategories).default("other"),
+});
+
+export const selectBudgetExpenseSchema = createSelectSchema(budgetExpenses);
+
+export const updateBudgetExpenseSchema = insertBudgetExpenseSchema
+  .partial()
+  .omit({ id: true, createdAt: true, budgetId: true });
+
+export type InsertBudget = z.infer<typeof insertBudgetSchema>;
+export type SelectBudget = z.infer<typeof selectBudgetSchema>;
+export type UpdateBudget = z.infer<typeof updateBudgetSchema>;
+
+export type InsertBudgetExpense = z.infer<typeof insertBudgetExpenseSchema>;
+export type SelectBudgetExpense = z.infer<typeof selectBudgetExpenseSchema>;
+export type UpdateBudgetExpense = z.infer<typeof updateBudgetExpenseSchema>;

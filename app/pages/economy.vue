@@ -319,6 +319,155 @@
             </div>
           </div>
 
+          <!-- Budget Expenses Section -->
+          <div
+            v-if="userHousehold"
+            class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700"
+          >
+            <div
+              class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div
+                    class="w-8 h-8 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3"
+                  >
+                    <UIcon
+                      name="i-heroicons-currency-dollar"
+                      class="w-4 h-4 text-neutral-600 dark:text-neutral-400"
+                    />
+                  </div>
+                  <div>
+                    <h3
+                      class="text-lg font-medium text-neutral-900 dark:text-white"
+                    >
+                      Fixed Monthly Expenses
+                    </h3>
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                      Rent, utilities, subscriptions, etc.
+                    </p>
+                  </div>
+                </div>
+                <UButton
+                  size="sm"
+                  variant="soft"
+                  icon="i-heroicons-plus"
+                  data-testid="add-budget-expense-button"
+                  @click="openBudgetExpenseModal()"
+                >
+                  Add Expense
+                </UButton>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div v-if="budgetExpensesLoading" class="text-center py-8">
+                <UIcon
+                  name="i-heroicons-arrow-path"
+                  class="animate-spin h-6 w-6 mx-auto mb-2 text-neutral-600"
+                />
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                  Loading expenses...
+                </p>
+              </div>
+
+              <div
+                v-else-if="budgetExpenses.length === 0"
+                class="text-center py-8"
+              >
+                <UIcon
+                  name="i-heroicons-currency-dollar"
+                  class="h-12 w-12 mx-auto mb-3 text-neutral-400"
+                />
+                <p class="text-neutral-600 dark:text-neutral-400 mb-2">
+                  No budget expenses yet
+                </p>
+                <p class="text-sm text-neutral-500 dark:text-neutral-500">
+                  Add fixed monthly expenses like rent and utilities
+                </p>
+              </div>
+
+              <div v-else class="space-y-3">
+                <TransitionGroup name="list" tag="div" class="space-y-3">
+                  <div
+                    v-for="expense in budgetExpenses"
+                    :key="expense.id"
+                    class="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg transition-all hover:shadow-md"
+                    :data-testid="`budget-expense-${expense.id}`"
+                  >
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-10 h-10 bg-white dark:bg-neutral-800 rounded-lg flex items-center justify-center"
+                      >
+                        <UIcon
+                          :name="getCategoryIcon(expense.category)"
+                          class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
+                        />
+                      </div>
+                      <div>
+                        <p class="font-medium text-neutral-900 dark:text-white">
+                          {{ expense.name }}
+                        </p>
+                        <p
+                          class="text-sm text-neutral-600 dark:text-neutral-400"
+                        >
+                          ${{
+                            parseFloat(expense.amount).toLocaleString()
+                          }}/month
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                      <UButton
+                        variant="ghost"
+                        size="sm"
+                        icon="i-heroicons-pencil"
+                        :data-testid="`edit-budget-expense-${expense.id}`"
+                        @click="openBudgetExpenseModal(expense)"
+                      />
+                      <UButton
+                        variant="ghost"
+                        size="sm"
+                        icon="i-heroicons-trash"
+                        :data-testid="`delete-budget-expense-${expense.id}`"
+                        @click="confirmDeleteBudgetExpense(expense)"
+                      />
+                    </div>
+                  </div>
+                </TransitionGroup>
+
+                <!-- Total -->
+                <div
+                  class="pt-3 border-t border-neutral-200 dark:border-neutral-700"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <p
+                      class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
+                    >
+                      Total Monthly Expenses
+                    </p>
+                    <p
+                      class="text-lg font-bold text-neutral-900 dark:text-white"
+                    >
+                      ${{ totalMonthlyExpenses.toLocaleString() }}
+                    </p>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <p class="text-xs text-neutral-500 dark:text-neutral-500">
+                      Projected Annual Cost
+                    </p>
+                    <p
+                      class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
+                    >
+                      ${{ (totalMonthlyExpenses * 12).toLocaleString() }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Savings Goals Section -->
           <div
             v-if="userHousehold && householdMembers.length > 0"
@@ -598,6 +747,13 @@
         @cancel="closeSavingsGoalModal"
       />
 
+      <!-- Budget Expense Modal -->
+      <BudgetExpenseModal
+        v-model:open="isBudgetExpenseModalOpen"
+        :expense="editingBudgetExpense || undefined"
+        @submit="handleBudgetExpenseSubmit"
+      />
+
       <!-- Add/Edit Person Modal -->
       <UModal v-model:open="isPersonModalOpen">
         <template #header>
@@ -704,6 +860,8 @@
 
 <script setup lang="ts">
 import type { ApiSuccessResponse } from "~~/server/utils/api-response";
+import type { BudgetExpense } from "~/composables/useBudgetExpenses";
+import { getCategoryIcon } from "~~/utils/budget-categories";
 
 // Page metadata
 definePageMeta({
@@ -983,6 +1141,91 @@ const {
   markGoalAsCompleted,
 } = useSavingsGoals(savingsGoalsHouseholdId);
 
+// Budget Expenses Management
+const isBudgetExpenseModalOpen = ref(false);
+const editingBudgetExpense = ref<BudgetExpense | null>(null);
+
+const {
+  budgetExpenses,
+  loading: budgetExpensesLoading,
+  totalMonthlyExpenses,
+  fetchBudgetExpenses,
+  createBudgetExpense,
+  updateBudgetExpense,
+  deleteBudgetExpense,
+} = useBudgetExpenses();
+
+// Fetch budget expenses on mount
+onMounted(() => {
+  fetchBudgetExpenses();
+});
+
+const openBudgetExpenseModal = (expense?: BudgetExpense) => {
+  editingBudgetExpense.value = expense || null;
+  isBudgetExpenseModalOpen.value = true;
+};
+
+const closeBudgetExpenseModal = () => {
+  isBudgetExpenseModalOpen.value = false;
+  editingBudgetExpense.value = null;
+};
+
+const handleBudgetExpenseSubmit = async (formData: {
+  name: string;
+  amount: string;
+  category: string;
+}) => {
+  const toast = useToast();
+  try {
+    if (editingBudgetExpense.value) {
+      await updateBudgetExpense(editingBudgetExpense.value.id, formData);
+      toast.add({
+        title: "Expense Updated",
+        description: `${formData.name} has been updated successfully.`,
+        color: "success",
+      });
+    } else {
+      await createBudgetExpense(formData);
+      toast.add({
+        title: "Expense Added",
+        description: `${formData.name} has been added to your budget.`,
+        color: "success",
+      });
+    }
+    closeBudgetExpenseModal();
+  } catch (error) {
+    console.error("Failed to save budget expense:", error);
+    toast.add({
+      title: "Error",
+      description:
+        error instanceof Error ? error.message : "Failed to save expense",
+      color: "error",
+    });
+  }
+};
+
+const confirmDeleteBudgetExpense = async (expense: BudgetExpense) => {
+  if (confirm(`Are you sure you want to delete "${expense.name}"?`)) {
+    const toast = useToast();
+    try {
+      await deleteBudgetExpense(expense.id);
+      toast.add({
+        title: "Expense Deleted",
+        description: `${expense.name} has been removed from your budget.`,
+        color: "success",
+      });
+    } catch (error) {
+      console.error("Failed to delete budget expense:", error);
+      toast.add({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to delete expense",
+        color: "error",
+      });
+    }
+  }
+};
+
 // Handle savings goal submission
 const handleSavingsGoalSubmit = async (formData: {
   name: string;
@@ -1007,3 +1250,21 @@ const handleSavingsGoalSubmit = async (formData: {
   }
 };
 </script>
+
+<style scoped>
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.3s ease;
+}
+.list-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
+.list-move {
+  transition: transform 0.3s ease;
+}
+</style>

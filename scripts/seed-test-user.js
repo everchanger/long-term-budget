@@ -354,6 +354,33 @@ async function seedTestUser() {
     console.log(`  Created savings goal: House Down Payment ($50,000 target)`);
     console.log(`  Linked 2 savings accounts to goal (Alice's & Bob's)`);
     
+    // Create budget expenses for the household
+    console.log('');
+    console.log('Creating budget expenses...');
+    
+    const budgetExpenses = [
+      { name: 'Rent', amount: '2500', category: 'housing' },
+      { name: 'Utilities', amount: '250', category: 'utilities' },
+      { name: 'Internet', amount: '80', category: 'utilities' },
+      { name: 'Groceries', amount: '600', category: 'food' },
+      { name: 'Transportation', amount: '150', category: 'transportation' },
+    ];
+    
+    for (const expense of budgetExpenses) {
+      const expenseResponse = await fetch(`${API_BASE_URL}/api/budget-expenses`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cookie': `better-auth.session_token=${sessionCookie}`,
+        },
+        body: JSON.stringify(expense),
+      });
+      
+      if (expenseResponse.ok) {
+        console.log(`  Created budget expense: ${expense.name} ($${expense.amount}/month)`);
+      }
+    }
+    
     console.log('');
     console.log('Test data created successfully!');
   } catch (error) {

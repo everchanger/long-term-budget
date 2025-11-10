@@ -5,8 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1762507021367,
-      "tag": "0000_magical_husk",
+      "when": 1762631473511,
+      "tag": "0000_eager_blizzard",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1762791456653,
+      "tag": "0001_bouncy_firebrand",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762794916890,
+      "tag": "0002_simple_mojo",
       "breakpoints": true
     }
   ]

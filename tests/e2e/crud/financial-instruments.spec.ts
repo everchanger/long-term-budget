@@ -7,22 +7,25 @@ import { test, expect, createTestData, cleanupTestData } from "../fixtures";
  */
 
 test.describe("Financial Instruments CRUD", () => {
-  test("should successfully navigate to Economy page and view financial overview", async ({
+  test("should successfully navigate to Economy page and view core elements", async ({
     authenticatedPage: page,
   }) => {
-    // Navigate to Economy page
     await page.goto("/economy");
+    await page.waitForLoadState("networkidle");
 
-    // Verify we're on the Economy page
     await expect(page).toHaveURL("/economy");
     await expect(
       page.getByRole("heading", { name: "Your Economy Overview" })
     ).toBeVisible();
 
-    // Verify financial overview sections are present
-    await expect(page.getByText("Monthly Income")).toBeVisible();
-    await expect(page.getByText("Total Savings")).toBeVisible();
-    await expect(page.getByText("Total Debt")).toBeVisible();
+    // Verify core sections are present (these are always visible regardless of data)
+    await expect(
+      page.getByRole("heading", { name: "Members", exact: true })
+    ).toBeVisible();
+    await expect(page.getByText("Fixed Monthly Expenses")).toBeVisible();
+
+    // Verify "Add First Member" button is visible for empty household
+    await expect(page.getByTestId("add-person-button")).toBeVisible();
   });
 
   // ===== INCOME SOURCE TESTS =====
