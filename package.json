@@ -12,13 +12,14 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test:e2e": "./scripts/e2e-tests.sh",
-    "test:e2e:playwright": "npm run dev:up && playwright test --reporter=list",
+    "test:e2e:playwright": "playwright test --reporter=list",
     "test:db:setup": "node scripts/test-db-setup.js",
     "test:db:teardown": "node scripts/test-db-teardown.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "db:seed:test-user": "tsx scripts/seed-test-user.js"
   },
   "dependencies": {
     "@nuxt/eslint": "^1.9.0",
