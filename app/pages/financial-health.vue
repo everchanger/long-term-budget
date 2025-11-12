@@ -31,7 +31,8 @@
           <div>
             <h2 class="text-2xl font-bold mb-2">Overall Financial Health</h2>
             <p class="text-gray-600 dark:text-gray-400">
-              Based on your net worth, cash flow, debt levels, and emergency fund
+              Based on your net worth, cash flow, debt levels, and emergency
+              fund
             </p>
           </div>
           <UBadge
@@ -40,7 +41,10 @@
             size="xl"
             class="text-lg px-4 py-2"
           >
-            <UIcon :name="getStatusIcon(data.summary.overallHealth)" class="w-6 h-6 mr-2" />
+            <UIcon
+              :name="getStatusIcon(data.summary.overallHealth)"
+              class="w-6 h-6 mr-2"
+            />
             {{ getStatusText(data.summary.overallHealth) }}
           </UBadge>
         </div>
@@ -91,15 +95,27 @@
             :key="recommendation.title"
             class="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
           >
-            <UIcon :name="recommendation.icon" class="w-5 h-5 mt-0.5" :class="recommendation.iconColor" />
+            <UIcon
+              :name="recommendation.icon"
+              class="w-5 h-5 mt-0.5"
+              :class="recommendation.iconColor"
+            />
             <div class="flex-1">
               <h4 class="font-semibold mb-1">{{ recommendation.title }}</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">{{ recommendation.description }}</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ recommendation.description }}
+              </p>
             </div>
           </div>
 
-          <div v-if="recommendations.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
-            <UIcon name="i-heroicons-trophy" class="w-12 h-12 mx-auto mb-2 text-green-500" />
+          <div
+            v-if="recommendations.length === 0"
+            class="text-center py-8 text-gray-500 dark:text-gray-400"
+          >
+            <UIcon
+              name="i-heroicons-trophy"
+              class="w-12 h-12 mx-auto mb-2 text-green-500"
+            />
             <p class="font-semibold">Excellent work!</p>
             <p class="text-sm">Your finances are in great shape. Keep it up!</p>
           </div>
@@ -110,30 +126,34 @@
 </template>
 
 <script setup lang="ts">
-import { useFinancialHealth } from '~/composables/useFinancialHealth'
-import NetWorthCard from '~/components/NetWorthCard.vue'
-import CashFlowCard from '~/components/CashFlowCard.vue'
-import DebtToIncomeCard from '~/components/DebtToIncomeCard.vue'
-import EmergencyFundCard from '~/components/EmergencyFundCard.vue'
+import { useFinancialHealth } from "~/composables/useFinancialHealth";
+import NetWorthCard from "~/components/NetWorthCard.vue";
+import CashFlowCard from "~/components/CashFlowCard.vue";
+import DebtToIncomeCard from "~/components/DebtToIncomeCard.vue";
+import EmergencyFundCard from "~/components/EmergencyFundCard.vue";
 
 definePageMeta({
-  middleware: 'auth',
-})
+  middleware: "auth",
+});
 
 // Fetch current user's households
-const { data: householdsResponse } = await useFetch('/api/households')
-const households = computed(() => householdsResponse.value?.data ?? [])
+const { data: householdsResponse } = await useFetch("/api/households");
+const households = computed(() => householdsResponse.value?.data ?? []);
 
 // Get first household (current user's household)
 const userHousehold = computed(() => {
-  if (!households.value || !Array.isArray(households.value) || households.value.length === 0) {
-    return null
+  if (
+    !households.value ||
+    !Array.isArray(households.value) ||
+    households.value.length === 0
+  ) {
+    return null;
   }
-  return households.value[0] || null
-})
+  return households.value[0] || null;
+});
 
 // Use financial health composable with household ID
-const currentHouseholdId = computed(() => userHousehold.value?.id ?? null)
+const currentHouseholdId = computed(() => userHousehold.value?.id ?? null);
 const {
   data,
   loading,
@@ -143,65 +163,76 @@ const {
   getStatusColor,
   getStatusIcon,
   getStatusText,
-} = useFinancialHealth(currentHouseholdId)
+} = useFinancialHealth(currentHouseholdId);
 
 // Generate smart recommendations based on data
 const recommendations = computed(() => {
-  if (!data.value) return []
+  if (!data.value) return [];
 
   const recs: Array<{
-    title: string
-    description: string
-    icon: string
-    iconColor: string
-    priority: number
-  }> = []
+    title: string;
+    description: string;
+    icon: string;
+    iconColor: string;
+    priority: number;
+  }> = [];
 
   // Emergency fund recommendations
   if (data.value.emergencyFund.monthsOfExpenses < 3) {
     recs.push({
-      title: 'Build Your Emergency Fund',
-      description: `Increase your emergency savings to cover at least 3-6 months of expenses. You currently have ${data.value.emergencyFund.monthsOfExpenses.toFixed(1)} months covered.`,
-      icon: 'i-heroicons-shield-exclamation',
-      iconColor: 'text-red-500',
+      title: "Build Your Emergency Fund",
+      description: `Increase your emergency savings to cover at least 3-6 months of expenses. You currently have ${data.value.emergencyFund.monthsOfExpenses.toFixed(
+        1
+      )} months covered.`,
+      icon: "i-heroicons-shield-exclamation",
+      iconColor: "text-red-500",
       priority: 1,
-    })
+    });
   }
 
   // Debt-to-income recommendations
   if (data.value.debtToIncome.ratio > 36) {
     recs.push({
-      title: 'Reduce Debt Burden',
-      description: `Your debt-to-income ratio is ${data.value.debtToIncome.ratio.toFixed(1)}%. Focus on paying down high-interest debt to improve financial flexibility.`,
-      icon: 'i-heroicons-credit-card',
-      iconColor: 'text-orange-500',
+      title: "Reduce Debt Burden",
+      description: `Your debt-to-income ratio is ${data.value.debtToIncome.ratio.toFixed(
+        1
+      )}%. Focus on paying down high-interest debt to improve financial flexibility.`,
+      icon: "i-heroicons-credit-card",
+      iconColor: "text-orange-500",
       priority: 2,
-    })
+    });
   }
 
   // Cash flow recommendations
   if (data.value.cashFlow.savingsRate < 10) {
     recs.push({
-      title: 'Increase Savings Rate',
-      description: `Your current savings rate is ${data.value.cashFlow.savingsRate.toFixed(1)}%. Try to save at least 10-20% of your income for future goals.`,
-      icon: 'i-heroicons-arrow-trending-up',
-      iconColor: 'text-blue-500',
+      title: "Increase Savings Rate",
+      description: `Your current savings rate is ${data.value.cashFlow.savingsRate.toFixed(
+        1
+      )}%. Try to save at least 10-20% of your income for future goals.`,
+      icon: "i-heroicons-arrow-trending-up",
+      iconColor: "text-blue-500",
       priority: 3,
-    })
+    });
   }
 
   // Net worth growth opportunity
-  if (data.value.netWorth.total > 0 && data.value.cashFlow.monthly.netCashFlow > 0) {
+  if (
+    data.value.netWorth.total > 0 &&
+    data.value.cashFlow.monthly.netCashFlow > 0
+  ) {
     recs.push({
-      title: 'Invest Excess Cash Flow',
-      description: `You have positive cash flow of ${formatCurrency(data.value.cashFlow.monthly.netCashFlow)}/month. Consider investing in retirement accounts or taxable investments.`,
-      icon: 'i-heroicons-chart-bar',
-      iconColor: 'text-green-500',
+      title: "Invest Excess Cash Flow",
+      description: `You have positive cash flow of ${formatCurrency(
+        data.value.cashFlow.monthly.netCashFlow
+      )}/month. Consider investing in retirement accounts or taxable investments.`,
+      icon: "i-heroicons-chart-bar",
+      iconColor: "text-green-500",
       priority: 4,
-    })
+    });
   }
 
   // Sort by priority
-  return recs.sort((a, b) => a.priority - b.priority).slice(0, 3)
-})
+  return recs.sort((a, b) => a.priority - b.priority).slice(0, 3);
+});
 </script>
