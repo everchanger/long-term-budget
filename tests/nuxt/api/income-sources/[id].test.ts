@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import type { InferSelectModel } from "drizzle-orm";
-import type { incomeSources } from "../../../../database/schema";
+import type { incomeSources } from "@db/schema";
 import {
   TestDataBuilder,
   authenticatedFetch,
   type TestUser,
   type TestPerson,
-} from "../../utils/test-data";
+} from "@test/nuxt/utils/test-data";
 
 // Use Drizzle-inferred income source type
 type IncomeSource = InferSelectModel<typeof incomeSources>;

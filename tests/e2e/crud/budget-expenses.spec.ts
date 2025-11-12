@@ -11,7 +11,7 @@ test.describe("Budget Expenses CRUD", () => {
     authenticatedPage: page,
   }) => {
     // Navigate to Economy page
-    await page.goto("/economy");
+    await page.goto("/economy", { waitUntil: "networkidle" });
 
     // Verify we're on the Economy page
     await expect(page).toHaveURL("/economy");
@@ -33,9 +33,8 @@ test.describe("Budget Expenses CRUD", () => {
   test("should create a new budget expense", async ({
     authenticatedPage: page,
   }) => {
-    await page.goto("/economy");
-    await page.waitForLoadState("networkidle");
-
+    await page.goto("/economy", { waitUntil: "networkidle" });
+    
     // Click "Add Expense" button
     await page.getByTestId("add-budget-expense-button").click();
 
@@ -67,8 +66,7 @@ test.describe("Budget Expenses CRUD", () => {
   test("should update an existing budget expense", async ({
     authenticatedPage: page,
   }) => {
-    await page.goto("/economy");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/economy", { waitUntil: "networkidle" });
 
     // First, create an expense to update
     await page.getByTestId("add-budget-expense-button").click();
@@ -134,8 +132,7 @@ test.describe("Budget Expenses CRUD", () => {
   test("should delete a budget expense", async ({
     authenticatedPage: page,
   }) => {
-    await page.goto("/economy");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/economy", { waitUntil: "networkidle" });
 
     // First, create an expense to delete
     await page.getByTestId("add-budget-expense-button").click();
@@ -217,8 +214,7 @@ test.describe("Budget Expenses CRUD", () => {
       },
     ]);
 
-    await page.goto("/economy");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/economy", { waitUntil: "networkidle" });
 
     // Verify empty state
     await expect(page.getByText("No budget expenses yet")).toBeVisible();
@@ -230,8 +226,7 @@ test.describe("Budget Expenses CRUD", () => {
   test("should display total monthly expenses calculation", async ({
     authenticatedPage: page,
   }) => {
-    await page.goto("/economy");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/economy", { waitUntil: "networkidle" });
 
     // Create multiple expenses with known amounts
     const expenses = [
@@ -296,8 +291,7 @@ test.describe("Budget Expenses CRUD", () => {
   test("should validate required fields in expense modal", async ({
     authenticatedPage: page,
   }) => {
-    await page.goto("/economy");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/economy", { waitUntil: "networkidle" });
 
     // Open modal
     await page.getByTestId("add-budget-expense-button").click();

@@ -16,6 +16,8 @@ export default defineConfig({
             "@@": r("."),
             "@@/": r("./"),
             "@s": r("./server"),
+            "@db": r("./database"),
+            "@test": r("./tests"),
           },
         },
         test: {
@@ -32,6 +34,8 @@ export default defineConfig({
             "@@": r("."),
             "@@/": r("./"),
             "@s": r("./server"),
+            "@db": r("./database"),
+            "@test": r("./tests"),
           },
         },
         test: {
@@ -49,6 +53,8 @@ export default defineConfig({
       "@@": r("."),
       "@@/": r("./"),
       "@s": r("./server"),
+      "@db": r("./database"),
+      "@test": r("./tests"),
     },
   },
 });

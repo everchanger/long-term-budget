@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
-import { TestDataBuilder, authenticatedFetch } from "../../utils/test-data";
+import {
+  TestDataBuilder,
+  authenticatedFetch,
+} from "@test/nuxt/utils/test-data";
 
 interface BrokerAccountResponse {
   id: number;

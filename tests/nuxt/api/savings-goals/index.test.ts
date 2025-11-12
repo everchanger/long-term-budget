@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import type { InferSelectModel } from "drizzle-orm";
-import type { savingsGoals } from "../../../../database/schema";
+import type { savingsGoals } from "@db/schema";
 import {
   TestDataBuilder,
   authenticatedFetch,
   type TestUser,
   type TestPerson,
-} from "../../utils/test-data";
+} from "@test/nuxt/utils/test-data";
 
 // Use Drizzle-inferred savings goal type
 type SavingsGoal = InferSelectModel<typeof savingsGoals>;

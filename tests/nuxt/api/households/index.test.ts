@@ -4,9 +4,9 @@ import {
   TestDataBuilder,
   authenticatedFetch,
   type TestUser,
-} from "../../utils/test-data";
-import { db } from "../../../../server/utils/drizzle";
-import { households } from "../../../../database/schema";
+} from "@test/nuxt/utils/test-data";
+import { db } from "@s/utils/drizzle";
+import { households } from "@db/schema";
 
 interface Household {
   id: number;

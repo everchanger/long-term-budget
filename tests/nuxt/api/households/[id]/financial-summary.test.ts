@@ -4,7 +4,7 @@ import {
   TestDataBuilder,
   authenticatedFetch,
   type TestUser,
-} from "../../../utils/test-data";
+} from "@test/nuxt/utils/test-data";
 
 interface FinancialSummary {
   totalMonthlyIncome: number;
@@ -21,9 +21,7 @@ interface FinancialSummary {
 
 describe("/api/households/[id]/financial-summary", async () => {
   await setup({
-    nuxtConfig: {
-      ssr: false,
-    },
+    host: `http://localhost:${process.env.NUXT_DEVSERVER_PORT || 5000}`,
   });
 
   let testUserWithFinances: TestUser;

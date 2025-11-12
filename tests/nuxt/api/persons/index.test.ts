@@ -4,7 +4,7 @@ import {
   TestDataBuilder,
   authenticatedFetch,
   type TestUser,
-} from "../../utils/test-data";
+} from "@test/nuxt/utils/test-data";
 
 interface Person {
   id: number;

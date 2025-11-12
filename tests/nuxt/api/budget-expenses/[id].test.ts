@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { setup } from "@nuxt/test-utils/e2e";
 import type { InferSelectModel } from "drizzle-orm";
-import type { budgetExpenses } from "../../../../database/schema";
+import type { budgetExpenses } from "@db/schema";
 import {
   TestDataBuilder,
   authenticatedFetch,
   type TestUser,
-} from "../../utils/test-data";
+} from "@test/nuxt/utils/test-data";
 
 // Use Drizzle-inferred budget expense type
 type BudgetExpense = InferSelectModel<typeof budgetExpenses>;

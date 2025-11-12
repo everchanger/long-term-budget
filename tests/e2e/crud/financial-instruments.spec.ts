@@ -22,7 +22,9 @@ test.describe("Financial Instruments CRUD", () => {
     await expect(
       page.getByRole("heading", { name: "Members", exact: true })
     ).toBeVisible();
-    await expect(page.getByText("Fixed Monthly Expenses")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Fixed Monthly Expenses" })
+    ).toBeVisible();
 
     // Verify "Add First Member" button is visible for empty household
     await expect(page.getByTestId("add-person-button")).toBeVisible();

@@ -10,6 +10,8 @@ export default defineNuxtConfig({
   },
   alias: {
     "@s": fileURLToPath(new URL("./server", import.meta.url)),
+    "@db": fileURLToPath(new URL("./database", import.meta.url)),
+    "@test": fileURLToPath(new URL("./tests", import.meta.url)),
   },
   css: ["~/assets/css/main.css"],
   modules: [
