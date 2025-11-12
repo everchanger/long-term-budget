@@ -42,11 +42,14 @@
               Economy
             </NuxtLink>
             <NuxtLink
-              to="/financial-health"
+              to="/financial-story"
               class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
               active-class="text-blue-600 dark:text-blue-400"
             >
-              Financial Health
+              <span class="flex items-center gap-1">
+                <UIcon name="i-heroicons-sparkles" class="text-lg" />
+                Your Story
+              </span>
             </NuxtLink>
             <NuxtLink
               to="/projections"
