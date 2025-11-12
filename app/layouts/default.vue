@@ -28,6 +28,11 @@
               class="text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
               Economy
             </NuxtLink>
+            <NuxtLink to="/financial-health"
+              class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              active-class="text-blue-600 dark:text-blue-400">
+              Financial Health
+            </NuxtLink>
             <NuxtLink to="/scenarios"
               class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
               active-class="text-blue-600 dark:text-blue-400">
