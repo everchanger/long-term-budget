@@ -25,11 +25,15 @@
     "amount": "Amount",
     "interestRate": "Interest Rate (%)",
     "applyChanges": "Apply Changes",
-    "resetAll": "Reset All"
+    "resetAll": "Reset All",
+    "switchToDarkMode": "Switch to dark mode",
+    "switchToLightMode": "Switch to light mode"
   },
   "auth": {
     "signIn": "Sign in",
     "signOut": "Sign out",
+    "signingOut": "Signing out...",
+    "signedInAs": "Signed in as",
     "signUp": "Sign up",
     "email": "Email",
     "password": "Password",
@@ -52,6 +56,7 @@
   "navigation": {
     "home": "Home",
     "dashboard": "Dashboard",
+    "overview": "Overview",
     "economy": "Economy",
     "economyOverview": "Your Economy Overview",
     "projections": "Projections",
@@ -134,7 +139,9 @@
   },
   "economy": {
     "totalMonthlyExpenses": "Total Monthly Expenses",
-    "projectedAnnualCost": "Projected Annual Cost"
+    "projectedAnnualCost": "Projected Annual Cost",
+    "financialStoryDescription": "See your financial journey visualized as an engaging story",
+    "viewStory": "View Story"
   },
   "person": {
     "name": "Name",
@@ -444,6 +451,46 @@
     "saveChanges": "Save Changes",
     "updateSuccess": "Settings updated successfully",
     "updateFailed": "Failed to update settings"
+  },
+  "budgetExpenses": {
+    "addExpense": "Add Budget Expense",
+    "editExpense": "Edit Budget Expense",
+    "name": "Name",
+    "nameRequired": "Expense name is required",
+    "namePlaceholder": "e.g., Rent, Utilities, Internet",
+    "category": "Category",
+    "monthlyAmount": "Monthly Amount",
+    "amountRequired": "Amount is required",
+    "amountMustBePositive": "Amount must be greater than 0",
+    "categories": {
+      "housing": "Housing",
+      "housingDesc": "Rent, mortgage, property tax",
+      "utilities": "Utilities",
+      "utilitiesDesc": "Electric, water, gas, internet",
+      "transportation": "Transportation",
+      "transportationDesc": "Car payment, gas, insurance, transit",
+      "food": "Food & Groceries",
+      "foodDesc": "Groceries, dining out",
+      "healthcare": "Healthcare",
+      "healthcareDesc": "Insurance, medications, doctor visits",
+      "insurance": "Insurance",
+      "insuranceDesc": "Life, health, home, auto insurance",
+      "debt": "Debt Payments",
+      "debtDesc": "Credit cards, loans, other debt",
+      "entertainment": "Entertainment",
+      "entertainmentDesc": "Streaming, hobbies, subscriptions",
+      "personal": "Personal Care",
+      "personalDesc": "Haircuts, gym, clothing",
+      "other": "Other",
+      "otherDesc": "Miscellaneous expenses"
+    }
+  },
+  "person": {
+    "editPerson": "Edit Person",
+    "name": "Name",
+    "namePlaceholder": "Enter person's name",
+    "age": "Age",
+    "agePlaceholder": "Enter age (optional)"
   },
   "savingsGoals": {
     "title": "Savings Goals",

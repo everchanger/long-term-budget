@@ -11,6 +11,42 @@
 
         <!-- Main Content -->
         <div v-if="userHousehold" class="space-y-6">
+          <!-- Financial Story CTA -->
+          <div
+            class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-800 p-6"
+          >
+            <div class="flex items-start justify-between">
+              <div class="flex items-start space-x-3">
+                <div
+                  class="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center flex-shrink-0"
+                >
+                  <UIcon
+                    name="i-heroicons-sparkles"
+                    class="w-6 h-6 text-blue-600 dark:text-blue-400"
+                  />
+                </div>
+                <div>
+                  <h3
+                    class="text-lg font-semibold text-neutral-900 dark:text-white mb-1"
+                  >
+                    {{ $t("navigation.financialStory") }}
+                  </h3>
+                  <p class="text-sm text-neutral-600 dark:text-neutral-300">
+                    {{ $t("economy.financialStoryDescription") }}
+                  </p>
+                </div>
+              </div>
+              <UButton
+                to="/financial-story"
+                color="primary"
+                icon="i-heroicons-arrow-right"
+                trailing
+              >
+                {{ $t("economy.viewStory") }}
+              </UButton>
+            </div>
+          </div>
+
           <!-- Overview Stats -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div>

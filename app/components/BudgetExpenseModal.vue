@@ -2,7 +2,11 @@
   <UModal v-model:open="isOpen">
     <template #header>
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-        {{ isEditing ? "Edit Budget Expense" : "Add Budget Expense" }}
+        {{
+          isEditing
+            ? $t("budgetExpenses.editExpense")
+            : $t("budgetExpenses.addExpense")
+        }}
       </h3>
     </template>
 
@@ -13,13 +17,13 @@
             for="expense-name"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Name *
+            {{ $t("budgetExpenses.name") }} *
           </label>
           <input
             id="expense-name"
             v-model="formState.name"
             type="text"
-            placeholder="e.g., Rent, Utilities, Internet"
+            :placeholder="$t('budgetExpenses.namePlaceholder')"
             required
             data-testid="budget-expense-name-input"
             :class="[
@@ -34,7 +38,7 @@
             v-if="touched.name && !formState.name.trim()"
             class="mt-1 text-sm text-red-600 dark:text-red-400"
           >
-            Expense name is required
+            {{ $t("budgetExpenses.nameRequired") }}
           </p>
         </div>
 
@@ -43,7 +47,7 @@
             for="expense-category"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Category *
+            {{ $t("budgetExpenses.category") }} *
           </label>
           <select
             id="expense-category"
@@ -57,11 +61,11 @@
               :key="category.value"
               :value="category.value"
             >
-              {{ category.label }}
+              {{ $t(`budgetExpenses.categories.${category.value}`) }}
             </option>
           </select>
           <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-            {{ getCategoryInfo(formState.category).description }}
+            {{ $t(`budgetExpenses.categories.${formState.category}Desc`) }}
           </p>
         </div>
 
@@ -70,7 +74,7 @@
             for="expense-amount"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Monthly Amount *
+            {{ $t("budgetExpenses.monthlyAmount") }} *
           </label>
           <input
             id="expense-amount"
@@ -94,13 +98,13 @@
             v-if="touched.amount && !formState.amount"
             class="mt-1 text-sm text-red-600 dark:text-red-400"
           >
-            Amount is required
+            {{ $t("budgetExpenses.amountRequired") }}
           </p>
           <p
             v-else-if="touched.amount && parseFloat(formState.amount) <= 0"
             class="mt-1 text-sm text-red-600 dark:text-red-400"
           >
-            Amount must be greater than 0
+            {{ $t("budgetExpenses.amountMustBePositive") }}
           </p>
         </div>
       </div>
@@ -108,14 +112,16 @@
 
     <template #footer>
       <div class="flex justify-end gap-3">
-        <UButton variant="ghost" @click="handleCancel">Cancel</UButton>
+        <UButton variant="ghost" @click="handleCancel">{{
+          $t("common.cancel")
+        }}</UButton>
         <UButton
           :loading="loading"
           :disabled="!isFormValid"
           data-testid="budget-expense-modal-submit-button"
           @click="handleSubmit"
         >
-          {{ isEditing ? "Update" : "Add" }}
+          {{ isEditing ? $t("common.update") : $t("common.add") }}
         </UButton>
       </div>
     </template>

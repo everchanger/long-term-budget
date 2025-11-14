@@ -2,7 +2,7 @@
   <UModal v-model:open="isOpen">
     <template #header>
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-        Edit Person
+        {{ $t("person.editPerson") }}
       </h3>
     </template>
 
@@ -13,13 +13,13 @@
             for="edit-person-name"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Name *
+            {{ $t("person.name") }} *
           </label>
           <input
             id="edit-person-name"
             v-model="formState.name"
             type="text"
-            placeholder="Enter person's name"
+            :placeholder="$t('person.namePlaceholder')"
             required
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
@@ -30,13 +30,13 @@
             for="edit-person-age"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Age
+            {{ $t("person.age") }}
           </label>
           <input
             id="edit-person-age"
             v-model="formState.age"
             type="number"
-            placeholder="Enter age (optional)"
+            :placeholder="$t('person.agePlaceholder')"
             min="0"
             max="120"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
@@ -47,13 +47,15 @@
 
     <template #footer>
       <div class="flex justify-end gap-3">
-        <UButton variant="ghost" @click="handleCancel">Cancel</UButton>
+        <UButton variant="ghost" @click="handleCancel">{{
+          $t("common.cancel")
+        }}</UButton>
         <UButton
           :loading="loading"
           :disabled="!isFormValid"
           @click="handleSubmit"
         >
-          Update
+          {{ $t("common.update") }}
         </UButton>
       </div>
     </template>

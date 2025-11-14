@@ -150,182 +150,182 @@ async function seedTestUser() {
     
     const householdId = households[0].id;
     
-    // Create Alice
-    const aliceResponse = await fetch(`${API_BASE_URL}/api/persons`, {
+    // Create Astrid
+    const astridResponse = await fetch(`${API_BASE_URL}/api/persons`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Cookie': `better-auth.session_token=${sessionCookie}`,
       },
       body: JSON.stringify({
-        name: 'Alice',
+        name: 'Astrid',
         age: 30,
         householdId: householdId,
       }),
     });
     
-    if (!aliceResponse.ok) {
-      throw new Error(`Failed to create Alice: ${aliceResponse.status}`);
+    if (!astridResponse.ok) {
+      throw new Error(`Failed to create Astrid: ${astridResponse.status}`);
     }
     
-    const aliceData = await aliceResponse.json();
-    const alice = aliceData.data; // Unwrap API response
-    console.log(`  Created person: Alice (ID: ${alice.id})`);
+    const astridData = await astridResponse.json();
+    const astrid = astridData.data; // Unwrap API response
+    console.log(`  Created person: Astrid (ID: ${astrid.id})`);
     
-    // Create Bob
-    const bobResponse = await fetch(`${API_BASE_URL}/api/persons`, {
+    // Create Filip
+    const filipResponse = await fetch(`${API_BASE_URL}/api/persons`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Cookie': `better-auth.session_token=${sessionCookie}`,
       },
       body: JSON.stringify({
-        name: 'Bob',
+        name: 'Filip',
         age: 32,
         householdId: householdId,
       }),
     });
     
-    if (!bobResponse.ok) {
-      throw new Error(`Failed to create Bob: ${bobResponse.status}`);
+    if (!filipResponse.ok) {
+      throw new Error(`Failed to create Filip: ${filipResponse.status}`);
     }
     
-    const bobData = await bobResponse.json();
-    const bob = bobData.data; // Unwrap API response
-    console.log(`  Created person: Bob (ID: ${bob.id})`);
+    const filipData = await filipResponse.json();
+    const filip = filipData.data; // Unwrap API response
+    console.log(`  Created person: Filip (ID: ${filip.id})`);
     
-    // Create Alice's income
-    const aliceIncomeResponse = await fetch(`${API_BASE_URL}/api/income-sources`, {
+    // Create Astrid's income
+    const astridIncomeResponse = await fetch(`${API_BASE_URL}/api/income-sources`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Cookie': `better-auth.session_token=${sessionCookie}`,
       },
       body: JSON.stringify({
-        personId: alice.id,
-        name: 'Software Engineer Salary',
-        amount: '5000',
+        personId: astrid.id,
+        name: 'Utvecklare lön',
+        amount: '28900',
         frequency: 'monthly',
         isActive: true,
       }),
     });
     
-    if (aliceIncomeResponse.ok) {
-      console.log(`  Created income for Alice: Software Engineer Salary ($5,000/month)`);
+    if (astridIncomeResponse.ok) {
+      console.log(`  Created income for Astrid: Utvecklare lön (28 900 kr/månad)`);
     }
     
-    // Create Bob's income
-    const bobIncomeResponse = await fetch(`${API_BASE_URL}/api/income-sources`, {
+    // Create Filip's income
+    const filipIncomeResponse = await fetch(`${API_BASE_URL}/api/income-sources`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Cookie': `better-auth.session_token=${sessionCookie}`,
       },
       body: JSON.stringify({
-        personId: bob.id,
-        name: 'Product Manager Salary',
-        amount: '6000',
+        personId: filip.id,
+        name: 'Produktchef lön',
+        amount: '33800',
         frequency: 'monthly',
         isActive: true,
       }),
     });
     
-    if (bobIncomeResponse.ok) {
-      console.log(`  Created income for Bob: Product Manager Salary ($6,000/month)`);
+    if (filipIncomeResponse.ok) {
+      console.log(`  Created income for Filip: Produktchef lön (33 800 kr/månad)`);
     }
     
-    // Create Alice's savings account
-    const aliceSavingsResponse = await fetch(`${API_BASE_URL}/api/savings-accounts`, {
+    // Create Astrid's savings account
+    const astridSavingsResponse = await fetch(`${API_BASE_URL}/api/savings-accounts`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Cookie': `better-auth.session_token=${sessionCookie}`,
       },
       body: JSON.stringify({
-        personId: alice.id,
-        name: 'Emergency Fund',
-        currentBalance: '15000',
-        monthlyDeposit: '300',
-        interestRate: '2.5',
+        personId: astrid.id,
+        name: 'Buffert',
+        currentBalance: '125000',
+        monthlyDeposit: '3000',
+        interestRate: '3.0',
         accountType: 'savings',
       }),
     });
     
-    if (!aliceSavingsResponse.ok) {
-      throw new Error(`Failed to create Alice's savings: ${aliceSavingsResponse.status}`);
+    if (!astridSavingsResponse.ok) {
+      throw new Error(`Failed to create Astrid's savings: ${astridSavingsResponse.status}`);
     }
     
-    const aliceSavingsData = await aliceSavingsResponse.json();
-    const aliceSavings = aliceSavingsData.data; // Unwrap API response
-    console.log(`  Created savings for Alice: Emergency Fund ($15,000 @ 2.5%, $300/month)`);
+    const astridSavingsData = await astridSavingsResponse.json();
+    const astridSavings = astridSavingsData.data; // Unwrap API response
+    console.log(`  Created savings for Astrid: Buffert (125 000 kr @ 3.0%, 3 000 kr/månad)`);
     
-    // Create Bob's savings account
-    const bobSavingsResponse = await fetch(`${API_BASE_URL}/api/savings-accounts`, {
+    // Create Filip's savings account
+    const filipSavingsResponse = await fetch(`${API_BASE_URL}/api/savings-accounts`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Cookie': `better-auth.session_token=${sessionCookie}`,
       },
       body: JSON.stringify({
-        personId: bob.id,
-        name: 'Investment Account',
-        currentBalance: '25000',
-        monthlyDeposit: '500',
-        interestRate: '5.0',
+        personId: filip.id,
+        name: 'Investeringskonto',
+        currentBalance: '215000',
+        monthlyDeposit: '5000',
+        interestRate: '6.5',
         accountType: 'investment',
       }),
     });
     
-    if (!bobSavingsResponse.ok) {
-      throw new Error(`Failed to create Bob's savings: ${bobSavingsResponse.status}`);
+    if (!filipSavingsResponse.ok) {
+      throw new Error(`Failed to create Filip's savings: ${filipSavingsResponse.status}`);
     }
     
-    const bobSavingsData = await bobSavingsResponse.json();
-    const bobSavings = bobSavingsData.data; // Unwrap API response
-    console.log(`  Created savings for Bob: Investment Account ($25,000 @ 5.0%, $500/month)`);
+    const filipSavingsData = await filipSavingsResponse.json();
+    const filipSavings = filipSavingsData.data; // Unwrap API response
+    console.log(`  Created savings for Filip: Investeringskonto (215 000 kr @ 6.5%, 5 000 kr/månad)`);
     
-    // Create Alice's loan
-    const aliceLoanResponse = await fetch(`${API_BASE_URL}/api/loans`, {
+    // Create Astrid's loan
+    const astridLoanResponse = await fetch(`${API_BASE_URL}/api/loans`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Cookie': `better-auth.session_token=${sessionCookie}`,
       },
       body: JSON.stringify({
-        personId: alice.id,
-        name: 'Student Loan',
-        originalAmount: '30000',
-        currentBalance: '20000',
-        interestRate: '4.5',
-        monthlyPayment: '400',
+        personId: astrid.id,
+        name: 'CSN-lån',
+        originalAmount: '280000',
+        currentBalance: '185000',
+        interestRate: '1.5',
+        monthlyPayment: '2800',
         loanType: 'student',
       }),
     });
     
-    if (aliceLoanResponse.ok) {
-      console.log(`  Created loan for Alice: Student Loan ($20,000 balance @ 4.5%)`);
+    if (astridLoanResponse.ok) {
+      console.log(`  Created loan for Astrid: CSN-lån (185 000 kr skuld @ 1.5%)`);
     }
     
-    // Create Bob's loan
-    const bobLoanResponse = await fetch(`${API_BASE_URL}/api/loans`, {
+    // Create Filip's loan
+    const filipLoanResponse = await fetch(`${API_BASE_URL}/api/loans`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Cookie': `better-auth.session_token=${sessionCookie}`,
       },
       body: JSON.stringify({
-        personId: bob.id,
-        name: 'Car Loan',
-        originalAmount: '25000',
-        currentBalance: '18000',
-        interestRate: '3.9',
-        monthlyPayment: '500',
+        personId: filip.id,
+        name: 'Billån',
+        originalAmount: '250000',
+        currentBalance: '175000',
+        interestRate: '4.2',
+        monthlyPayment: '4500',
         loanType: 'auto',
       }),
     });
     
-    if (bobLoanResponse.ok) {
-      console.log(`  Created loan for Bob: Car Loan ($18,000 balance @ 3.9%)`);
+    if (filipLoanResponse.ok) {
+      console.log(`  Created loan for Filip: Billån (175 000 kr skuld @ 4.2%)`);
     }
     
     // Create household savings goal with linked accounts
@@ -337,12 +337,12 @@ async function seedTestUser() {
       },
       body: JSON.stringify({
         householdId: householdId,
-        name: 'House Down Payment',
-        description: 'Save for 20% down payment on a new home',
-        targetAmount: '50000',
+        name: 'Kontantinsats villa',
+        description: 'Spara till 15% kontantinsats för ett nytt hus',
+        targetAmount: '500000',
         priority: 3, // high priority
         category: 'house',
-        savingsAccountIds: [aliceSavings.id, bobSavings.id], // Link both accounts
+        savingsAccountIds: [astridSavings.id, filipSavings.id], // Link both accounts
       }),
     });
     
@@ -351,19 +351,19 @@ async function seedTestUser() {
     }
     
     await savingsGoalResponse.json();
-    console.log(`  Created savings goal: House Down Payment ($50,000 target)`);
-    console.log(`  Linked 2 savings accounts to goal (Alice's & Bob's)`);
+    console.log(`  Created savings goal: Kontantinsats villa (500 000 kr målbelopp)`);
+    console.log(`  Linked 2 savings accounts to goal (Astrid's & Filip's)`);
     
     // Create budget expenses for the household
     console.log('');
     console.log('Creating budget expenses...');
     
     const budgetExpenses = [
-      { name: 'Rent', amount: '2500', category: 'housing' },
-      { name: 'Utilities', amount: '250', category: 'utilities' },
-      { name: 'Internet', amount: '80', category: 'utilities' },
-      { name: 'Groceries', amount: '600', category: 'food' },
-      { name: 'Transportation', amount: '150', category: 'transportation' },
+      { name: 'Hyra', amount: '14000', category: 'housing' },
+      { name: 'El & Vatten', amount: '1200', category: 'utilities' },
+      { name: 'Bredband', amount: '399', category: 'utilities' },
+      { name: 'Mat & Hushåll', amount: '6500', category: 'food' },
+      { name: 'Kollektivtrafik', amount: '1800', category: 'transportation' },
     ];
     
     for (const expense of budgetExpenses) {
@@ -377,7 +377,7 @@ async function seedTestUser() {
       });
       
       if (expenseResponse.ok) {
-        console.log(`  Created budget expense: ${expense.name} ($${expense.amount}/month)`);
+        console.log(`  Created budget expense: ${expense.name} (${expense.amount} kr/månad)`);
       }
     }
     

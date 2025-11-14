@@ -25,11 +25,15 @@
     "amount": "Belopp",
     "interestRate": "Ränta (%)",
     "applyChanges": "Tillämpa ändringar",
-    "resetAll": "Återställ alla"
+    "resetAll": "Återställ alla",
+    "switchToDarkMode": "Byt till mörkt läge",
+    "switchToLightMode": "Byt till ljust läge"
   },
   "auth": {
     "signIn": "Logga in",
     "signOut": "Logga ut",
+    "signingOut": "Loggar ut...",
+    "signedInAs": "Inloggad som",
     "signUp": "Registrera",
     "email": "E-post",
     "password": "Lösenord",
@@ -52,6 +56,7 @@
   "navigation": {
     "home": "Hem",
     "dashboard": "Översikt",
+    "overview": "Översikt",
     "economy": "Ekonomi",
     "economyOverview": "Din ekonomiska översikt",
     "projections": "Prognoser",
@@ -134,7 +139,9 @@
   },
   "economy": {
     "totalMonthlyExpenses": "Totala månadskostnader",
-    "projectedAnnualCost": "Beräknad årskostnad"
+    "projectedAnnualCost": "Beräknad årskostnad",
+    "financialStoryDescription": "Se din ekonomiska resa visualiserad som en engagerande berättelse",
+    "viewStory": "Visa berättelse"
   },
   "person": {
     "name": "Namn",
@@ -155,7 +162,6 @@
     "managePersonSources": "Hantera {name}s inkomstkällor",
     "noSources": "Inga inkomstkällor",
     "addFirstSource": "Lägg till {name}s första inkomstkälla för att komma igång.",
-    "addSource": "Lägg till inkomstkälla",
     "editSource": "Redigera inkomstkälla",
     "nameRequired": "Namn *",
     "namePlaceholder": "t.ex., Lön, Frilans, etc.",
@@ -211,7 +217,6 @@
     "noLoans": "Inga lån ännu",
     "addLoansToTrack": "Lägg till lån och skulder för att spåra betalningar och saldon.",
     "balanceLabel": "saldo",
-    "addLoan": "Lägg till lån",
     "editLoan": "Redigera lån",
     "nameRequired": "Namn *",
     "namePlaceholder": "t.ex., Bolån, Kreditkort, etc.",
@@ -294,11 +299,9 @@
     "debtBalance": "Skuldsaldo",
     "originalDebt": "Ursprunglig skuld",
     "totalSaved": "Totalt sparat",
-    "totalDebtPaid": "Total skuld betald",
     "yearlyData": "Årsdata",
     "dataTable": "Datatabell",
     "reachedNetWorth": "Nådde {amount} i nettoförmögenhet",
-    "month": "Månad",
     "visualization": "Visualisering",
     "year": "År",
     "investments": "Investeringar",
@@ -405,15 +408,7 @@
     "comingSoon": "Denna funktion kommer snart! Du kommer att kunna modellera och jämföra olika finansiella scenarier här.",
     "backToDashboard": "Tillbaka till översikt"
   },
-  "settings": {
-    "title": "Inställningar",
-    "preferences": "Preferenser",
-    "language": "Språk",
-    "currency": "Valuta",
-    "updateSuccess": "Inställningar uppdaterade",
-    "updateError": "Misslyckades att uppdatera inställningar"
-  },
-  "budget": {
+  "budgetExpenses": {
     "title": "Budget",
     "categories": {
       "housing": "Boende",
@@ -465,6 +460,39 @@
     "saveChanges": "Spara ändringar",
     "updateSuccess": "Inställningar uppdaterade",
     "updateFailed": "Misslyckades att uppdatera inställningar"
+  },
+  "budgetExpenses": {
+    "addExpense": "Lägg till budgetutgift",
+    "editExpense": "Redigera budgetutgift",
+    "name": "Namn",
+    "nameRequired": "Namn på utgift krävs",
+    "namePlaceholder": "t.ex. Hyra, El, Internet",
+    "category": "Kategori",
+    "monthlyAmount": "Månadsbelopp",
+    "amountRequired": "Belopp krävs",
+    "amountMustBePositive": "Beloppet måste vara större än 0",
+    "categories": {
+      "housing": "Boende",
+      "housingDesc": "Hyra, bolån, fastighetsskatt",
+      "utilities": "Hushållskostnader",
+      "utilitiesDesc": "El, vatten, gas, internet",
+      "transportation": "Transport",
+      "transportationDesc": "Billån, bensin, försäkring, kollektivtrafik",
+      "food": "Mat & Livsmedel",
+      "foodDesc": "Matinköp, restaurang",
+      "healthcare": "Hälsovård",
+      "healthcareDesc": "Försäkring, mediciner, läkarbesök",
+      "insurance": "Försäkringar",
+      "insuranceDesc": "Liv-, hem-, bil- och sjukförsäkring",
+      "debt": "Skuldbetalningar",
+      "debtDesc": "Kreditkort, lån, andra skulder",
+      "entertainment": "Nöje",
+      "entertainmentDesc": "Streaming, hobbyer, prenumerationer",
+      "personal": "Personlig vård",
+      "personalDesc": "Frisör, gym, kläder",
+      "other": "Övrigt",
+      "otherDesc": "Diverse utgifter"
+    }
   },
   "savingsGoals": {
     "title": "Sparmål",

@@ -21,50 +21,22 @@
 
           <!-- Navigation Links -->
           <nav class="hidden md:flex space-x-8">
-            <NuxtLink
-              to="/"
-              class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              active-class="text-blue-600 dark:text-blue-400"
-            >
-              {{ $t("navigation.home") }}
-            </NuxtLink>
-            <NuxtLink
-              to="/dashboard"
-              class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              active-class="text-blue-600 dark:text-blue-400"
-            >
-              {{ $t("navigation.dashboard") }}
-            </NuxtLink>
-            <NuxtLink
-              to="/economy"
-              class="text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-            >
-              {{ $t("navigation.economy") }}
-            </NuxtLink>
-            <NuxtLink
-              to="/financial-story"
-              class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              active-class="text-blue-600 dark:text-blue-400"
-            >
-              <span class="flex items-center gap-1">
-                <UIcon name="i-heroicons-sparkles" class="text-lg" />
-                {{ $t("navigation.financialStory") }}
-              </span>
-            </NuxtLink>
-            <NuxtLink
-              to="/projections"
-              class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              active-class="text-blue-600 dark:text-blue-400"
-            >
-              {{ $t("navigation.projections") }}
-            </NuxtLink>
-            <NuxtLink
-              to="/scenarios"
-              class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              active-class="text-blue-600 dark:text-blue-400"
-            >
-              {{ $t("navigation.scenarios") }}
-            </NuxtLink>
+            <template v-if="session">
+              <NuxtLink
+                to="/economy"
+                class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                active-class="text-blue-600 dark:text-blue-400"
+              >
+                {{ $t("navigation.home") }}
+              </NuxtLink>
+              <NuxtLink
+                to="/projections"
+                class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                active-class="text-blue-600 dark:text-blue-400"
+              >
+                {{ $t("navigation.projections") }}
+              </NuxtLink>
+            </template>
           </nav>
 
           <!-- Right side actions -->
@@ -81,21 +53,17 @@
                 variant="ghost"
                 icon="i-heroicons-cog-6-tooth"
                 to="/settings"
-              >
-                <span class="hidden md:inline ml-2">{{
-                  $t("navigation.settings")
-                }}</span>
-              </UButton>
+                :title="$t('navigation.settings')"
+                :aria-label="$t('navigation.settings')"
+              />
               <UButton
                 variant="ghost"
                 icon="i-heroicons-arrow-right-on-rectangle"
                 :loading="isSigningOut"
+                :title="$t('auth.signOut')"
+                :aria-label="$t('auth.signOut')"
                 @click="handleSignOut"
-              >
-                <span class="hidden md:inline ml-2">{{
-                  $t("auth.signOut")
-                }}</span>
-              </UButton>
+              />
             </template>
             <template v-else>
               <!-- Unauthenticated state -->
@@ -113,12 +81,16 @@
               variant="ghost"
               icon="i-heroicons-sun"
               class="dark:hidden"
+              :title="$t('common.switchToDarkMode')"
+              :aria-label="$t('common.switchToDarkMode')"
               @click="$colorMode.preference = 'dark'"
             />
             <UButton
               variant="ghost"
               icon="i-heroicons-moon"
               class="hidden dark:block"
+              :title="$t('common.switchToLightMode')"
+              :aria-label="$t('common.switchToLightMode')"
               @click="$colorMode.preference = 'light'"
             />
 
@@ -144,7 +116,7 @@
               class="px-3 py-2 border-b border-gray-200 dark:border-gray-700 mb-2"
             >
               <p class="text-sm text-gray-600 dark:text-gray-300">
-                Signed in as
+                {{ $t("auth.signedInAs") }}
               </p>
               <p class="text-sm font-medium text-gray-900 dark:text-white">
                 {{ session.user.name }}
@@ -164,42 +136,28 @@
                   isMobileMenuOpen = false;
                 "
               >
-                Sign In
+                {{ $t("auth.signIn") }}
               </UButton>
             </div>
 
-            <NuxtLink
-              to="/"
-              class="block text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-base font-medium transition-colors"
-              active-class="text-blue-600 dark:text-blue-400"
-              @click="isMobileMenuOpen = false"
-            >
-              Home
-            </NuxtLink>
-            <NuxtLink
-              to="/dashboard"
-              class="block text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-base font-medium transition-colors"
-              active-class="text-blue-600 dark:text-blue-400"
-              @click="isMobileMenuOpen = false"
-            >
-              Dashboard
-            </NuxtLink>
-            <NuxtLink
-              to="/economy"
-              class="block text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-base font-medium transition-colors"
-              active-class="text-blue-600 dark:text-blue-400"
-              @click="isMobileMenuOpen = false"
-            >
-              Economy
-            </NuxtLink>
-            <NuxtLink
-              to="/scenarios"
-              class="block text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-base font-medium transition-colors"
-              active-class="text-blue-600 dark:text-blue-400"
-              @click="isMobileMenuOpen = false"
-            >
-              Scenarios
-            </NuxtLink>
+            <template v-if="session">
+              <NuxtLink
+                to="/economy"
+                class="block text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-base font-medium transition-colors"
+                active-class="text-blue-600 dark:text-blue-400"
+                @click="isMobileMenuOpen = false"
+              >
+                {{ $t("navigation.home") }}
+              </NuxtLink>
+              <NuxtLink
+                to="/projections"
+                class="block text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-base font-medium transition-colors"
+                active-class="text-blue-600 dark:text-blue-400"
+                @click="isMobileMenuOpen = false"
+              >
+                {{ $t("navigation.projections") }}
+              </NuxtLink>
+            </template>
 
             <!-- Sign out button on mobile -->
             <button
@@ -212,7 +170,7 @@
                 name="i-heroicons-arrow-right-on-rectangle"
                 class="inline mr-2"
               />
-              {{ isSigningOut ? "Signing out..." : "Sign Out" }}
+              {{ isSigningOut ? $t("auth.signingOut") : $t("auth.signOut") }}
             </button>
           </div>
         </div>
