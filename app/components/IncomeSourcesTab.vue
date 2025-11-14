@@ -4,10 +4,10 @@
       <div class="flex items-center gap-3">
         <div>
           <h3 class="text-xl font-semibold text-neutral-900 dark:text-white">
-            Income Sources
+            {{ $t("income.sources") }}
           </h3>
           <p class="text-neutral-600 dark:text-neutral-400">
-            Manage {{ personName }}'s income sources
+            {{ $t("income.managePersonSources", { name: personName }) }}
           </p>
         </div>
       </div>
@@ -16,7 +16,7 @@
         data-testid="add-income-button"
         @click="openIncomeModal"
       >
-        Add Income Source
+        {{ $t("income.addSource") }}
       </UButton>
     </div>
 
@@ -32,10 +32,10 @@
         class="mx-auto h-12 w-12 text-neutral-400 mb-4"
       />
       <h4 class="text-lg font-medium text-neutral-900 dark:text-white mb-2">
-        No Income Sources
+        {{ $t("income.noSources") }}
       </h4>
       <p class="text-neutral-600 dark:text-neutral-400 mb-4">
-        Add {{ personName }}'s first income source to get started.
+        {{ $t("income.addFirstSource", { name: personName }) }}
       </p>
       <UButton
         variant="soft"
@@ -43,7 +43,7 @@
         data-testid="add-income-button"
         @click="openIncomeModal"
       >
-        Add Income Source
+        {{ $t("income.addSource") }}
       </UButton>
     </div>
     <div v-else class="space-y-4">
@@ -55,20 +55,23 @@
                 {{ income.name }}
               </h4>
               <UBadge :color="income.isActive ? 'success' : 'error'">
-                {{ income.isActive ? "Active" : "Inactive" }}
+                {{
+                  income.isActive ? $t("common.active") : $t("common.inactive")
+                }}
               </UBadge>
             </div>
             <p
               class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-1"
             >
-              ${{ income.amount }} {{ income.frequency }}
+              {{ formatCurrency(parseFloat(income.amount)) }}
+              {{ $t(`income.frequencies.${income.frequency}`) }}
             </p>
             <div class="text-sm text-neutral-600 dark:text-neutral-400">
               <p v-if="income.startDate">
-                Started: {{ formatDate(income.startDate) }}
+                {{ $t("common.started") }}: {{ formatDate(income.startDate) }}
               </p>
               <p v-if="income.endDate">
-                Ends: {{ formatDate(income.endDate) }}
+                {{ $t("common.ends") }}: {{ formatDate(income.endDate) }}
               </p>
             </div>
           </div>
@@ -106,6 +109,9 @@
 
 <script setup lang="ts">
 import type { SelectIncomeSource } from "~~/database/validation-schemas";
+
+const { formatCurrency } = useFormatters();
+const { t } = useI18n();
 
 interface Props {
   incomeSources: SelectIncomeSource[];

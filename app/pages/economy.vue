@@ -5,7 +5,7 @@
         <!-- Header -->
         <div class="mb-8">
           <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">
-            Your Economy Overview
+            {{ $t("navigation.economyOverview") }}
           </h1>
         </div>
 
@@ -15,7 +15,7 @@
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div>
               <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                Created
+                {{ $t("household.created") }}
               </p>
               <p class="font-semibold text-lg text-neutral-900 dark:text-white">
                 {{ new Date(userHousehold.createdAt).toLocaleDateString() }}
@@ -24,7 +24,7 @@
 
             <div>
               <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                Members
+                {{ $t("household.members") }}
               </p>
               <p class="font-semibold text-lg text-neutral-900 dark:text-white">
                 {{ householdMembersText }}
@@ -33,7 +33,7 @@
 
             <div v-if="financialSummary">
               <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                Net Worth
+                {{ $t("financialHealth.netWorth") }}
               </p>
               <p
                 class="font-semibold text-lg"
@@ -43,13 +43,13 @@
                     : 'text-neutral-700 dark:text-neutral-300'
                 "
               >
-                ${{ netWorth.toLocaleString() }}
+                {{ formatCurrency(netWorth) }}
               </p>
             </div>
 
             <div>
               <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                Planning
+                {{ $t("household.planning") }}
               </p>
               <UButton
                 to="/scenarios"
@@ -57,7 +57,7 @@
                 size="sm"
                 class="p-0 h-auto text-left justify-start font-semibold text-lg"
               >
-                View Scenarios
+                {{ $t("household.viewScenarios") }}
               </UButton>
             </div>
           </div>
@@ -82,7 +82,7 @@
                   <h3
                     class="text-lg font-medium text-neutral-900 dark:text-white"
                   >
-                    Members
+                    {{ $t("household.members") }}
                   </h3>
                 </div>
                 <UButton
@@ -93,7 +93,7 @@
                   data-testid="add-person-button"
                   @click="openAddPersonModal"
                 >
-                  Add Member
+                  {{ $t("household.addMember") }}
                 </UButton>
               </div>
             </div>
@@ -123,8 +123,8 @@
                       <p class="text-sm text-neutral-600 dark:text-neutral-400">
                         {{
                           member.age
-                            ? `Age: ${member.age}`
-                            : "Age not specified"
+                            ? `${$t("person.age")}: ${member.age}`
+                            : $t("household.ageNotSpecified")
                         }}
                       </p>
                     </div>
@@ -138,7 +138,7 @@
                       class="w-full sm:w-auto justify-center"
                       :data-testid="`person-${member.id}-manage-button`"
                     >
-                      Manage Finances
+                      {{ $t("household.manageFinances") }}
                     </UButton>
                     <UButton
                       size="lg"
@@ -148,7 +148,7 @@
                       class="w-full sm:w-auto justify-center"
                       :data-testid="`person-${member.id}-delete-button`"
                       @click="openDeletePersonModal(member)"
-                      >Delete</UButton
+                      >{{ $t("common.delete") }}</UButton
                     >
                   </div>
                 </div>
@@ -166,10 +166,10 @@
                 <h4
                   class="text-lg font-medium text-neutral-900 dark:text-white mb-2"
                 >
-                  No members yet
+                  {{ $t("household.noMembersYet") }}
                 </h4>
                 <p class="text-neutral-600 dark:text-neutral-400 mb-6">
-                  Add your first member to get started
+                  {{ $t("household.addFirstMemberDesc") }}
                 </p>
                 <UButton
                   variant="soft"
@@ -177,7 +177,7 @@
                   data-testid="add-person-button"
                   @click="openAddPersonModal"
                 >
-                  Add First Member
+                  {{ $t("household.addFirstMember") }}
                 </UButton>
               </div>
             </div>
@@ -204,10 +204,10 @@
                   <h3
                     class="text-lg font-medium text-neutral-900 dark:text-white"
                   >
-                    Financial Overview
+                    {{ $t("household.financialOverview") }}
                   </h3>
                   <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                    Combined finances for all members
+                    {{ $t("household.combinedFinances") }}
                   </p>
                 </div>
               </div>
@@ -225,18 +225,16 @@
                     <p
                       class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
                     >
-                      Monthly Income
+                      {{ $t("household.monthlyIncome") }}
                     </p>
                     <p
                       class="text-2xl font-bold text-neutral-900 dark:text-white"
                     >
-                      ${{
-                        financialSummary.totalMonthlyIncome.toLocaleString()
-                      }}
+                      {{ formatCurrency(financialSummary.totalMonthlyIncome) }}
                     </p>
                     <p class="text-xs text-neutral-500 dark:text-neutral-500">
-                      ${{ financialSummary.totalAnnualIncome.toLocaleString() }}
-                      annually
+                      {{ formatCurrency(financialSummary.totalAnnualIncome) }}
+                      {{ $t("household.annually") }}
                     </p>
                   </div>
                 </div>
@@ -249,15 +247,16 @@
                     <p
                       class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
                     >
-                      Total Savings
+                      {{ $t("household.totalSavings") }}
                     </p>
                     <p
                       class="text-2xl font-bold text-neutral-900 dark:text-white"
                     >
-                      ${{ financialSummary.totalSavings.toLocaleString() }}
+                      {{ formatCurrency(financialSummary.totalSavings) }}
                     </p>
                     <p class="text-xs text-neutral-500 dark:text-neutral-500">
-                      {{ financialSummary.savingsAccountsCount }} accounts
+                      {{ financialSummary.savingsAccountsCount }}
+                      {{ $t("household.accounts") }}
                     </p>
                   </div>
                 </div>
@@ -270,15 +269,16 @@
                     <p
                       class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
                     >
-                      Total Debt
+                      {{ $t("household.totalDebt") }}
                     </p>
                     <p
                       class="text-2xl font-bold text-neutral-900 dark:text-white"
                     >
-                      ${{ financialSummary.totalDebt.toLocaleString() }}
+                      {{ formatCurrency(financialSummary.totalDebt) }}
                     </p>
                     <p class="text-xs text-neutral-500 dark:text-neutral-500">
-                      {{ financialSummary.loansCount }} loans
+                      {{ financialSummary.loansCount }}
+                      {{ $t("loans.title").toLowerCase() }}
                     </p>
                   </div>
                 </div>
@@ -302,17 +302,17 @@
                       <p
                         class="text-lg font-medium text-neutral-900 dark:text-white"
                       >
-                        Estimated Net Worth
+                        {{ $t("household.estimatedNetWorth") }}
                       </p>
                       <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                        (Savings - Debt)
+                        {{ $t("household.savingsMinusDebt") }}
                       </p>
                     </div>
                   </div>
                   <p
                     class="text-3xl font-bold text-neutral-900 dark:text-neutral-100"
                   >
-                    ${{ netWorth.toLocaleString() }}
+                    {{ formatCurrency(netWorth) }}
                   </p>
                 </div>
               </div>
@@ -341,10 +341,10 @@
                     <h3
                       class="text-lg font-medium text-neutral-900 dark:text-white"
                     >
-                      Fixed Monthly Expenses
+                      {{ $t("household.fixedMonthlyExpenses") }}
                     </h3>
                     <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                      Rent, utilities, subscriptions, etc.
+                      {{ $t("household.rentUtilitiesEtc") }}
                     </p>
                   </div>
                 </div>
@@ -355,7 +355,7 @@
                   data-testid="add-budget-expense-button"
                   @click="openBudgetExpenseModal()"
                 >
-                  Add Expense
+                  {{ $t("household.addExpense") }}
                 </UButton>
               </div>
             </div>
@@ -367,7 +367,7 @@
                   class="animate-spin h-6 w-6 mx-auto mb-2 text-neutral-600"
                 />
                 <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                  Loading expenses...
+                  {{ $t("household.loadingExpenses") }}
                 </p>
               </div>
 
@@ -380,10 +380,10 @@
                   class="h-12 w-12 mx-auto mb-3 text-neutral-400"
                 />
                 <p class="text-neutral-600 dark:text-neutral-400 mb-2">
-                  No budget expenses yet
+                  {{ $t("household.noBudgetExpenses") }}
                 </p>
                 <p class="text-sm text-neutral-500 dark:text-neutral-500">
-                  Add fixed monthly expenses like rent and utilities
+                  {{ $t("household.addFixedExpenses") }}
                 </p>
               </div>
 
@@ -411,9 +411,8 @@
                         <p
                           class="text-sm text-neutral-600 dark:text-neutral-400"
                         >
-                          ${{
-                            parseFloat(expense.amount).toLocaleString()
-                          }}/month
+                          {{ formatCurrency(parseFloat(expense.amount))
+                          }}{{ $t("time.perMonth") }}
                         </p>
                       </div>
                     </div>
@@ -445,22 +444,22 @@
                     <p
                       class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
                     >
-                      Total Monthly Expenses
+                      {{ $t("economy.totalMonthlyExpenses") }}
                     </p>
                     <p
                       class="text-lg font-bold text-neutral-900 dark:text-white"
                     >
-                      ${{ totalMonthlyExpenses.toLocaleString() }}
+                      {{ formatCurrency(totalMonthlyExpenses) }}
                     </p>
                   </div>
                   <div class="flex items-center justify-between">
                     <p class="text-xs text-neutral-500 dark:text-neutral-500">
-                      Projected Annual Cost
+                      {{ $t("economy.projectedAnnualCost") }}
                     </p>
                     <p
                       class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
                     >
-                      ${{ (totalMonthlyExpenses * 12).toLocaleString() }}
+                      {{ formatCurrency(totalMonthlyExpenses * 12) }}
                     </p>
                   </div>
                 </div>
@@ -490,10 +489,10 @@
                     <h3
                       class="text-lg font-medium text-neutral-900 dark:text-white"
                     >
-                      Savings Goals
+                      {{ $t("savingsGoals.title") }}
                     </h3>
                     <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                      Track your financial objectives
+                      {{ $t("savingsGoals.trackYourObjectives") }}
                     </p>
                   </div>
                 </div>
@@ -503,7 +502,7 @@
                   icon="i-heroicons-plus"
                   @click="() => openSavingsGoalModal()"
                 >
-                  Add Goal
+                  {{ $t("savingsGoals.addGoal") }}
                 </UButton>
               </div>
             </div>
@@ -515,7 +514,7 @@
                   class="animate-spin h-6 w-6 mx-auto mb-2 text-neutral-600"
                 />
                 <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                  Loading goals...
+                  {{ $t("savingsGoals.loadingGoals") }}
                 </p>
               </div>
 
@@ -582,9 +581,9 @@
                   <!-- Progress Bar -->
                   <div class="mb-3">
                     <div class="flex justify-between text-sm mb-1">
-                      <span class="text-neutral-600 dark:text-neutral-400"
-                        >Progress</span
-                      >
+                      <span class="text-neutral-600 dark:text-neutral-400">{{
+                        $t("savingsGoals.progress")
+                      }}</span>
                       <span class="font-medium"
                         >{{ getGoalProgress(goal).toFixed(1) }}%</span
                       >
@@ -602,12 +601,10 @@
                     <div
                       class="flex justify-between text-xs text-neutral-500 dark:text-neutral-500 mt-1"
                     >
-                      <span>${{ goal.currentAmount.toLocaleString() }}</span>
-                      <span
-                        >${{
-                          parseFloat(goal.targetAmount).toLocaleString()
-                        }}</span
-                      >
+                      <span>{{ formatCurrency(goal.currentAmount) }}</span>
+                      <span>{{
+                        formatCurrency(parseFloat(goal.targetAmount))
+                      }}</span>
                     </div>
                   </div>
 
@@ -615,15 +612,15 @@
                   <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                     <div>
                       <p class="text-neutral-600 dark:text-neutral-400">
-                        Remaining
+                        {{ $t("savingsGoals.remaining") }}
                       </p>
                       <p class="font-medium">
-                        ${{ getRemainingAmount(goal).toLocaleString() }}
+                        {{ formatCurrency(getRemainingAmount(goal)) }}
                       </p>
                     </div>
                     <div v-if="goal.category">
                       <p class="text-neutral-600 dark:text-neutral-400">
-                        Category
+                        {{ $t("savingsGoals.category") }}
                       </p>
                       <p class="font-medium capitalize">
                         {{ goal.category.replace("-", " ") }}
@@ -636,7 +633,7 @@
                       "
                     >
                       <p class="text-neutral-600 dark:text-neutral-400">
-                        Time to Goal
+                        {{ $t("savingsGoals.timeToGoal") }}
                       </p>
                       <p class="font-medium">
                         {{ getEstimatedCompletionTime(goal) || "N/A" }}
@@ -657,11 +654,11 @@
                           color="success"
                           @click="markGoalAsCompleted(goal)"
                         >
-                          Mark Complete
+                          {{ $t("savingsGoals.markComplete") }}
                         </UButton>
                       </div>
                       <p class="text-xs text-neutral-500 dark:text-neutral-500">
-                        Created
+                        {{ $t("savingsGoals.created") }}
                         {{ new Date(goal.createdAt).toLocaleDateString() }}
                       </p>
                     </div>
@@ -677,20 +674,20 @@
                       <p
                         class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
                       >
-                        ${{ totalTargetAmount }}
+                        {{ formatCurrency(parseFloat(totalTargetAmount)) }}
                       </p>
                       <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                        Total Goal Amount
+                        {{ $t("savingsGoals.totalGoalAmount") }}
                       </p>
                     </div>
                     <div class="text-center">
                       <p
                         class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
                       >
-                        ${{ totalCurrentAmount }}
+                        {{ formatCurrency(parseFloat(totalCurrentAmount)) }}
                       </p>
                       <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                        Total Saved
+                        {{ $t("savingsGoals.totalSaved") }}
                       </p>
                     </div>
                     <div class="text-center">
@@ -700,7 +697,7 @@
                         {{ totalProgress.toFixed(1) }}%
                       </p>
                       <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                        Overall Progress
+                        {{ $t("savingsGoals.overallProgress") }}
                       </p>
                     </div>
                   </div>
@@ -719,17 +716,17 @@
                 <h4
                   class="text-lg font-medium text-neutral-900 dark:text-white mb-2"
                 >
-                  No savings goals yet
+                  {{ $t("savingsGoals.noGoalsYet") }}
                 </h4>
                 <p class="text-neutral-600 dark:text-neutral-400 mb-6">
-                  Set your first savings goal to start tracking your progress
+                  {{ $t("savingsGoals.setFirstGoal") }}
                 </p>
                 <UButton
                   variant="soft"
                   icon="i-heroicons-plus"
                   @click="() => openSavingsGoalModal()"
                 >
-                  Create First Goal
+                  {{ $t("savingsGoals.createFirstGoal") }}
                 </UButton>
               </div>
             </div>
@@ -862,6 +859,9 @@
 import type { ApiSuccessResponse } from "~~/server/utils/api-response";
 import type { BudgetExpense } from "~/composables/useBudgetExpenses";
 import { getCategoryIcon } from "~~/utils/budget-categories";
+
+const { t } = useI18n();
+const { formatCurrency } = useFormatters();
 
 // Page metadata
 definePageMeta({

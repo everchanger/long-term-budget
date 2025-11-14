@@ -1,5 +1,6 @@
 {
   "common": {
+    "appName": "Budget Planner",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -25,12 +26,33 @@
     "name": "Name"
   },
   "navigation": {
+    "home": "Home",
     "dashboard": "Dashboard",
     "economy": "Economy",
     "projections": "Projections",
     "scenarios": "Scenarios",
+    "settings": "Settings",
     "financialHealth": "Financial Health",
-    "financialStory": "Financial Story"
+    "financialStory": "Your Story"
+  },
+  "home": {
+    "title": "Long-Term Budget Planner",
+    "subtitle": "Take control of your financial future with our comprehensive planning tool. Model scenarios, track expenses, and make informed decisions about your money.",
+    "getStarted": "Get Started",
+    "features": {
+      "economy": {
+        "title": "Economy",
+        "description": "Model your complete financial picture including income, expenses, savings, and loans across all family members."
+      },
+      "scenarios": {
+        "title": "Scenario Planning",
+        "description": "Compare \"what-if\" scenarios like paying off debt early vs. investing, or buying vs. renting decisions over months and years."
+      },
+      "projections": {
+        "title": "Long-Term Projections",
+        "description": "Visualize your financial trajectory over time and understand the long-term impact of today's financial decisions."
+      }
+    }
   },
   "dashboard": {
     "title": "Users Dashboard",

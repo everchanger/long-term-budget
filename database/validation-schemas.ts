@@ -34,9 +34,7 @@ export const updateUserPreferencesSchema = z.object({
   currency: z.enum(["USD", "SEK"]).optional(),
 });
 
-export type UpdateUserPreferences = z.infer<
-  typeof updateUserPreferencesSchema
->;
+export type UpdateUserPreferences = z.infer<typeof updateUserPreferencesSchema>;
 
 // Household schemas
 export const insertHouseholdSchema = createInsertSchema(households, {

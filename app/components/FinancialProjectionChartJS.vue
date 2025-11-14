@@ -2,28 +2,30 @@
   <UCard>
     <template #header>
       <div class="flex items-center justify-between">
-        <h3 class="text-lg font-semibold">10-Year Financial Projection</h3>
+        <h3 class="text-lg font-semibold">
+          {{ $t("projections.chartTitle") }}
+        </h3>
         <div class="flex gap-2">
           <UButton
             :color="selectedView === 'netWorth' ? 'primary' : 'neutral'"
             size="xs"
             @click="selectedView = 'netWorth'"
           >
-            Net Worth
+            {{ $t("projections.netWorth") }}
           </UButton>
           <UButton
             :color="selectedView === 'breakdown' ? 'primary' : 'neutral'"
             size="xs"
             @click="selectedView = 'breakdown'"
           >
-            Assets
+            {{ $t("projections.assets") }}
           </UButton>
           <UButton
             :color="selectedView === 'debt' ? 'primary' : 'neutral'"
             size="xs"
             @click="selectedView = 'debt'"
           >
-            Debt
+            {{ $t("projections.debt") }}
           </UButton>
         </div>
       </div>
@@ -41,7 +43,7 @@
       >
         <div>
           <div class="text-xs text-gray-500 dark:text-gray-400">
-            Starting Net Worth
+            {{ $t("projections.startingNetWorth") }}
           </div>
           <div class="text-lg font-semibold">
             {{ formatCurrency(startValue) }}
@@ -49,7 +51,7 @@
         </div>
         <div>
           <div class="text-xs text-gray-500 dark:text-gray-400">
-            Projected (10 Years)
+            {{ $t("projections.projected10Years") }}
           </div>
           <div class="text-lg font-semibold text-green-600 dark:text-green-400">
             {{ formatCurrency(endValue) }}
@@ -57,7 +59,7 @@
         </div>
         <div>
           <div class="text-xs text-gray-500 dark:text-gray-400">
-            Total Growth
+            {{ $t("projections.totalGrowth") }}
           </div>
           <div class="text-lg font-semibold text-blue-600 dark:text-blue-400">
             {{ formatCurrency(endValue - startValue) }}
@@ -65,7 +67,7 @@
         </div>
         <div>
           <div class="text-xs text-gray-500 dark:text-gray-400">
-            Growth Rate
+            {{ $t("projections.growthRate") }}
           </div>
           <div class="text-lg font-semibold">
             {{
@@ -98,6 +100,8 @@ import {
   type ChartOptions,
 } from "chart.js";
 
+const { t } = useI18n();
+
 // Register Chart.js components
 ChartJS.register(
   CategoryScale,
@@ -128,7 +132,7 @@ const selectedView = ref<"netWorth" | "breakdown" | "debt">("netWorth");
 
 // Generate year labels
 const yearLabels = computed(() => {
-  return Array.from({ length: 11 }, (_, i) => `Year ${i}`);
+  return Array.from({ length: 11 }, (_, i) => `${t("projections.year")} ${i}`);
 });
 
 // Chart data
@@ -136,7 +140,7 @@ const chartData = computed(() => {
   if (selectedView.value === "netWorth") {
     const datasets = [
       {
-        label: "Projected Net Worth",
+        label: t("projections.projectedNetWorth"),
         data: props.yearlyNetWorth,
         borderColor: "rgb(34, 197, 94)",
         backgroundColor: "rgba(34, 197, 94, 0.1)",
@@ -151,7 +155,7 @@ const chartData = computed(() => {
     // Add baseline if provided
     if (props.baselineNetWorth && props.baselineNetWorth.length > 0) {
       datasets.push({
-        label: "Original Projection",
+        label: t("projections.originalProjection"),
         data: props.baselineNetWorth,
         borderColor: "rgb(156, 163, 175)",
         backgroundColor: "rgba(156, 163, 175, 0.05)",
@@ -172,7 +176,7 @@ const chartData = computed(() => {
   } else if (selectedView.value === "debt") {
     const datasets = [
       {
-        label: "Debt Balance",
+        label: t("projections.debtBalance"),
         data: props.yearlyDebt,
         borderColor: "rgb(239, 68, 68)",
         backgroundColor: "rgba(239, 68, 68, 0.1)",
@@ -187,7 +191,7 @@ const chartData = computed(() => {
     // Add baseline if provided
     if (props.baselineDebt && props.baselineDebt.length > 0) {
       datasets.push({
-        label: "Original Debt",
+        label: t("projections.originalDebt"),
         data: props.baselineDebt,
         borderColor: "rgb(156, 163, 175)",
         backgroundColor: "rgba(156, 163, 175, 0.05)",
@@ -210,7 +214,7 @@ const chartData = computed(() => {
       labels: yearLabels.value,
       datasets: [
         {
-          label: "Savings",
+          label: t("savings.title"),
           data: props.yearlySavings,
           borderColor: "rgb(59, 130, 246)",
           backgroundColor: "rgba(59, 130, 246, 0.1)",
@@ -221,7 +225,7 @@ const chartData = computed(() => {
           pointHoverRadius: 5,
         },
         {
-          label: "Investments",
+          label: t("projections.investments"),
           data: props.yearlyInvestments,
           borderColor: "rgb(168, 85, 247)",
           backgroundColor: "rgba(168, 85, 247, 0.1)",
@@ -293,12 +297,7 @@ const chartOptions = computed<ChartOptions<"line">>(() => ({
   },
 }));
 
-const { formatCurrencyCompact } = useCurrency();
-
-// Format currency
-const formatCurrency = (value: number) => {
-  return formatCurrencyCompact(value);
-};
+const { formatCurrency, formatCurrencyCompact } = useFormatters();
 
 // Summary stats
 const startValue = computed(() => props.yearlyNetWorth[0] || 0);

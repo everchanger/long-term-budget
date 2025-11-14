@@ -9,7 +9,7 @@
         <div
           class="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-white mb-4"
         />
-        <p class="text-xl">Crafting your financial snapshot...</p>
+        <p class="text-xl">{{ $t("financialStory.loading") }}</p>
       </div>
     </div>
 
@@ -41,13 +41,13 @@
           <h1
             class="text-6xl md:text-8xl font-black mb-6 bg-gradient-to-r from-yellow-200 to-pink-200 bg-clip-text text-transparent"
           >
-            Your Financial Snapshot
+            {{ $t("financialStory.yourFinancialSnapshot") }}
           </h1>
           <p class="text-2xl md:text-3xl mb-12 text-purple-100">
-            Where you stand right now
+            {{ $t("financialStory.whereYouStandNow") }}
           </p>
           <div class="text-lg text-purple-200 animate-bounce">
-            Scroll to explore ↓
+            {{ $t("financialStory.scrollToExplore") }}
           </div>
         </div>
       </section>
@@ -76,25 +76,25 @@
         </div>
 
         <div class="text-center max-w-4xl space-y-8 relative z-10">
-          <h2 class="text-5xl md:text-7xl font-black mb-8">Your Household</h2>
+          <h2 class="text-5xl md:text-7xl font-black mb-8">
+            {{ $t("financialStory.yourHousehold") }}
+          </h2>
           <p class="text-2xl md:text-3xl text-cyan-100 mb-12">
             {{
               householdPersons.length === 1
-                ? "Flying solo"
-                : "Your household has"
+                ? $t("financialStory.flyingSolo")
+                : $t("financialStory.householdHas")
             }}
             <span class="font-bold text-yellow-300">{{
               householdPersons.length
             }}</span>
             {{
-              householdPersons.length === 1
-                ? ""
-                : householdPersons.length === 2
-                ? "people"
-                : "people"
+              householdPersons.length === 1 ? "" : $t("financialStory.people")
             }}
             {{
-              householdPersons.length === 1 ? "" : "building wealth together"
+              householdPersons.length === 1
+                ? ""
+                : $t("financialStory.buildingWealthTogether")
             }}
           </p>
           <div class="flex justify-center gap-6 flex-wrap">
@@ -106,7 +106,7 @@
             >
               <div class="text-xl font-semibold">{{ person.name }}</div>
               <div v-if="person.age" class="text-sm text-cyan-200 mt-1">
-                Age {{ person.age }}
+                {{ $t("financialStory.age") }} {{ person.age }}
               </div>
             </NuxtLink>
           </div>
@@ -142,16 +142,16 @@
 
         <div class="text-center max-w-4xl relative z-10">
           <p class="text-2xl md:text-3xl mb-6 text-emerald-100">
-            Monthly Income
+            {{ $t("financialStory.monthlyIncome") }}
           </p>
           <h2 class="text-7xl md:text-9xl font-black mb-8 text-green-300">
             {{ formatCurrency(data.cashFlow.monthly.income) }}
           </h2>
           <p class="text-xl md:text-2xl text-emerald-100/80">
-            flowing in each month
+            {{ $t("financialStory.flowingInEachMonth") }}
           </p>
           <div class="mt-12 text-lg text-emerald-200">
-            Annual:
+            {{ $t("financialStory.annual") }}:
             <span class="font-bold text-yellow-300">{{
               formatCurrency(data.cashFlow.monthly.income * 12)
             }}</span>
@@ -239,7 +239,7 @@
 
         <div class="text-center max-w-4xl relative z-10">
           <p class="text-3xl md:text-4xl mb-6 text-purple-100">
-            Current net worth
+            {{ $t("financialStory.currentNetWorth") }}
           </p>
           <h2
             class="text-7xl md:text-9xl font-black mb-8"
@@ -253,7 +253,9 @@
             <div
               class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 transform hover:scale-105 transition-transform"
             >
-              <div class="text-sm text-purple-200 mb-2">Assets</div>
+              <div class="text-sm text-purple-200 mb-2">
+                {{ $t("financialStory.assets") }}
+              </div>
               <div class="text-3xl font-bold text-green-300">
                 {{ formatCurrency(data.netWorth.assets) }}
               </div>
@@ -261,7 +263,9 @@
             <div
               class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 transform hover:scale-105 transition-transform"
             >
-              <div class="text-sm text-purple-200 mb-2">Debts</div>
+              <div class="text-sm text-purple-200 mb-2">
+                {{ $t("financialStory.debts") }}
+              </div>
               <div class="text-3xl font-bold text-red-300">
                 {{ formatCurrency(data.netWorth.liabilities) }}
               </div>
@@ -293,12 +297,14 @@
         </div>
 
         <div class="text-center max-w-4xl relative z-10">
-          <p class="text-3xl md:text-4xl mb-6 text-orange-100">Savings rate</p>
+          <p class="text-3xl md:text-4xl mb-6 text-orange-100">
+            {{ $t("financialStory.savingsRate") }}
+          </p>
           <h2 class="text-7xl md:text-9xl font-black mb-8 text-yellow-300">
             {{ data.cashFlow.savingsRate.toFixed(1) }}%
           </h2>
           <p class="text-2xl md:text-3xl text-orange-100 mb-8">
-            of income saved
+            {{ $t("financialStory.ofIncomeSaved") }}
           </p>
 
           <!-- Progress bar -->
@@ -317,22 +323,22 @@
             </div>
             <div class="flex justify-between text-sm text-blue-200 mt-2">
               <span>0%</span>
-              <span>Recommended: 20%</span>
+              <span>{{ $t("financialStory.recommended") }}: 20%</span>
               <span>100%</span>
             </div>
           </div>
 
           <div v-if="data.cashFlow.savingsRate >= 20" class="mt-12 text-2xl">
-            🌟 Crushing it! That's fantastic!
+            {{ $t("financialStory.savingsRateExcellent") }}
           </div>
           <div
             v-else-if="data.cashFlow.savingsRate >= 10"
             class="mt-12 text-2xl"
           >
-            👍 Solid progress! Keep going!
+            {{ $t("financialStory.savingsRateGood") }}
           </div>
           <div v-else class="mt-12 text-2xl">
-            💪 Room to grow - you've got this!
+            {{ $t("financialStory.savingsRateFair") }}
           </div>
         </div>
       </section>
@@ -357,11 +363,15 @@
         </div>
 
         <div class="text-center max-w-4xl relative z-10">
-          <p class="text-3xl md:text-4xl mb-6 text-blue-100">Safety net</p>
+          <p class="text-3xl md:text-4xl mb-6 text-blue-100">
+            {{ $t("financialStory.safetyNet") }}
+          </p>
           <h2 class="text-7xl md:text-9xl font-black mb-8 text-cyan-300">
             {{ data.emergencyFund.monthsOfExpenses.toFixed(1) }}
           </h2>
-          <p class="text-2xl md:text-3xl text-blue-100 mb-8">months covered</p>
+          <p class="text-2xl md:text-3xl text-blue-100 mb-8">
+            {{ $t("financialStory.monthsCovered") }}
+          </p>
 
           <div class="max-w-md mx-auto space-y-4">
             <div class="flex items-center gap-3 text-left">
@@ -369,8 +379,12 @@
                 {{ data.emergencyFund.monthsOfExpenses >= 6 ? "✅" : "⏳" }}
               </div>
               <div>
-                <div class="font-semibold">6 months (Ideal)</div>
-                <div class="text-sm text-blue-200">Ultimate safety</div>
+                <div class="font-semibold">
+                  {{ $t("financialStory.sixMonthsIdeal") }}
+                </div>
+                <div class="text-sm text-blue-200">
+                  {{ $t("financialStory.ultimateSafety") }}
+                </div>
               </div>
             </div>
             <div class="flex items-center gap-3 text-left">
@@ -378,8 +392,12 @@
                 {{ data.emergencyFund.monthsOfExpenses >= 3 ? "✅" : "⏳" }}
               </div>
               <div>
-                <div class="font-semibold">3 months (Good)</div>
-                <div class="text-sm text-blue-200">Solid cushion</div>
+                <div class="font-semibold">
+                  {{ $t("financialStory.threeMonthsGood") }}
+                </div>
+                <div class="text-sm text-blue-200">
+                  {{ $t("financialStory.solidCushion") }}
+                </div>
               </div>
             </div>
             <div class="flex items-center gap-3 text-left">
@@ -387,8 +405,12 @@
                 {{ data.emergencyFund.monthsOfExpenses >= 1 ? "✅" : "⏳" }}
               </div>
               <div>
-                <div class="font-semibold">1 month (Start)</div>
-                <div class="text-sm text-blue-200">Building up</div>
+                <div class="font-semibold">
+                  {{ $t("financialStory.oneMonthStart") }}
+                </div>
+                <div class="text-sm text-blue-200">
+                  {{ $t("financialStory.buildingUp") }}
+                </div>
               </div>
             </div>
           </div>
@@ -419,7 +441,7 @@
 
         <div class="text-center max-w-4xl relative z-10">
           <p class="text-3xl md:text-4xl mb-6 text-pink-100">
-            Debt-to-income ratio
+            {{ $t("financialStory.debtToIncomeRatio") }}
           </p>
           <h2 class="text-7xl md:text-9xl font-black mb-8 text-rose-300">
             {{ data.debtToIncome.ratio.toFixed(1) }}%
@@ -442,8 +464,8 @@
               </div>
             </div>
             <div class="flex justify-between text-sm text-blue-200 mt-2">
-              <span>0% (No debt)</span>
-              <span>36% (Healthy)</span>
+              <span>{{ $t("financialStory.noDebt") }}</span>
+              <span>{{ $t("financialStory.healthyDebt") }}</span>
               <span>50%+</span>
             </div>
           </div>
@@ -452,10 +474,10 @@
             v-if="data.debtToIncome.ratio <= 36"
             class="text-2xl text-green-300"
           >
-            ✨ Excellent! Your debt is manageable
+            {{ $t("financialStory.debtExcellent") }}
           </div>
           <div v-else class="text-2xl text-yellow-300">
-            💡 Focus on reducing debt for more flexibility
+            {{ $t("financialStory.debtFocusOnReducing") }}
           </div>
         </div>
       </section>
@@ -478,26 +500,28 @@
 
         <div class="text-center max-w-4xl relative z-10">
           <p class="text-2xl md:text-3xl mb-6 text-lime-100">
-            Monthly savings equals
+            {{ $t("financialStory.monthlySavingsEquals") }}
           </p>
           <h2 class="text-7xl md:text-9xl font-black mb-8 text-yellow-300">
             {{ Math.floor(Math.max(0, data.cashFlow.monthly.netCashFlow) / 5) }}
           </h2>
-          <p class="text-2xl md:text-3xl text-lime-100">fancy lattes</p>
+          <p class="text-2xl md:text-3xl text-lime-100">
+            {{ $t("financialStory.fancyLattes") }}
+          </p>
           <div class="mt-12 space-y-4 text-xl text-lime-200">
             <div>
-              Or
+              {{ $t("financialStory.or") }}
               {{
                 Math.floor(Math.max(0, data.cashFlow.monthly.netCashFlow) / 15)
               }}
-              movie tickets
+              {{ $t("financialStory.movieTickets") }}
             </div>
             <div>
-              Or
+              {{ $t("financialStory.or") }}
               {{
                 Math.floor(Math.max(0, data.cashFlow.monthly.netCashFlow) / 60)
               }}
-              nice dinners
+              {{ $t("financialStory.niceDinners") }}
             </div>
           </div>
         </div>
@@ -556,27 +580,39 @@
           <h2
             class="text-5xl md:text-7xl font-black mb-6 bg-gradient-to-r from-yellow-200 via-pink-200 to-purple-200 bg-clip-text text-transparent"
           >
-            Your Financial Snapshot
+            {{ $t("financialStory.yourFinancialSnapshot") }}
           </h2>
           <div class="space-y-6 text-xl md:text-2xl text-violet-100">
             <div v-if="data.summary.overallHealth === 'excellent'">
-              Financial health:
-              <span class="text-green-300 font-bold">Excellent</span> 🌟
+              {{ $t("financialStory.financialHealth") }}:
+              <span class="text-green-300 font-bold">{{
+                $t("financialStory.healthExcellent")
+              }}</span>
+              🌟
             </div>
             <div v-else-if="data.summary.overallHealth === 'good'">
-              Financial health:
-              <span class="text-blue-300 font-bold">Good</span> 💪
+              {{ $t("financialStory.financialHealth") }}:
+              <span class="text-blue-300 font-bold">{{
+                $t("financialStory.healthGood")
+              }}</span>
+              💪
             </div>
             <div v-else-if="data.summary.overallHealth === 'fair'">
-              Financial health:
-              <span class="text-yellow-300 font-bold">Fair</span> 📈
+              {{ $t("financialStory.financialHealth") }}:
+              <span class="text-yellow-300 font-bold">{{
+                $t("financialStory.healthFair")
+              }}</span>
+              📈
             </div>
             <div v-else>
-              Financial health:
-              <span class="text-orange-300 font-bold">Building</span> 🚀
+              {{ $t("financialStory.financialHealth") }}:
+              <span class="text-orange-300 font-bold">{{
+                $t("financialStory.healthBuilding")
+              }}</span>
+              🚀
             </div>
             <p class="text-lg text-violet-200">
-              Keep moving forward, one step at a time
+              {{ $t("financialStory.keepMovingForward") }}
             </p>
           </div>
 
@@ -587,7 +623,7 @@
               variant="solid"
               @click="navigateTo('/projections')"
             >
-              Detailed Projections
+              {{ $t("financialStory.detailedProjections") }}
             </UButton>
             <UButton
               size="xl"
@@ -596,7 +632,7 @@
               @click="shareStory"
             >
               <UIcon name="i-heroicons-share" class="mr-2" />
-              Share Snapshot
+              {{ $t("financialStory.shareSnapshot") }}
             </UButton>
           </div>
         </div>

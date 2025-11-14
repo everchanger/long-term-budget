@@ -1,12 +1,12 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div class="flex items-center justify-between mb-6">
-      <h1 class="text-3xl font-bold">Financial Projections</h1>
+      <h1 class="text-3xl font-bold">{{ $t("projections.title") }}</h1>
     </div>
 
     <div v-if="!userHousehold" class="text-center py-12">
       <p class="text-gray-500">
-        No household found. Please create a household first.
+        {{ $t("projections.noHousehold") }}
       </p>
     </div>
 
@@ -14,11 +14,15 @@
       <div
         class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"
       />
-      <p class="mt-4 text-gray-500">Generating projections...</p>
+      <p class="mt-4 text-gray-500">
+        {{ $t("projections.generatingProjections") }}
+      </p>
     </div>
 
     <div v-else-if="error" class="text-center py-12">
-      <p class="text-red-500">Error loading projections: {{ error.message }}</p>
+      <p class="text-red-500">
+        {{ $t("projections.errorLoadingProjections") }}: {{ error.message }}
+      </p>
     </div>
 
     <template v-else-if="data">
@@ -27,10 +31,11 @@
         <div class="lg:col-span-1 space-y-4">
           <UCard>
             <template #header>
-              <h2 class="text-xl font-semibold">Adjust Instruments</h2>
+              <h2 class="text-xl font-semibold">
+                {{ $t("projections.adjustInstruments") }}
+              </h2>
               <p class="text-sm text-gray-500 mt-1">
-                Modify values below to see how they affect your 10-year
-                projection
+                {{ $t("projections.adjustInstrumentsDesc") }}
               </p>
             </template>
 
@@ -53,14 +58,18 @@
             <template #header>
               <div class="flex items-center justify-between">
                 <div>
-                  <h2 class="text-lg font-semibold">Global Assumptions</h2>
+                  <h2 class="text-lg font-semibold">
+                    {{ $t("projections.globalAssumptions") }}
+                  </h2>
                   <p class="text-xs text-gray-500 mt-1">
-                    Apply growth rates and returns to projections
+                    {{ $t("projections.globalAssumptionsDesc") }}
                   </p>
                 </div>
                 <label class="flex items-center gap-2 cursor-pointer">
                   <span class="text-sm text-gray-600">{{
-                    enableGlobalAssumptions ? "Enabled" : "Disabled"
+                    enableGlobalAssumptions
+                      ? $t("projections.enabled")
+                      : $t("projections.disabled")
                   }}</span>
                   <input
                     v-model="enableGlobalAssumptions"
@@ -135,16 +144,18 @@
           <UCard>
             <template #header>
               <div>
-                <h2 class="text-xl font-semibold">Stored Financial Data</h2>
+                <h2 class="text-xl font-semibold">
+                  {{ $t("projections.storedFinancialData") }}
+                </h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Current values from your database (before any adjustments)
+                  {{ $t("projections.storedFinancialDataDesc") }}
                 </p>
               </div>
             </template>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <div class="text-sm text-gray-500 dark:text-gray-400">
-                  Net Worth
+                  {{ $t("projections.netWorth") }}
                 </div>
                 <div
                   class="text-2xl font-bold"
@@ -159,7 +170,7 @@
               </div>
               <div>
                 <div class="text-sm text-gray-500 dark:text-gray-400">
-                  Monthly Income
+                  {{ $t("projections.monthlyIncome") }}
                 </div>
                 <div class="text-2xl font-bold">
                   {{ formatCurrency(originalCurrentState?.monthlyIncome ?? 0) }}
@@ -167,7 +178,7 @@
               </div>
               <div>
                 <div class="text-sm text-gray-500 dark:text-gray-400">
-                  Monthly Expenses
+                  {{ $t("projections.monthlyExpenses") }}
                 </div>
                 <div class="text-2xl font-bold">
                   {{
@@ -177,7 +188,7 @@
               </div>
               <div>
                 <div class="text-sm text-gray-500 dark:text-gray-400">
-                  Total Debt
+                  {{ $t("projections.totalDebt") }}
                 </div>
                 <div class="text-2xl font-bold text-red-600 dark:text-red-400">
                   {{ formatCurrency(originalCurrentState?.debt ?? 0) }}
@@ -196,11 +207,10 @@
             <template #header>
               <div>
                 <h2 class="text-xl font-semibold">
-                  Adjusted Projection Values
+                  {{ $t("projections.adjustedProjectionValues") }}
                 </h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Starting values used for the projection (with your adjustments
-                  applied)
+                  {{ $t("projections.adjustedProjectionValuesDesc") }}
                 </p>
               </div>
             </template>
@@ -281,7 +291,9 @@
           <UCard>
             <template #header>
               <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold">Projection Data</h2>
+                <h2 class="text-xl font-semibold">
+                  {{ $t("projections.projectionData") }}
+                </h2>
                 <UButton
                   :color="showDataTable ? 'primary' : 'neutral'"
                   size="sm"
@@ -295,7 +307,11 @@
                     "
                     class="mr-1"
                   />
-                  {{ showDataTable ? "Hide Table" : "Show Table" }}
+                  {{
+                    showDataTable
+                      ? $t("projections.hideTable")
+                      : $t("projections.showTable")
+                  }}
                 </UButton>
               </div>
             </template>
@@ -303,20 +319,26 @@
               <table class="w-full text-sm">
                 <thead>
                   <tr class="border-b dark:border-gray-700">
-                    <th class="text-left py-2 px-2 font-semibold">Year</th>
-                    <th class="text-right py-2 px-2 font-semibold">
-                      Net Worth
-                    </th>
-                    <th class="text-right py-2 px-2 font-semibold">Savings</th>
-                    <th class="text-right py-2 px-2 font-semibold">
-                      Investments
-                    </th>
-                    <th class="text-right py-2 px-2 font-semibold">Debt</th>
-                    <th class="text-right py-2 px-2 font-semibold">
-                      Monthly Income
+                    <th class="text-left py-2 px-2 font-semibold">
+                      {{ $t("projections.year") }}
                     </th>
                     <th class="text-right py-2 px-2 font-semibold">
-                      Monthly Expenses
+                      {{ $t("projections.netWorth") }}
+                    </th>
+                    <th class="text-right py-2 px-2 font-semibold">
+                      {{ $t("savings.title") }}
+                    </th>
+                    <th class="text-right py-2 px-2 font-semibold">
+                      {{ $t("projections.investments") }}
+                    </th>
+                    <th class="text-right py-2 px-2 font-semibold">
+                      {{ $t("projections.debt") }}
+                    </th>
+                    <th class="text-right py-2 px-2 font-semibold">
+                      {{ $t("projections.monthlyIncome") }}
+                    </th>
+                    <th class="text-right py-2 px-2 font-semibold">
+                      {{ $t("projections.monthlyExpenses") }}
                     </th>
                   </tr>
                 </thead>
@@ -326,7 +348,9 @@
                     :key="year - 1"
                     class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
                   >
-                    <td class="py-2 px-2 font-medium">Year {{ year - 1 }}</td>
+                    <td class="py-2 px-2 font-medium">
+                      {{ $t("projections.year") }} {{ year - 1 }}
+                    </td>
                     <td
                       class="text-right py-2 px-2"
                       :class="
@@ -387,14 +411,16 @@
               v-else
               class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm"
             >
-              Click "Show Table" to view detailed yearly data
+              {{ $t("projections.clickShowTable") }}
             </div>
           </UCard>
 
           <!-- Milestones -->
           <UCard v-if="data.projection.milestones.length > 0">
             <template #header>
-              <h2 class="text-xl font-semibold">Key Milestones</h2>
+              <h2 class="text-xl font-semibold">
+                {{ $t("projections.keyMilestones") }}
+              </h2>
             </template>
             <div class="space-y-3">
               <div
@@ -410,7 +436,9 @@
                   />
                 </div>
                 <div class="flex-1">
-                  <div class="font-medium">{{ milestone.description }}</div>
+                  <div class="font-medium">
+                    {{ getMilestoneDescription(milestone) }}
+                  </div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">
                     {{ formatMilestoneTime(milestone.month) }}
                   </div>
@@ -428,13 +456,15 @@
           <!-- Summary -->
           <UCard>
             <template #header>
-              <h2 class="text-xl font-semibold">10-Year Summary</h2>
+              <h2 class="text-xl font-semibold">
+                {{ $t("projections.summary") }}
+              </h2>
             </template>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-4">
                 <div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">
-                    Starting Net Worth
+                    {{ $t("projections.startingNetWorth") }}
                   </div>
                   <div class="text-2xl font-bold">
                     {{ formatCurrency(data.projection.summary.startNetWorth) }}
@@ -442,7 +472,7 @@
                 </div>
                 <div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">
-                    Ending Net Worth
+                    {{ $t("projections.endingNetWorth") }}
                   </div>
                   <div
                     class="text-2xl font-bold text-green-600 dark:text-green-400"
@@ -452,7 +482,7 @@
                 </div>
                 <div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">
-                    Total Growth
+                    {{ $t("projections.totalGrowth") }}
                   </div>
                   <div
                     class="text-2xl font-bold text-blue-600 dark:text-blue-400"
@@ -464,7 +494,7 @@
               <div class="space-y-4">
                 <div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">
-                    Total Savings
+                    {{ $t("projections.totalSaved") }}
                   </div>
                   <div class="text-2xl font-bold">
                     {{
@@ -476,7 +506,7 @@
                 </div>
                 <div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">
-                    Total Debt Paid
+                    {{ $t("projections.totalDebtPaid") }}
                   </div>
                   <div
                     class="text-2xl font-bold text-green-600 dark:text-green-400"
@@ -486,7 +516,7 @@
                 </div>
                 <div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">
-                    Avg Monthly Cash Flow
+                    {{ $t("projections.avgMonthlyCashFlow") }}
                   </div>
                   <div class="text-2xl font-bold">
                     {{
@@ -517,6 +547,9 @@ import type {
 definePageMeta({
   middleware: "auth",
 });
+
+const { t } = useI18n();
+const { formatCurrencyCompact } = useFormatters();
 
 // Fetch user's household
 const { data: householdsData } = await useFetch("/api/households");
@@ -702,14 +735,24 @@ onMounted(() => {
 // Milestone helpers
 const formatMilestoneTime = (month: number) => {
   if (month <= 12) {
-    return `Month ${month}`;
+    return `${t("projections.month")} ${month}`;
   }
   const years = Math.floor((month - 1) / 12);
   const months = month - years * 12;
   if (months === 0) {
-    return `Year ${years}`;
+    return `${t("projections.year")} ${years}`;
   }
-  return `Year ${years}, Month ${months}`;
+  return `${t("projections.year")} ${years}, ${t(
+    "projections.month"
+  )} ${months}`;
+};
+
+const getMilestoneDescription = (milestone: any) => {
+  if (milestone.type === "net_worth_milestone" && milestone.amount) {
+    const amount = formatCurrencyCompact(milestone.amount);
+    return t("projections.reachedNetWorth", { amount });
+  }
+  return milestone.description;
 };
 
 const getMilestoneIcon = (type: string) => {

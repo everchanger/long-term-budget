@@ -13,9 +13,9 @@
                 name="i-heroicons-chart-bar"
                 class="text-2xl text-blue-600 dark:text-blue-400"
               />
-              <span class="text-xl font-bold text-gray-900 dark:text-white"
-                >Budget Planner</span
-              >
+              <span class="text-xl font-bold text-gray-900 dark:text-white">{{
+                $t("common.appName")
+              }}</span>
             </NuxtLink>
           </div>
 
@@ -26,20 +26,20 @@
               class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
               active-class="text-blue-600 dark:text-blue-400"
             >
-              Home
+              {{ $t("navigation.home") }}
             </NuxtLink>
             <NuxtLink
               to="/dashboard"
               class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
               active-class="text-blue-600 dark:text-blue-400"
             >
-              Dashboard
+              {{ $t("navigation.dashboard") }}
             </NuxtLink>
             <NuxtLink
               to="/economy"
               class="text-neutral-600 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
             >
-              Economy
+              {{ $t("navigation.economy") }}
             </NuxtLink>
             <NuxtLink
               to="/financial-story"
@@ -48,7 +48,7 @@
             >
               <span class="flex items-center gap-1">
                 <UIcon name="i-heroicons-sparkles" class="text-lg" />
-                Your Story
+                {{ $t("navigation.financialStory") }}
               </span>
             </NuxtLink>
             <NuxtLink
@@ -56,14 +56,14 @@
               class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
               active-class="text-blue-600 dark:text-blue-400"
             >
-              Projections
+              {{ $t("navigation.projections") }}
             </NuxtLink>
             <NuxtLink
               to="/scenarios"
               class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
               active-class="text-blue-600 dark:text-blue-400"
             >
-              Scenarios
+              {{ $t("navigation.scenarios") }}
             </NuxtLink>
           </nav>
 
@@ -82,7 +82,9 @@
                 icon="i-heroicons-cog-6-tooth"
                 to="/settings"
               >
-                <span class="hidden md:inline ml-2">Settings</span>
+                <span class="hidden md:inline ml-2">{{
+                  $t("navigation.settings")
+                }}</span>
               </UButton>
               <UButton
                 variant="ghost"
@@ -90,7 +92,9 @@
                 :loading="isSigningOut"
                 @click="handleSignOut"
               >
-                <span class="hidden md:inline ml-2">Sign Out</span>
+                <span class="hidden md:inline ml-2">{{
+                  $t("auth.signOut")
+                }}</span>
               </UButton>
             </template>
             <template v-else>
@@ -100,7 +104,7 @@
                 color="primary"
                 @click="navigateTo('/auth')"
               >
-                Sign In
+                {{ $t("auth.signIn") }}
               </UButton>
             </template>
 

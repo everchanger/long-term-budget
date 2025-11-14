@@ -2,7 +2,9 @@
   <UModal v-model:open="isOpen">
     <template #header>
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-        {{ isEditing ? "Edit Savings Goal" : "Add Savings Goal" }}
+        {{
+          isEditing ? $t("savingsGoals.editGoal") : $t("savingsGoals.addGoal")
+        }}
       </h3>
     </template>
 
@@ -14,14 +16,14 @@
             for="goal-name"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Goal Name *
+            {{ $t("savingsGoals.goalNameRequired") }}
           </label>
           <input
             id="goal-name"
             v-model="formState.name"
             type="text"
             required
-            placeholder="e.g., Emergency Fund, Vacation, New Car"
+            :placeholder="$t('savingsGoals.goalNamePlaceholder')"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
         </div>
@@ -32,13 +34,13 @@
             for="goal-description"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Description
+            {{ $t("savingsGoals.description") }}
           </label>
           <textarea
             id="goal-description"
             v-model="formState.description"
             rows="3"
-            placeholder="Optional description of your savings goal"
+            :placeholder="$t('savingsGoals.descriptionPlaceholder')"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
         </div>
@@ -49,7 +51,7 @@
             for="goal-target-amount"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Target Amount *
+            {{ $t("savingsGoals.targetAmountRequired") }}
           </label>
           <input
             id="goal-target-amount"
@@ -68,16 +70,16 @@
             for="goal-priority"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Priority
+            {{ $t("savingsGoals.priority") }}
           </label>
           <select
             id="goal-priority"
             v-model="formState.priority"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           >
-            <option value="1">Low</option>
-            <option value="2">Medium</option>
-            <option value="3">High</option>
+            <option value="1">{{ $t("savingsGoals.priorityLow") }}</option>
+            <option value="2">{{ $t("savingsGoals.priorityMedium") }}</option>
+            <option value="3">{{ $t("savingsGoals.priorityHigh") }}</option>
           </select>
         </div>
 
@@ -87,22 +89,36 @@
             for="goal-category"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Category
+            {{ $t("savingsGoals.category") }}
           </label>
           <select
             id="goal-category"
             v-model="formState.category"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           >
-            <option value="">Select a category</option>
-            <option value="Emergency Fund">Emergency Fund</option>
-            <option value="Vacation">Vacation</option>
-            <option value="Car">Car</option>
-            <option value="House">House</option>
-            <option value="Education">Education</option>
-            <option value="Retirement">Retirement</option>
-            <option value="Investment">Investment</option>
-            <option value="Other">Other</option>
+            <option value="">{{ $t("savingsGoals.selectCategory") }}</option>
+            <option value="Emergency Fund">
+              {{ $t("savingsGoals.categoryEmergencyFund") }}
+            </option>
+            <option value="Vacation">
+              {{ $t("savingsGoals.categoryVacation") }}
+            </option>
+            <option value="Car">{{ $t("savingsGoals.categoryCar") }}</option>
+            <option value="House">
+              {{ $t("savingsGoals.categoryHouse") }}
+            </option>
+            <option value="Education">
+              {{ $t("savingsGoals.categoryEducation") }}
+            </option>
+            <option value="Retirement">
+              {{ $t("savingsGoals.categoryRetirement") }}
+            </option>
+            <option value="Investment">
+              {{ $t("savingsGoals.categoryInvestment") }}
+            </option>
+            <option value="Other">
+              {{ $t("savingsGoals.categoryOther") }}
+            </option>
           </select>
         </div>
 
@@ -113,10 +129,10 @@
           <label
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Track Progress from Specific Accounts
+            {{ $t("savingsGoals.trackFromAccounts") }}
           </label>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-            Select which savings accounts should count toward this goal
+            {{ $t("savingsGoals.trackFromAccountsHelp") }}
           </p>
           <div
             class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md p-3"
@@ -145,18 +161,17 @@
                   </span>
                 </div>
                 <div class="text-sm text-gray-600 dark:text-gray-400">
-                  ${{ parseFloat(account.currentBalance).toLocaleString() }}
+                  {{ formatCurrency(parseFloat(account.currentBalance)) }}
                   <span v-if="account.monthlyDeposit">
-                    · ${{
-                      parseFloat(account.monthlyDeposit).toLocaleString()
-                    }}/month
+                    · {{ formatCurrency(parseFloat(account.monthlyDeposit))
+                    }}{{ $t("time.perMonth") }}
                   </span>
                 </div>
               </div>
             </label>
           </div>
           <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            Leave unselected to track all household savings accounts
+            {{ $t("savingsGoals.unselectedTracksAll") }}
           </p>
         </div>
 
@@ -166,12 +181,11 @@
           class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"
         >
           <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Current Progress
+            {{ $t("savingsGoals.currentProgress") }}
           </h4>
           <div class="text-sm text-gray-600 dark:text-gray-400">
             <p>
-              Progress is calculated automatically from your household's savings
-              accounts
+              {{ $t("savingsGoals.progressCalculatedAuto") }}
             </p>
           </div>
         </div>
@@ -189,12 +203,10 @@
               <h4
                 class="text-sm font-medium text-neutral-800 dark:text-neutral-200 mb-1"
               >
-                Automatic Progress Tracking
+                {{ $t("savingsGoals.autoTracking") }}
               </h4>
               <p class="text-sm text-neutral-700 dark:text-neutral-300">
-                Your progress towards this goal will be calculated automatically
-                based on your household's total savings, income, and expenses.
-                No need to manually update amounts!
+                {{ $t("savingsGoals.autoTrackingHelp") }}
               </p>
             </div>
           </div>
@@ -205,10 +217,10 @@
     <template #footer>
       <div class="flex justify-end space-x-3">
         <UButton color="neutral" variant="ghost" @click="handleCancel">
-          Cancel
+          {{ $t("common.cancel") }}
         </UButton>
         <UButton :loading="loading" @click="handleSubmit">
-          {{ isEditing ? "Update Goal" : "Create Goal" }}
+          {{ isEditing ? $t("common.update") : $t("common.create") }}
         </UButton>
       </div>
     </template>
@@ -255,6 +267,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<Emits>();
+
+const { formatCurrency } = useFormatters();
 
 const formState = reactive<FormState>({
   name: "",

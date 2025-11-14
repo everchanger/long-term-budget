@@ -2,7 +2,7 @@
   <UModal v-model:open="isOpen">
     <template #header>
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-        {{ isEditing ? "Edit Income Source" : "Add Income Source" }}
+        {{ isEditing ? $t("income.editSource") : $t("income.addSource") }}
       </h3>
     </template>
 
@@ -13,13 +13,13 @@
             for="income-name"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Name *
+            {{ $t("income.nameRequired") }}
           </label>
           <input
             id="income-name"
             v-model="formState.name"
             type="text"
-            placeholder="e.g., Salary, Freelance, etc."
+            :placeholder="$t('income.namePlaceholder')"
             required
             data-testid="income-source-input"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
@@ -31,7 +31,7 @@
             for="income-amount"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Amount *
+            {{ $t("income.amountRequired") }}
           </label>
           <input
             id="income-amount"
@@ -51,7 +51,7 @@
             for="income-frequency"
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            Frequency *
+            {{ $t("income.frequencyRequired") }}
           </label>
           <select
             id="income-frequency"
@@ -59,11 +59,11 @@
             required
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           >
-            <option value="">Select frequency</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-            <option value="weekly">Weekly</option>
-            <option value="bi-weekly">Bi-weekly</option>
+            <option value="">{{ $t("income.selectFrequency") }}</option>
+            <option value="monthly">{{ $t("time.monthly") }}</option>
+            <option value="yearly">{{ $t("time.yearly") }}</option>
+            <option value="weekly">{{ $t("time.weekly") }}</option>
+            <option value="bi-weekly">{{ $t("time.biWeekly") }}</option>
           </select>
         </div>
       </div>
@@ -71,14 +71,16 @@
 
     <template #footer>
       <div class="flex justify-end gap-3">
-        <UButton variant="ghost" @click="handleCancel">Cancel</UButton>
+        <UButton variant="ghost" @click="handleCancel">{{
+          $t("common.cancel")
+        }}</UButton>
         <UButton
           :loading="loading"
           :disabled="!isFormValid"
           data-testid="income-modal-submit-button"
           @click="handleSubmit"
         >
-          {{ isEditing ? "Update" : "Add" }}
+          {{ isEditing ? $t("common.update") : $t("common.add") }}
         </UButton>
       </div>
     </template>

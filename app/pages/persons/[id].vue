@@ -6,7 +6,7 @@
         name="i-heroicons-arrow-path"
         class="animate-spin h-8 w-8 mx-auto mb-4"
       />
-      <p>Loading person details...</p>
+      <p>{{ $t("common.loading") }}</p>
     </div>
 
     <!-- Error State -->
@@ -23,7 +23,7 @@
           The person you're looking for doesn't exist.
         </p>
         <UButton to="/economy" icon="i-heroicons-arrow-left">
-          Back to Economy
+          {{ $t("navigation.economy") }}
         </UButton>
       </UCard>
     </div>
@@ -40,13 +40,17 @@
               icon="i-heroicons-arrow-left"
               class="mb-4"
             >
-              Back to Economy
+              {{ $t("navigation.economy") }}
             </UButton>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
               {{ person.name }}
             </h1>
             <p class="text-gray-600 dark:text-gray-400">
-              {{ person.age ? `Age: ${person.age}` : "Age not specified" }}
+              {{
+                person.age
+                  ? `${$t("person.age")}: ${person.age}`
+                  : $t("household.ageNotSpecified")
+              }}
             </p>
           </div>
           <div class="flex gap-2">
@@ -55,7 +59,7 @@
               icon="i-heroicons-pencil"
               @click="() => openEditPersonModal(person || null)"
             >
-              Edit
+              {{ $t("common.edit") }}
             </UButton>
           </div>
         </div>
@@ -113,6 +117,8 @@
 import type { SelectPerson } from "~~/database/validation-schemas";
 import type { ApiSuccessResponse } from "~~/server/utils/api-response";
 
+const { t } = useI18n();
+
 // Route params
 const route = useRoute();
 const personId = route.params.id as string;
@@ -129,13 +135,13 @@ const {
 const person = computed(() => personResponse.value?.data);
 
 // Financial tabs
-const financialTabs = [
-  { value: "income", label: "Income Sources" },
-  { value: "loans", label: "Loans & Debts" },
-  { value: "savings", label: "Savings" },
-];
+const financialTabs = computed(() => [
+  { value: "income", label: t("income.sources") },
+  { value: "loans", label: t("loans.title") },
+  { value: "savings", label: t("savings.title") },
+]);
 
-const selectedTab = ref(financialTabs[0]?.value);
+const selectedTab = ref("income");
 
 // Use composables for financial data management
 const incomeSourcesComposable = useIncomeSources(personId);
@@ -183,8 +189,8 @@ const handleEditPersonSubmit = async (formData: {
 
     const toast = useToast();
     toast.add({
-      title: "Person updated",
-      description: `${formData.name} has been updated successfully.`,
+      title: t("common.success"),
+      description: t("dashboard.userUpdatedSuccess"),
       color: "success",
     });
   } catch (error: unknown) {

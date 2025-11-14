@@ -80,8 +80,10 @@ export const useSavingsGoals = (householdId: MaybeRefOrGetter<string>) => {
   };
 
   const getEstimatedCompletionTime = (goal: EnrichedSavingsGoal) => {
+    const { t } = useI18n();
+
     if (!goal.estimatedMonthsToGoal) {
-      return "Unable to calculate - need positive monthly savings";
+      return t("savingsGoals.unableToCalculate");
     }
 
     const months = goal.estimatedMonthsToGoal;
@@ -89,13 +91,16 @@ export const useSavingsGoals = (householdId: MaybeRefOrGetter<string>) => {
     const remainingMonths = months % 12;
 
     if (years > 0) {
-      return remainingMonths > 0
-        ? `${years} year${years > 1 ? "s" : ""} and ${remainingMonths} month${
-            remainingMonths > 1 ? "s" : ""
-          }`
-        : `${years} year${years > 1 ? "s" : ""}`;
+      if (remainingMonths > 0) {
+        return t("savingsGoals.timeYearsAndMonths", {
+          years,
+          months: remainingMonths,
+        });
+      } else {
+        return t("savingsGoals.timeYears", { years });
+      }
     } else {
-      return `${months} month${months > 1 ? "s" : ""}`;
+      return t("savingsGoals.timeMonths", { months });
     }
   };
 

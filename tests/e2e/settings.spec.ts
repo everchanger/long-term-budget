@@ -62,7 +62,7 @@ test.describe("Settings Page", () => {
     expect(data).toHaveProperty("data");
     expect(data.data).toHaveProperty("locale");
     expect(data.data).toHaveProperty("currency");
-    
+
     // Verify valid values
     expect(["en", "sv"]).toContain(data.data.locale);
     expect(["USD", "SEK"]).toContain(data.data.currency);

@@ -2,9 +2,11 @@
   <div class="container mx-auto p-4 sm:p-6 lg:p-8">
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold mb-2">Financial Health Dashboard</h1>
+      <h1 class="text-3xl font-bold mb-2">
+        {{ $t("financialHealth.dashboard") }}
+      </h1>
       <p class="text-gray-600 dark:text-gray-400">
-        Track your overall financial wellness and key metrics
+        {{ $t("financialHealth.subtitle") }}
       </p>
     </div>
 
@@ -18,7 +20,7 @@
       v-else-if="error"
       color="error"
       variant="subtle"
-      title="Failed to load financial health data"
+      :title="$t('financialHealth.failedToLoad')"
       :description="error"
       class="mb-6"
     />
@@ -29,10 +31,11 @@
       <UCard>
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-2xl font-bold mb-2">Overall Financial Health</h2>
+            <h2 class="text-2xl font-bold mb-2">
+              {{ $t("financialHealth.overallFinancialHealth") }}
+            </h2>
             <p class="text-gray-600 dark:text-gray-400">
-              Based on your net worth, cash flow, debt levels, and emergency
-              fund
+              {{ $t("financialHealth.overallHealthDesc") }}
             </p>
           </div>
           <UBadge
@@ -86,7 +89,9 @@
       <!-- Action Items / Recommendations -->
       <UCard>
         <template #header>
-          <h3 class="text-lg font-semibold">Recommended Actions</h3>
+          <h3 class="text-lg font-semibold">
+            {{ $t("financialHealth.recommendedActions") }}
+          </h3>
         </template>
 
         <div class="space-y-3">
@@ -116,8 +121,12 @@
               name="i-heroicons-trophy"
               class="w-12 h-12 mx-auto mb-2 text-green-500"
             />
-            <p class="font-semibold">Excellent work!</p>
-            <p class="text-sm">Your finances are in great shape. Keep it up!</p>
+            <p class="font-semibold">
+              {{ $t("financialHealth.excellentWork") }}
+            </p>
+            <p class="text-sm">
+              {{ $t("financialHealth.financesInGreatShape") }}
+            </p>
           </div>
         </div>
       </UCard>
@@ -131,6 +140,8 @@ import NetWorthCard from "~/components/NetWorthCard.vue";
 import CashFlowCard from "~/components/CashFlowCard.vue";
 import DebtToIncomeCard from "~/components/DebtToIncomeCard.vue";
 import EmergencyFundCard from "~/components/EmergencyFundCard.vue";
+
+const { t } = useI18n();
 
 definePageMeta({
   middleware: "auth",
@@ -180,10 +191,10 @@ const recommendations = computed(() => {
   // Emergency fund recommendations
   if (data.value.emergencyFund.monthsOfExpenses < 3) {
     recs.push({
-      title: "Build Your Emergency Fund",
-      description: `Increase your emergency savings to cover at least 3-6 months of expenses. You currently have ${data.value.emergencyFund.monthsOfExpenses.toFixed(
-        1
-      )} months covered.`,
+      title: t("financialHealth.buildEmergencyFund"),
+      description: t("financialHealth.buildEmergencyFundDesc", {
+        months: data.value.emergencyFund.monthsOfExpenses.toFixed(1),
+      }),
       icon: "i-heroicons-shield-exclamation",
       iconColor: "text-red-500",
       priority: 1,
@@ -193,10 +204,10 @@ const recommendations = computed(() => {
   // Debt-to-income recommendations
   if (data.value.debtToIncome.ratio > 36) {
     recs.push({
-      title: "Reduce Debt Burden",
-      description: `Your debt-to-income ratio is ${data.value.debtToIncome.ratio.toFixed(
-        1
-      )}%. Focus on paying down high-interest debt to improve financial flexibility.`,
+      title: t("financialHealth.reduceDebtBurden"),
+      description: t("financialHealth.reduceDebtBurdenDesc", {
+        ratio: data.value.debtToIncome.ratio.toFixed(1),
+      }),
       icon: "i-heroicons-credit-card",
       iconColor: "text-orange-500",
       priority: 2,
@@ -206,10 +217,10 @@ const recommendations = computed(() => {
   // Cash flow recommendations
   if (data.value.cashFlow.savingsRate < 10) {
     recs.push({
-      title: "Increase Savings Rate",
-      description: `Your current savings rate is ${data.value.cashFlow.savingsRate.toFixed(
-        1
-      )}%. Try to save at least 10-20% of your income for future goals.`,
+      title: t("financialHealth.increaseSavingsRate"),
+      description: t("financialHealth.increaseSavingsRateDesc", {
+        rate: data.value.cashFlow.savingsRate.toFixed(1),
+      }),
       icon: "i-heroicons-arrow-trending-up",
       iconColor: "text-blue-500",
       priority: 3,
@@ -222,10 +233,10 @@ const recommendations = computed(() => {
     data.value.cashFlow.monthly.netCashFlow > 0
   ) {
     recs.push({
-      title: "Invest Excess Cash Flow",
-      description: `You have positive cash flow of ${formatCurrency(
-        data.value.cashFlow.monthly.netCashFlow
-      )}/month. Consider investing in retirement accounts or taxable investments.`,
+      title: t("financialHealth.investExcessCashFlow"),
+      description: t("financialHealth.investExcessCashFlowDesc", {
+        amount: formatCurrency(data.value.cashFlow.monthly.netCashFlow),
+      }),
       icon: "i-heroicons-chart-bar",
       iconColor: "text-green-500",
       priority: 4,

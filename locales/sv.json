@@ -1,5 +1,6 @@
 {
   "common": {
+    "appName": "Budgetplanerare",
     "save": "Spara",
     "cancel": "Avbryt",
     "delete": "Ta bort",
@@ -25,12 +26,33 @@
     "name": "Namn"
   },
   "navigation": {
+    "home": "Hem",
     "dashboard": "Översikt",
     "economy": "Ekonomi",
     "projections": "Prognoser",
     "scenarios": "Scenarier",
+    "settings": "Inställningar",
     "financialHealth": "Finansiell hälsa",
-    "financialStory": "Finansiell berättelse"
+    "financialStory": "Din berättelse"
+  },
+  "home": {
+    "title": "Långsiktig budgetplanering",
+    "subtitle": "Ta kontroll över din ekonomiska framtid med vårt omfattande planeringsverktyg. Modellera scenarier, spåra utgifter och fatta välgrundade beslut om dina pengar.",
+    "getStarted": "Kom igång",
+    "features": {
+      "economy": {
+        "title": "Ekonomi",
+        "description": "Modellera din kompletta ekonomiska bild inklusive inkomster, utgifter, besparingar och lån för alla familjemedlemmar."
+      },
+      "scenarios": {
+        "title": "Scenarioplanering",
+        "description": "Jämför \"vad-om\"-scenarier som att betala av skuld tidigt vs. att investera, eller köpa vs. hyra beslut över månader och år."
+      },
+      "projections": {
+        "title": "Långsiktiga prognoser",
+        "description": "Visualisera din ekonomiska bana över tid och förstå den långsiktiga påverkan av dagens ekonomiska beslut."
+      }
+    }
   },
   "dashboard": {
     "title": "Användaröversikt",

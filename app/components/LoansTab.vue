@@ -4,10 +4,10 @@
       <div class="flex items-center gap-3">
         <div>
           <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-            Loans & Debts
+            {{ $t("loans.title") }}
           </h3>
           <p class="text-gray-600 dark:text-gray-400">
-            Manage {{ personName }}'s loans and debts
+            {{ $t("loans.managePersonLoans", { name: personName }) }}
           </p>
         </div>
       </div>
@@ -16,7 +16,7 @@
         data-testid="add-loan-button"
         @click="openLoanModal"
       >
-        Add Loan
+        {{ $t("loans.addLoan") }}
       </UButton>
     </div>
 
@@ -32,10 +32,10 @@
         class="mx-auto h-12 w-12 text-gray-400 mb-4"
       />
       <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-        No Loans Yet
+        {{ $t("loans.noLoans") }}
       </h4>
       <p class="text-gray-600 dark:text-gray-400 mb-4">
-        Add loans and debts to track payments and balances.
+        {{ $t("loans.addLoansToTrack") }}
       </p>
       <UButton
         variant="soft"
@@ -43,7 +43,7 @@
         data-testid="add-loan-button"
         @click="openLoanModal"
       >
-        Add Loan
+        {{ $t("loans.addLoan") }}
       </UButton>
     </div>
     <div v-else class="space-y-4">
@@ -61,16 +61,17 @@
             <p
               class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-1"
             >
-              ${{ parseFloat(loan.currentBalance).toLocaleString() }} balance
+              {{ formatCurrency(parseFloat(loan.currentBalance)) }}
+              {{ $t("loans.balanceLabel") }}
             </p>
             <div class="text-sm text-neutral-600 dark:text-neutral-400">
               <p v-if="loan.interestRate">
-                Interest Rate: {{ parseFloat(loan.interestRate).toFixed(2) }}%
+                {{ $t("loans.interestRate") }}:
+                {{ parseFloat(loan.interestRate).toFixed(2) }}%
               </p>
               <p v-if="loan.monthlyPayment">
-                Monthly Payment: ${{
-                  parseFloat(loan.monthlyPayment).toLocaleString()
-                }}
+                {{ $t("loans.monthlyPayment") }}:
+                {{ formatCurrency(parseFloat(loan.monthlyPayment)) }}
               </p>
             </div>
           </div>
@@ -108,6 +109,9 @@
 
 <script setup lang="ts">
 import type { SelectLoan } from "~~/database/validation-schemas";
+
+const { formatCurrency } = useFormatters();
+const { t } = useI18n();
 
 interface Props {
   loans: SelectLoan[];

@@ -6,14 +6,12 @@
         <h2
           class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white"
         >
-          {{ isSignUp ? "Create your account" : "Sign in to your account" }}
+          {{
+            isSignUp ? $t("auth.createYourAccount") : $t("auth.signInToAccount")
+          }}
         </h2>
         <p class="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed">
-          {{
-            isSignUp
-              ? "Join us today to start your financial journey"
-              : "Welcome back to your financial journey"
-          }}
+          {{ isSignUp ? $t("auth.joinToday") : $t("auth.welcomeBack") }}
         </p>
       </div>
 
@@ -25,14 +23,14 @@
               class="flex-1"
               @click="isSignUp = false"
             >
-              Sign In
+              {{ $t("auth.signIn") }}
             </UButton>
             <UButton
               :variant="isSignUp ? 'solid' : 'ghost'"
               class="flex-1"
               @click="isSignUp = true"
             >
-              Sign Up
+              {{ $t("auth.signUp") }}
             </UButton>
           </div>
         </template>
@@ -53,35 +51,40 @@
           />
 
           <!-- Name field -->
-          <UFormField v-if="isSignUp" label="Name" name="name" required>
+          <UFormField
+            v-if="isSignUp"
+            :label="$t('auth.name')"
+            name="name"
+            required
+          >
             <UInput
               id="name"
               v-model="name"
               type="text"
-              placeholder="Enter your full name"
+              :placeholder="$t('auth.enterFullName')"
               icon="i-heroicons-user"
               required
             />
           </UFormField>
 
-          <UFormField label="Email" name="email" required>
+          <UFormField :label="$t('auth.email')" name="email" required>
             <UInput
               id="email"
               v-model="email"
               type="email"
-              placeholder="Enter your email"
+              :placeholder="$t('auth.enterEmail')"
               icon="i-heroicons-envelope"
               required
               data-testid="auth-email-input"
             />
           </UFormField>
 
-          <UFormField label="Password" name="password" required>
+          <UFormField :label="$t('auth.password')" name="password" required>
             <UInput
               id="password"
               v-model="password"
               type="password"
-              placeholder="Enter your password"
+              :placeholder="$t('auth.enterPassword')"
               icon="i-heroicons-lock-closed"
               required
               data-testid="auth-password-input"
@@ -101,17 +104,19 @@
             "
             data-testid="auth-submit-button"
           >
-            {{ isSignUp ? "Create Account" : "Sign In" }}
+            {{ isSignUp ? $t("auth.createAccount") : $t("auth.signIn") }}
           </UButton>
         </form>
 
         <template #footer>
           <div class="text-center text-sm text-gray-500 dark:text-gray-400">
             {{
-              isSignUp ? "Already have an account?" : "Don't have an account?"
+              isSignUp
+                ? $t("auth.alreadyHaveAccount")
+                : $t("auth.dontHaveAccount")
             }}
             <UButton
-              :label="isSignUp ? 'Sign in here' : 'Sign up here'"
+              :label="isSignUp ? $t('auth.signInHere') : $t('auth.signUpHere')"
               variant="link"
               class="p-0"
               @click="isSignUp = !isSignUp"
@@ -130,6 +135,7 @@ definePageMeta({
 });
 
 const { signIn, signUp, getSession } = useAuth();
+const { t } = useI18n();
 
 const email = ref("");
 const password = ref("");
@@ -176,7 +182,7 @@ const handleSubmit = async () => {
           },
           onError: (ctx: { error: { message?: string } }) => {
             console.error("SignUp error:", ctx);
-            error.value = ctx.error.message || "Failed to create account";
+            error.value = ctx.error.message || t("auth.failedToCreateAccount");
           },
         }
       );
@@ -196,7 +202,7 @@ const handleSubmit = async () => {
           },
           onError: (ctx: { error: { message?: string } }) => {
             console.error("SignIn error:", ctx);
-            error.value = ctx.error.message || "Failed to sign in";
+            error.value = ctx.error.message || t("auth.failedToSignIn");
           },
         }
       );

@@ -2,7 +2,7 @@
   <UModal v-model:open="isOpen">
     <template #header>
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-        {{ isEditing ? "Edit Loan/Debt" : "Add Loan/Debt" }}
+        {{ isEditing ? $t("loans.editLoan") : $t("loans.addLoan") }}
       </h3>
     </template>
 
@@ -13,13 +13,13 @@
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             for="loan-name"
           >
-            Name *
+            {{ $t("loans.nameRequired") }}
           </label>
           <input
             id="loan-name"
             v-model="formState.name"
             type="text"
-            placeholder="e.g., Mortgage, Credit Card, etc."
+            :placeholder="$t('loans.namePlaceholder')"
             required
             data-testid="loan-name-input"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
@@ -31,7 +31,7 @@
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             for="loan-amount"
           >
-            Original Loan Amount *
+            {{ $t("loans.originalAmountRequired") }}
           </label>
           <input
             id="loan-amount"
@@ -45,7 +45,7 @@
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            The total amount you originally borrowed
+            {{ $t("loans.originalAmountHelp") }}
           </p>
         </div>
 
@@ -54,7 +54,7 @@
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             for="loan-current-balance"
           >
-            Current Balance (Amount Still Owed) *
+            {{ $t("loans.currentBalanceRequired") }}
           </label>
           <input
             id="loan-current-balance"
@@ -67,7 +67,7 @@
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            How much you currently owe on this loan
+            {{ $t("loans.currentBalanceHelp") }}
           </p>
         </div>
 
@@ -76,7 +76,7 @@
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             for="loan-interest-rate"
           >
-            Interest Rate (%)
+            {{ $t("common.interestRate") }}
           </label>
           <input
             id="loan-interest-rate"
@@ -95,7 +95,7 @@
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             for="loan-monthly-payment"
           >
-            Monthly Payment
+            {{ $t("loans.monthlyPayment") }}
           </label>
           <input
             id="loan-monthly-payment"
@@ -114,19 +114,19 @@
             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             for="loan-type"
           >
-            Loan Type
+            {{ $t("loans.loanType") }}
           </label>
           <select
             id="loan-type"
             v-model="formState.loanType"
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           >
-            <option value="">Select type</option>
-            <option value="mortgage">Mortgage</option>
-            <option value="personal">Personal Loan</option>
-            <option value="credit-card">Credit Card</option>
-            <option value="auto">Auto Loan</option>
-            <option value="other">Other</option>
+            <option value="">{{ $t("loans.selectType") }}</option>
+            <option value="mortgage">{{ $t("loans.types.mortgage") }}</option>
+            <option value="personal">{{ $t("loans.types.personal") }}</option>
+            <option value="credit-card">{{ $t("loans.types.credit") }}</option>
+            <option value="auto">{{ $t("loans.types.auto") }}</option>
+            <option value="other">{{ $t("loans.types.other") }}</option>
           </select>
         </div>
       </div>
@@ -134,14 +134,17 @@
 
     <template #footer>
       <div class="flex justify-end gap-3">
-        <UButton variant="ghost" @click="handleCancel">Cancel</UButton>
+        <UButton variant="ghost" @click="handleCancel">{{
+          $t("common.cancel")
+        }}</UButton>
         <UButton
           :loading="loading"
           :disabled="!isFormValid"
           data-testid="loan-modal-submit-button"
           @click="handleSubmit"
         >
-          {{ isEditing ? "Update" : "Add" }} Loan
+          {{ isEditing ? $t("common.update") : $t("common.add") }}
+          {{ $t("loans.loanSingular") }}
         </UButton>
       </div>
     </template>

@@ -62,7 +62,9 @@ test.describe("Financial Health Dashboard - Fast", () => {
 
     // Check for numeric/currency content (cards may have different exact labels)
     // Now defaults to SEK (kr) instead of USD ($)
-    const hasCurrency = await page.locator("text=/[$kr][\\d,\\s]+|[\\d,]+\\s*kr/").count();
+    const hasCurrency = await page
+      .locator("text=/[$kr][\\d,\\s]+|[\\d,]+\\s*kr/")
+      .count();
     expect(hasCurrency).toBeGreaterThan(0);
 
     // Should have some percentage values

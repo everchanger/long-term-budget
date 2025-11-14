@@ -24,9 +24,23 @@ export default defineNuxtConfig({
     "@nuxtjs/i18n",
   ],
   i18n: {
-    locales: ["sv", "en"],
+    locales: [
+      {
+        code: "sv",
+        language: "sv-SE",
+        name: "Svenska",
+        file: "sv.json",
+      },
+      {
+        code: "en",
+        language: "en-US",
+        name: "English",
+        file: "en.json",
+      },
+    ],
     defaultLocale: "sv",
     strategy: "no_prefix",
+    detectBrowserLanguage: false,
     vueI18n: "./i18n.config.ts",
   },
   runtimeConfig: {

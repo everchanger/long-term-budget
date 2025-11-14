@@ -28,3 +28,4 @@ nuxt-test.log
 # Test output
 playwright-report/*
 test-results/
+.playwright-mcp/*

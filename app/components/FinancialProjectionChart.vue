@@ -349,4 +349,3 @@ const endValue = computed(
   () => currentData.value[currentData.value.length - 1] || 0
 );
 </script>
-

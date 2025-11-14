@@ -12,7 +12,7 @@ test.describe("i18n and Currency with Authentication", () => {
 
     // Look for any currency symbols or formatted numbers
     const bodyText = await page.textContent("body");
-    
+
     // Should have some financial data displayed
     expect(bodyText).toBeTruthy();
     expect(bodyText!.length).toBeGreaterThan(100);
@@ -26,7 +26,9 @@ test.describe("i18n and Currency with Authentication", () => {
     await page.waitForLoadState("networkidle");
 
     // Look for currency formatted values ($ or kr)
-    const currencyElements = page.locator('[class*="currency"], [data-currency]');
+    const currencyElements = page.locator(
+      '[class*="currency"], [data-currency]'
+    );
     const count = await currencyElements.count();
 
     // If currency elements exist, verify they're visible
@@ -105,7 +107,7 @@ test.describe("i18n and Currency with Authentication", () => {
     if (bodyText) {
       // Should not contain untranslated key patterns like "income.monthly"
       expect(bodyText).not.toMatch(/^[a-z]+\.[a-z]+$/m);
-      
+
       // Should not contain placeholder text
       expect(bodyText).not.toContain("undefined");
       expect(bodyText).not.toContain("[object Object]");
@@ -117,18 +119,18 @@ test.describe("i18n and Currency with Authentication", () => {
   }) => {
     // Make sure preferences endpoint is accessible
     const response = await page.request.get(`${BASE_URL}/api/user/preferences`);
-    
+
     // Should return 200 or 401 (if session expired)
     expect([200, 401]).toContain(response.status());
 
     if (response.status() === 200) {
       const responseData = await response.json();
       const data = responseData.data;
-      
+
       // Should have locale and currency fields
       expect(data).toHaveProperty("locale");
       expect(data).toHaveProperty("currency");
-      
+
       // Values should be valid
       expect(["en", "sv"]).toContain(data.locale);
       expect(["USD", "SEK"]).toContain(data.currency);

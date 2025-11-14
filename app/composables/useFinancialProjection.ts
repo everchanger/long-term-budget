@@ -168,13 +168,9 @@ export function useFinancialProjection(householdId: Ref<number | null>) {
   );
 
   // Format helpers for display
+  const { formatCurrency: formatCurrencyHelper } = useFormatters();
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
+    return formatCurrencyHelper(value);
   };
 
   const formatPercent = (value: number, decimals = 1) => {

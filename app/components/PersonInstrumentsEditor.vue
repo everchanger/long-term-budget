@@ -3,7 +3,9 @@
     <template #header>
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-semibold">
-          {{ person.name }}'s Financial Instruments
+          {{
+            $t("projections.personFinancialInstruments", { name: person.name })
+          }}
         </h3>
         <UButton
           :icon="
@@ -22,7 +24,7 @@
       <div v-if="incomeSources.length > 0">
         <h4 class="text-sm font-semibold mb-3 flex items-center gap-2">
           <UIcon name="i-heroicons-banknotes" class="text-green-500" />
-          Income Sources
+          {{ $t("income.sources") }}
         </h4>
         <div class="space-y-3">
           <div
@@ -36,7 +38,9 @@
             </div>
             <div class="space-y-2">
               <div>
-                <label class="text-xs text-gray-500">Amount</label>
+                <label class="text-xs text-gray-500">{{
+                  $t("common.amount")
+                }}</label>
                 <div class="flex items-center gap-2 mt-1">
                   <input
                     :value="localIncome[income.id]?.amount ?? income.amount"
@@ -73,7 +77,7 @@
       <div v-if="savingsAccounts.length > 0">
         <h4 class="text-sm font-semibold mb-3 flex items-center gap-2">
           <UIcon name="i-heroicons-building-library" class="text-blue-500" />
-          Savings Accounts
+          {{ $t("savings.accounts") }}
         </h4>
         <div class="space-y-3">
           <div
@@ -89,7 +93,9 @@
             </div>
             <div class="space-y-2">
               <div>
-                <label class="text-xs text-gray-500">Current Balance</label>
+                <label class="text-xs text-gray-500">{{
+                  $t("savings.currentBalance")
+                }}</label>
                 <div class="flex items-center gap-2 mt-1">
                   <input
                     :value="
@@ -118,7 +124,9 @@
                 </div>
               </div>
               <div>
-                <label class="text-xs text-gray-500">Monthly Deposit</label>
+                <label class="text-xs text-gray-500">{{
+                  $t("savings.monthlyDeposit")
+                }}</label>
                 <input
                   :value="
                     localSavings[account.id]?.monthlyDeposit ??
@@ -138,7 +146,9 @@
                 />
               </div>
               <div>
-                <label class="text-xs text-gray-500">Interest Rate (%)</label>
+                <label class="text-xs text-gray-500">{{
+                  $t("common.interestRate")
+                }}</label>
                 <input
                   :value="
                     (localSavings[account.id]?.interestRate ??
@@ -168,7 +178,7 @@
       <div v-if="loans.length > 0">
         <h4 class="text-sm font-semibold mb-3 flex items-center gap-2">
           <UIcon name="i-heroicons-credit-card" class="text-red-500" />
-          Loans
+          {{ $t("loans.title") }}
         </h4>
         <div class="space-y-3">
           <div
@@ -184,7 +194,9 @@
             </div>
             <div class="space-y-2">
               <div>
-                <label class="text-xs text-gray-500">Current Balance</label>
+                <label class="text-xs text-gray-500">{{
+                  $t("loans.currentBalance")
+                }}</label>
                 <div class="flex items-center gap-2 mt-1">
                   <input
                     :value="
@@ -212,7 +224,9 @@
                 </div>
               </div>
               <div>
-                <label class="text-xs text-gray-500">Monthly Payment</label>
+                <label class="text-xs text-gray-500">{{
+                  $t("loans.monthlyPayment")
+                }}</label>
                 <input
                   :value="
                     localLoans[loan.id]?.monthlyPayment ?? loan.monthlyPayment
@@ -231,7 +245,9 @@
                 />
               </div>
               <div>
-                <label class="text-xs text-gray-500">Interest Rate (%)</label>
+                <label class="text-xs text-gray-500">{{
+                  $t("common.interestRate")
+                }}</label>
                 <input
                   :value="
                     (localLoans[loan.id]?.interestRate ?? loan.interestRate) *
@@ -261,7 +277,7 @@
       <div v-if="brokerAccounts.length > 0">
         <h4 class="text-sm font-semibold mb-3 flex items-center gap-2">
           <UIcon name="i-heroicons-chart-bar" class="text-purple-500" />
-          Investment Accounts
+          {{ $t("brokers.investmentAccounts") }}
         </h4>
         <div class="space-y-3">
           <div
@@ -277,7 +293,9 @@
             </div>
             <div class="space-y-2">
               <div>
-                <label class="text-xs text-gray-500">Current Value</label>
+                <label class="text-xs text-gray-500">{{
+                  $t("brokers.currentValue")
+                }}</label>
                 <div class="flex items-center gap-2 mt-1">
                   <input
                     :value="
@@ -314,12 +332,12 @@
       <div
         class="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700"
       >
-        <UButton size="sm" color="primary" @click="applyChanges"
-          >Apply Changes</UButton
-        >
-        <UButton size="sm" color="neutral" variant="ghost" @click="resetAll"
-          >Reset All</UButton
-        >
+        <UButton size="sm" color="primary" @click="applyChanges">{{
+          $t("common.applyChanges")
+        }}</UButton>
+        <UButton size="sm" color="neutral" variant="ghost" @click="resetAll">{{
+          $t("common.resetAll")
+        }}</UButton>
       </div>
     </div>
   </UCard>
@@ -497,6 +515,5 @@ const applyChanges = () => {
   });
 };
 
-const { formatCurrency } = useCurrency();
+const { formatCurrency } = useFormatters();
 </script>
-

@@ -24,8 +24,8 @@ test.describe("i18n and Currency Support", () => {
 
     // Look for dollar sign formatting
     // This is a basic check - you may need to adjust based on your actual app structure
-    const dollarSign = page.locator('text=/\\$/').first();
-    if (await dollarSign.count() > 0) {
+    const dollarSign = page.locator("text=/\\$/").first();
+    if ((await dollarSign.count()) > 0) {
       await expect(dollarSign).toBeVisible();
     }
   });
@@ -37,7 +37,7 @@ test.describe("i18n and Currency Support", () => {
     // Nuxt i18n with no_prefix strategy doesn't necessarily set cookies
     const pageContent = await page.textContent("body");
     expect(pageContent).toBeTruthy();
-    
+
     // The page should have loaded without i18n errors
     const hasContent = pageContent && pageContent.length > 0;
     expect(hasContent).toBe(true);
@@ -71,7 +71,7 @@ test.describe("i18n and Currency Support", () => {
     // If there's navigation in your app, test that currency format persists
     // This is a placeholder - adjust based on your app structure
     const initialFormat = await page
-      .locator('text=/[$kr]/')
+      .locator("text=/[$kr]/")
       .first()
       .textContent();
 
@@ -160,9 +160,11 @@ test.describe("Currency Formatting", () => {
 
     // Look for abbreviated currency (1M, 1k, etc.)
     // This depends on your app displaying such values
-    const abbreviatedCurrency = page.locator('text=/[\\d.]+[Mkm]\\s*(USD|SEK|\\$|kr)/');
-    
-    if (await abbreviatedCurrency.count() > 0) {
+    const abbreviatedCurrency = page.locator(
+      "text=/[\\d.]+[Mkm]\\s*(USD|SEK|\\$|kr)/"
+    );
+
+    if ((await abbreviatedCurrency.count()) > 0) {
       await expect(abbreviatedCurrency.first()).toBeVisible();
     }
   });
@@ -174,8 +176,8 @@ test.describe("Currency Formatting", () => {
     // Check for currency symbols
     // USD uses $, SEK uses kr
     const _hasCurrency =
-      (await page.locator('text=/\\$/').count()) > 0 ||
-      (await page.locator('text=/kr/').count()) > 0;
+      (await page.locator("text=/\\$/").count()) > 0 ||
+      (await page.locator("text=/kr/").count()) > 0;
 
     // At least one currency format should be present if there's financial data
     // This might be false on landing page without data
@@ -189,7 +191,7 @@ test.describe("Translation Keys", () => {
     await page.waitForLoadState("networkidle");
 
     // Check that we don't see untranslated keys like "common.save" or "income.title"
-    const keyPattern = page.locator('text=/^[a-z]+\\.[a-z]+$/i');
+    const keyPattern = page.locator("text=/^[a-z]+\\.[a-z]+$/i");
     const keyCount = await keyPattern.count();
 
     // There should be no visible translation keys
