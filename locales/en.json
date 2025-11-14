@@ -1,0 +1,229 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "required": "Required",
+    "refresh": "Refresh",
+    "signOut": "Sign Out"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "economy": "Economy",
+    "projections": "Projections",
+    "scenarios": "Scenarios",
+    "financialHealth": "Financial Health",
+    "financialStory": "Financial Story"
+  },
+  "dashboard": {
+    "title": "Users Dashboard",
+    "description": "Manage application users and their accounts",
+    "addUser": "Add User",
+    "allUsers": "All Users ({count})",
+    "noUsers": "No users yet",
+    "getStarted": "Get started by adding your first user to the system.",
+    "addFirstUser": "Add First User",
+    "loadingUsers": "Loading users...",
+    "errorLoadingUsers": "Error loading users",
+    "createdAt": "Created"
+  },
+  "household": {
+    "title": "Household",
+    "name": "Household Name",
+    "members": "Members",
+    "addMember": "Add Member"
+  },
+  "person": {
+    "name": "Name",
+    "age": "Age",
+    "addPerson": "Add Person",
+    "editPerson": "Edit Person"
+  },
+  "income": {
+    "title": "Income",
+    "sources": "Income Sources",
+    "addSource": "Add Income Source",
+    "sourceName": "Source Name",
+    "amount": "Amount",
+    "frequency": "Frequency",
+    "monthlyIncome": "Monthly Income",
+    "totalIncome": "Total Income",
+    "annualIncome": "Annual Income",
+    "frequencies": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "weekly": "Weekly",
+      "biweekly": "Bi-weekly",
+      "daily": "Daily"
+    }
+  },
+  "expenses": {
+    "title": "Expenses",
+    "addExpense": "Add Expense",
+    "monthlyExpenses": "Monthly Expenses",
+    "totalExpenses": "Total Expenses",
+    "category": "Category",
+    "amount": "Amount",
+    "monthlyAmount": "Monthly Amount"
+  },
+  "savings": {
+    "title": "Savings",
+    "accounts": "Savings Accounts",
+    "addAccount": "Add Savings Account",
+    "accountName": "Account Name",
+    "currentBalance": "Current Balance",
+    "interestRate": "Interest Rate",
+    "totalSavings": "Total Savings",
+    "goals": "Savings Goals",
+    "addGoal": "Add Savings Goal"
+  },
+  "loans": {
+    "title": "Loans",
+    "addLoan": "Add Loan",
+    "loanName": "Loan Name",
+    "originalAmount": "Original Loan Amount",
+    "originalAmountDescription": "The total amount you originally borrowed",
+    "currentBalance": "Current Balance (Amount Still Owed)",
+    "currentBalanceDescription": "How much you currently owe on this loan",
+    "interestRate": "Interest Rate (%)",
+    "monthlyPayment": "Monthly Payment",
+    "loanType": "Loan Type",
+    "totalDebt": "Total Debt",
+    "types": {
+      "mortgage": "Mortgage",
+      "auto": "Auto Loan",
+      "student": "Student Loan",
+      "personal": "Personal Loan",
+      "credit": "Credit Card",
+      "other": "Other"
+    }
+  },
+  "brokers": {
+    "title": "Broker Accounts",
+    "addAccount": "Add Broker Account",
+    "accountName": "Account Name"
+  },
+  "projections": {
+    "title": "Financial Projections",
+    "tenYearProjection": "10-Year Financial Projection",
+    "currentSnapshot": "Current Financial Snapshot",
+    "adjustAssumptions": "Adjust Assumptions",
+    "resetDefaults": "Reset to Defaults",
+    "netWorth": "Net Worth",
+    "monthlyIncome": "Monthly Income",
+    "monthlyExpenses": "Monthly Expenses",
+    "monthlySurplus": "Monthly Surplus",
+    "totalSavings": "Total Savings",
+    "totalInvestments": "Total Investments",
+    "totalDebt": "Total Debt",
+    "assumptions": {
+      "incomeGrowth": "Annual Income Growth",
+      "investmentReturn": "Investment Return",
+      "inflationRate": "Inflation Rate",
+      "savingsInterest": "Savings Interest Rate"
+    },
+    "milestones": "Financial Milestones",
+    "summary": "10-Year Summary",
+    "startingNetWorth": "Starting Net Worth",
+    "endingNetWorth": "Ending Net Worth",
+    "totalSaved": "Total Saved",
+    "totalDebtPaid": "Total Debt Paid",
+    "yearlyData": "Yearly Data",
+    "dataTable": "Data Table",
+    "visualization": "Visualization",
+    "year": "Year",
+    "investments": "Investments",
+    "debt": "Debt",
+    "month": "Month",
+    "flowingInEachMonth": "flowing in each month",
+    "annual": "Annual"
+  },
+  "financialHealth": {
+    "title": "Financial Health",
+    "netWorth": "Net Worth",
+    "emergencyFund": "Emergency Fund",
+    "debtToIncome": "Debt-to-Income Ratio",
+    "savingsRate": "Savings Rate",
+    "cashFlow": "Cash Flow",
+    "scores": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "poor": "Poor"
+    },
+    "monthsOfExpenses": "months of expenses",
+    "ofIncome": "of income"
+  },
+  "financialStory": {
+    "title": "Your Financial Story",
+    "subtitle": "A visual journey through your money",
+    "welcome": "Welcome to Your Financial Journey",
+    "scroll": "Scroll to explore",
+    "cashFlow": "Your Cash Flow",
+    "whereMoneyGoes": "Where Your Money Goes",
+    "buildingWealth": "You're building wealth by saving {amount} each month! 🚀",
+    "breakingEven": "You're breaking even. Let's find ways to save more! 💪",
+    "overspending": "Spending more than earning. Time to adjust the budget! ⚠️"
+  },
+  "settings": {
+    "title": "Settings",
+    "preferences": "Preferences",
+    "language": "Language",
+    "currency": "Currency",
+    "updateSuccess": "Settings updated successfully",
+    "updateError": "Failed to update settings"
+  },
+  "budget": {
+    "title": "Budget",
+    "categories": {
+      "housing": "Housing",
+      "transportation": "Transportation",
+      "food": "Food & Dining",
+      "utilities": "Utilities",
+      "healthcare": "Healthcare",
+      "entertainment": "Entertainment",
+      "personal": "Personal Care",
+      "education": "Education",
+      "insurance": "Insurance",
+      "debt": "Debt Payments",
+      "savings": "Savings & Investments",
+      "other": "Other"
+    },
+    "categoryDescriptions": {
+      "housing": "Rent, mortgage, property taxes, home maintenance",
+      "transportation": "Car payments, gas, insurance, public transit",
+      "food": "Groceries, restaurants, delivery",
+      "utilities": "Electricity, water, gas, internet, phone",
+      "healthcare": "Insurance, medications, doctor visits",
+      "entertainment": "Subscriptions, hobbies, events",
+      "personal": "Haircuts, toiletries, clothing",
+      "education": "Tuition, books, courses",
+      "insurance": "Life, health, home, auto insurance",
+      "debt": "Credit cards, loans (not including mortgage)",
+      "savings": "Emergency fund, retirement, investments",
+      "other": "Miscellaneous expenses"
+    }
+  },
+  "tabs": {
+    "incomeSources": "Income Sources",
+    "savingsAccounts": "Savings Accounts",
+    "loans": "Loans"
+  }
+}

@@ -4,10 +4,10 @@
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm text-neutral-600 dark:text-neutral-400">
-            Monthly Income
+            {{ t('income.monthlyIncome') }}
           </p>
           <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-            ${{ totalMonthlyIncome }}
+            {{ formatCurrency(parseFloat(totalMonthlyIncome)) }}
           </p>
         </div>
       </div>
@@ -17,10 +17,10 @@
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm text-neutral-600 dark:text-neutral-400">
-            Total Savings
+            {{ t('savings.totalSavings') }}
           </p>
           <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-            ${{ totalSavings }}
+            {{ formatCurrency(parseFloat(totalSavings)) }}
           </p>
         </div>
       </div>
@@ -30,10 +30,10 @@
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm text-neutral-600 dark:text-neutral-400">
-            Total Debt
+            {{ t('loans.totalDebt') }}
           </p>
           <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-            ${{ totalDebt }}
+            {{ formatCurrency(parseFloat(totalDebt)) }}
           </p>
         </div>
       </div>
@@ -42,6 +42,9 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
+const { formatCurrency } = useCurrency();
+
 interface Props {
   totalMonthlyIncome: string;
   totalSavings: string;

@@ -29,6 +29,15 @@ export const updateUserSchema = insertUserSchema
   .partial()
   .omit({ id: true, createdAt: true });
 
+export const updateUserPreferencesSchema = z.object({
+  locale: z.enum(["en", "sv"]).optional(),
+  currency: z.enum(["USD", "SEK"]).optional(),
+});
+
+export type UpdateUserPreferences = z.infer<
+  typeof updateUserPreferencesSchema
+>;
+
 // Household schemas
 export const insertHouseholdSchema = createInsertSchema(households, {
   name: z

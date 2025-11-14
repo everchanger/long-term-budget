@@ -79,6 +79,13 @@
               </span>
               <UButton
                 variant="ghost"
+                icon="i-heroicons-cog-6-tooth"
+                to="/settings"
+              >
+                <span class="hidden md:inline ml-2">Settings</span>
+              </UButton>
+              <UButton
+                variant="ghost"
                 icon="i-heroicons-arrow-right-on-rectangle"
                 :loading="isSigningOut"
                 @click="handleSignOut"

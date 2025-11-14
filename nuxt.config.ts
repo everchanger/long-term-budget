@@ -21,7 +21,14 @@ export default defineNuxtConfig({
     "@nuxt/test-utils",
     "@nuxt/ui",
     "@nuxt/test-utils/module",
+    "@nuxtjs/i18n",
   ],
+  i18n: {
+    locales: ["sv", "en"],
+    defaultLocale: "sv",
+    strategy: "no_prefix",
+    vueI18n: "./i18n.config.ts",
+  },
   runtimeConfig: {
     dbHost: "",
     dbPort: "",

@@ -286,27 +286,18 @@ const chartOptions = computed<ChartOptions<"line">>(() => ({
       ticks: {
         callback: (value) => {
           const num = value as number;
-          if (Math.abs(num) >= 1_000_000) {
-            return `$${(num / 1_000_000).toFixed(1)}M`;
-          } else if (Math.abs(num) >= 1_000) {
-            return `$${(num / 1_000).toFixed(0)}k`;
-          }
-          return `$${num.toFixed(0)}`;
+          return formatCurrencyCompact(num);
         },
       },
     },
   },
 }));
 
+const { formatCurrencyCompact } = useCurrency();
+
 // Format currency
 const formatCurrency = (value: number) => {
-  const absValue = Math.abs(value);
-  if (absValue >= 1_000_000) {
-    return `$${(value / 1_000_000).toFixed(1)}M`;
-  } else if (absValue >= 1_000) {
-    return `$${(value / 1_000).toFixed(0)}k`;
-  }
-  return `$${value.toFixed(0)}`;
+  return formatCurrencyCompact(value);
 };
 
 // Summary stats

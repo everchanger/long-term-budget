@@ -497,13 +497,6 @@ const applyChanges = () => {
   });
 };
 
-// Format currency
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-};
+const { formatCurrency } = useCurrency();
 </script>
+

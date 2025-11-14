@@ -1,0 +1,229 @@
+{
+  "common": {
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "delete": "Ta bort",
+    "edit": "Redigera",
+    "add": "Lägg till",
+    "close": "Stäng",
+    "yes": "Ja",
+    "no": "Nej",
+    "confirm": "Bekräfta",
+    "loading": "Laddar...",
+    "error": "Fel",
+    "success": "Lyckades",
+    "required": "Obligatorisk",
+    "refresh": "Uppdatera",
+    "signOut": "Logga ut"
+  },
+  "auth": {
+    "signIn": "Logga in",
+    "signOut": "Logga ut",
+    "signUp": "Registrera",
+    "email": "E-post",
+    "password": "Lösenord",
+    "name": "Namn"
+  },
+  "navigation": {
+    "dashboard": "Översikt",
+    "economy": "Ekonomi",
+    "projections": "Prognoser",
+    "scenarios": "Scenarier",
+    "financialHealth": "Finansiell hälsa",
+    "financialStory": "Finansiell berättelse"
+  },
+  "dashboard": {
+    "title": "Användaröversikt",
+    "description": "Hantera applikationsanvändare och deras konton",
+    "addUser": "Lägg till användare",
+    "allUsers": "Alla användare ({count})",
+    "noUsers": "Inga användare ännu",
+    "getStarted": "Kom igång genom att lägga till din första användare i systemet.",
+    "addFirstUser": "Lägg till första användare",
+    "loadingUsers": "Laddar användare...",
+    "errorLoadingUsers": "Fel vid laddning av användare",
+    "createdAt": "Skapad"
+  },
+  "household": {
+    "title": "Hushåll",
+    "name": "Hushållsnamn",
+    "members": "Medlemmar",
+    "addMember": "Lägg till medlem"
+  },
+  "person": {
+    "name": "Namn",
+    "age": "Ålder",
+    "addPerson": "Lägg till person",
+    "editPerson": "Redigera person"
+  },
+  "income": {
+    "title": "Inkomst",
+    "sources": "Inkomstkällor",
+    "addSource": "Lägg till inkomstkälla",
+    "sourceName": "Källans namn",
+    "amount": "Belopp",
+    "frequency": "Frekvens",
+    "monthlyIncome": "Månadsinkomst",
+    "totalIncome": "Total inkomst",
+    "annualIncome": "Årsinkomst",
+    "frequencies": {
+      "monthly": "Månatlig",
+      "yearly": "Årlig",
+      "weekly": "Veckovis",
+      "biweekly": "Varannan vecka",
+      "daily": "Daglig"
+    }
+  },
+  "expenses": {
+    "title": "Utgifter",
+    "addExpense": "Lägg till utgift",
+    "monthlyExpenses": "Månadskostnader",
+    "totalExpenses": "Totala utgifter",
+    "category": "Kategori",
+    "amount": "Belopp",
+    "monthlyAmount": "Månadsbelopp"
+  },
+  "savings": {
+    "title": "Sparande",
+    "accounts": "Sparkonton",
+    "addAccount": "Lägg till sparkonto",
+    "accountName": "Kontonamn",
+    "currentBalance": "Aktuellt saldo",
+    "interestRate": "Ränta",
+    "totalSavings": "Totalt sparande",
+    "goals": "Sparmål",
+    "addGoal": "Lägg till sparmål"
+  },
+  "loans": {
+    "title": "Lån",
+    "addLoan": "Lägg till lån",
+    "loanName": "Lånets namn",
+    "originalAmount": "Ursprungligt lånebelopp",
+    "originalAmountDescription": "Det totala beloppet du ursprungligen lånade",
+    "currentBalance": "Aktuellt saldo (kvarvarande skuld)",
+    "currentBalanceDescription": "Hur mycket du för närvarande är skyldig på detta lån",
+    "interestRate": "Ränta (%)",
+    "monthlyPayment": "Månadsbetalning",
+    "loanType": "Lånetyp",
+    "totalDebt": "Total skuld",
+    "types": {
+      "mortgage": "Bolån",
+      "auto": "Billån",
+      "student": "Studielån",
+      "personal": "Privatlån",
+      "credit": "Kreditkort",
+      "other": "Annat"
+    }
+  },
+  "brokers": {
+    "title": "Mäklarkonton",
+    "addAccount": "Lägg till mäklarkonto",
+    "accountName": "Kontonamn"
+  },
+  "projections": {
+    "title": "Finansiella prognoser",
+    "tenYearProjection": "10-årig finansiell prognos",
+    "currentSnapshot": "Aktuell finansiell ögonblicksbild",
+    "adjustAssumptions": "Justera antaganden",
+    "resetDefaults": "Återställ till standard",
+    "netWorth": "Nettoförmögenhet",
+    "monthlyIncome": "Månadsinkomst",
+    "monthlyExpenses": "Månadskostnader",
+    "monthlySurplus": "Månadsöverskott",
+    "totalSavings": "Totalt sparande",
+    "totalInvestments": "Totala investeringar",
+    "totalDebt": "Total skuld",
+    "assumptions": {
+      "incomeGrowth": "Årlig inkomsttillväxt",
+      "investmentReturn": "Investeringsavkastning",
+      "inflationRate": "Inflationstakt",
+      "savingsInterest": "Sparränta"
+    },
+    "milestones": "Finansiella milstolpar",
+    "summary": "10-årssammanfattning",
+    "startingNetWorth": "Startande nettoförmögenhet",
+    "endingNetWorth": "Slutlig nettoförmögenhet",
+    "totalSaved": "Totalt sparat",
+    "totalDebtPaid": "Total skuld betald",
+    "yearlyData": "Årsdata",
+    "dataTable": "Datatabell",
+    "visualization": "Visualisering",
+    "year": "År",
+    "investments": "Investeringar",
+    "debt": "Skuld",
+    "month": "Månad",
+    "flowingInEachMonth": "kommer in varje månad",
+    "annual": "Årlig"
+  },
+  "financialHealth": {
+    "title": "Finansiell hälsa",
+    "netWorth": "Nettoförmögenhet",
+    "emergencyFund": "Buffert",
+    "debtToIncome": "Skuld-till-inkomst-förhållande",
+    "savingsRate": "Sparkvot",
+    "cashFlow": "Kassaflöde",
+    "scores": {
+      "excellent": "Utmärkt",
+      "good": "Bra",
+      "fair": "Okej",
+      "poor": "Dålig"
+    },
+    "monthsOfExpenses": "månaders utgifter",
+    "ofIncome": "av inkomst"
+  },
+  "financialStory": {
+    "title": "Din finansiella berättelse",
+    "subtitle": "En visuell resa genom dina pengar",
+    "welcome": "Välkommen till din finansiella resa",
+    "scroll": "Scrolla för att utforska",
+    "cashFlow": "Ditt kassaflöde",
+    "whereMoneyGoes": "Vart dina pengar tar vägen",
+    "buildingWealth": "Du bygger förmögenhet genom att spara {amount} varje månad! 🚀",
+    "breakingEven": "Du går jämnt upp. Låt oss hitta sätt att spara mer! 💪",
+    "overspending": "Spenderar mer än du tjänar. Dags att justera budgeten! ⚠️"
+  },
+  "settings": {
+    "title": "Inställningar",
+    "preferences": "Preferenser",
+    "language": "Språk",
+    "currency": "Valuta",
+    "updateSuccess": "Inställningar uppdaterade",
+    "updateError": "Misslyckades att uppdatera inställningar"
+  },
+  "budget": {
+    "title": "Budget",
+    "categories": {
+      "housing": "Boende",
+      "transportation": "Transport",
+      "food": "Mat & Restaurang",
+      "utilities": "El & Vatten",
+      "healthcare": "Hälsovård",
+      "entertainment": "Nöje",
+      "personal": "Personlig vård",
+      "education": "Utbildning",
+      "insurance": "Försäkring",
+      "debt": "Skuldbetalningar",
+      "savings": "Sparande & Investeringar",
+      "other": "Övrigt"
+    },
+    "categoryDescriptions": {
+      "housing": "Hyra, bolån, fastighetsskatt, underhåll",
+      "transportation": "Bilbetalningar, bensin, försäkring, kollektivtrafik",
+      "food": "Matvaror, restauranger, hemleverans",
+      "utilities": "El, vatten, gas, internet, telefon",
+      "healthcare": "Försäkring, mediciner, läkarbesök",
+      "entertainment": "Prenumerationer, hobbyer, evenemang",
+      "personal": "Frisör, hygienartiklar, kläder",
+      "education": "Studieavgift, böcker, kurser",
+      "insurance": "Liv-, sjuk-, hem-, bilförsäkring",
+      "debt": "Kreditkort, lån (ej bolån)",
+      "savings": "Buffert, pension, investeringar",
+      "other": "Diverse utgifter"
+    }
+  },
+  "tabs": {
+    "incomeSources": "Inkomstkällor",
+    "savingsAccounts": "Sparkonton",
+    "loans": "Lån"
+  }
+}

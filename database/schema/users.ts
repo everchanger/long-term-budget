@@ -12,6 +12,8 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
   image: text("image"),
+  locale: varchar("locale", { length: 10 }).notNull().default("sv"),
+  currency: varchar("currency", { length: 3 }).notNull().default("SEK"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

@@ -73,14 +73,11 @@ export const useFinancialHealth = (householdId: Ref<number | null>) => {
   // Auto-fetch when householdId changes
   watch(householdId, fetchFinancialHealth, { immediate: true });
 
+  const { formatCurrency: currencyFormatter } = useCurrency();
+
   // Format currency helper
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
+    return currencyFormatter(amount);
   };
 
   // Format percentage helper
