@@ -16,17 +16,17 @@ test.describe("Financial Instruments CRUD", () => {
     await expect(page).toHaveURL("/economy");
     await expect(
       page.getByRole("heading", {
-        name: /Your Economy Overview|Din ekonomiska översikt/i,
+        name: "Din ekonomiska översikt",
       })
     ).toBeVisible();
 
     // Verify core sections are present (these are always visible regardless of data)
     await expect(
-      page.getByRole("heading", { name: /^Members$|^Medlemmar$/i })
+      page.getByRole("heading", { name: "Medlemmar" })
     ).toBeVisible();
     await expect(
       page.getByRole("heading", {
-        name: /Fixed Monthly Expenses|Fasta månadskostnader/i,
+        name: "Fasta månadskostnader",
       })
     ).toBeVisible();
 
@@ -50,7 +50,7 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Should be on Income Sources tab by default
       await expect(
-        page.getByRole("tab", { name: /Income Sources|Inkomstkällor/i })
+        page.getByRole("tab", { name: "Inkomstkällor" })
       ).toBeVisible();
 
       // Click "Add Income Source" button
@@ -134,7 +134,7 @@ test.describe("Financial Instruments CRUD", () => {
         page.getByRole("heading", { name: testData.person.name, exact: true })
       ).toBeVisible();
       await expect(
-        page.getByRole("tab", { name: /Income Sources|Inkomstkällor/i })
+        page.getByRole("tab", { name: "Inkomstkällor" })
       ).toBeVisible();
 
       // Wait for income data to load
@@ -190,14 +190,14 @@ test.describe("Financial Instruments CRUD", () => {
       await page.waitForLoadState("networkidle");
 
       // Click Savings tab
-      await page.getByRole("tab", { name: /Savings|Sparande/i }).click();
+      await page.getByRole("tab", { name: "Sparande" }).click();
 
       // Click "Add Savings Account" button
       await page.getByTestId("add-savings-button").click();
 
       // Wait for modal to open
       await expect(
-        page.getByRole("heading", { name: /Add Savings Account/i })
+        page.getByRole("heading", { name: "Lägg till sparkonto" })
       ).toBeVisible();
 
       // Fill in savings account details
@@ -218,7 +218,7 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Wait for modal to close
       await expect(
-        page.getByRole("heading", { name: /Add Savings Account/i })
+        page.getByRole("heading", { name: "Lägg till sparkonto" })
       ).not.toBeVisible();
 
       // Verify new savings account appears
@@ -244,7 +244,7 @@ test.describe("Financial Instruments CRUD", () => {
       await page.waitForLoadState("networkidle");
 
       // Click Savings tab
-      await page.getByRole("tab", { name: /Savings|Sparande/i }).click();
+      await page.getByRole("tab", { name: "Sparande" }).click();
 
       // Wait for savings account to load
       await page.waitForSelector(
@@ -280,7 +280,7 @@ test.describe("Financial Instruments CRUD", () => {
       await page.waitForLoadState("networkidle");
 
       // Click on Savings tab
-      await page.getByRole("tab", { name: /Savings|Sparande/i }).click();
+      await page.getByRole("tab", { name: "Sparande" }).click();
 
       // Wait for savings data to load
       await page.waitForSelector(
@@ -297,7 +297,7 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Wait for modal to open
       await expect(
-        page.getByRole("heading", { name: /Edit Savings Account/i })
+        page.getByRole("heading", { name: "Redigera sparkonto" })
       ).toBeVisible();
 
       // Update the monthly deposit from $300 to $400
@@ -319,7 +319,7 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Wait for modal to close
       await expect(
-        page.getByRole("heading", { name: /Edit Savings Account/i })
+        page.getByRole("heading", { name: "Redigera sparkonto" })
       ).not.toBeVisible();
 
       // Verify the monthly deposit was updated to 400 kr
@@ -490,7 +490,7 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Step 1: Update Income
       await expect(
-        page.getByRole("tab", { name: /Income Sources|Inkomstkällor/i })
+        page.getByRole("tab", { name: "Inkomstkällor" })
       ).toBeVisible();
       await page.waitForSelector(
         `[data-testid="income-${testData.income.id}-edit-button"]`
@@ -503,7 +503,7 @@ test.describe("Financial Instruments CRUD", () => {
       await expect(page.getByText("5 500 kr Månatlig")).toBeVisible();
 
       // Step 2: Update Savings
-      await page.getByRole("tab", { name: /Savings|Sparande/i }).click();
+      await page.getByRole("tab", { name: "Sparande" }).click();
       await page.waitForSelector(
         `[data-testid="savings-${testData.savings.id}-edit-button"]`
       );
@@ -544,12 +544,10 @@ test.describe("Financial Instruments CRUD", () => {
       });
 
       // Step 4: Verify all changes persisted
-      await page
-        .getByRole("tab", { name: /Income Sources|Inkomstkällor/i })
-        .click();
+      await page.getByRole("tab", { name: "Inkomstkällor" }).click();
       await expect(page.getByText("5 500 kr Månatlig")).toBeVisible();
 
-      await page.getByRole("tab", { name: /Savings|Sparande/i }).click();
+      await page.getByRole("tab", { name: "Sparande" }).click();
       await expect(page.getByText("Månadsinsättning: 400 kr")).toBeVisible();
 
       await page.getByRole("tab", { name: /Lån/i }).click();

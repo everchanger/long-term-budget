@@ -791,7 +791,11 @@
       <UModal v-model:open="isPersonModalOpen">
         <template #header>
           <h3 class="text-lg font-semibold">
-            {{ editingPerson ? "Edit Member" : "Add Member" }}
+            {{
+              editingPerson
+                ? $t("household.editMember")
+                : $t("household.addMember")
+            }}
           </h3>
         </template>
 
@@ -854,7 +858,9 @@
       <!-- Delete Person Confirmation Modal -->
       <UModal v-model:open="isDeletePersonModalOpen">
         <template #header>
-          <h3 class="text-lg font-semibold text-red-600">Delete Member</h3>
+          <h3 class="text-lg font-semibold text-red-600">
+            {{ $t("household.deleteMember") }}
+          </h3>
         </template>
 
         <template #body>
@@ -882,7 +888,7 @@
               data-testid="confirm-delete-person-button"
               @click="confirmPersonDelete"
             >
-              Delete Member
+              {{ $t("household.deleteMember") }}
             </UButton>
           </div>
         </template>

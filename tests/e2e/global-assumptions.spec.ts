@@ -10,16 +10,14 @@ test.describe("Global Assumptions - Fast", () => {
     // Using default Swedish locale (SSR default)
 
     await page.goto(`${BASE_URL}/auth`);
-    await page.getByLabel(/Email|E-post/i).fill(TEST_USER.email);
-    await page.getByLabel(/Password|Lösenord/i).fill(TEST_USER.password);
+    await page.getByLabel("E-post").fill(TEST_USER.email);
+    await page.getByLabel("Lösenord").fill(TEST_USER.password);
     await page.getByTestId("auth-submit-button").click();
     await page.waitForURL(/\/(dashboard)?$/);
     await page.goto(`${BASE_URL}/projections`);
 
     // Wait for the page to load by checking for the Global Assumptions card
-    await expect(
-      page.locator("text=/Global Assumptions|Globala antaganden/i")
-    ).toBeVisible();
+    await expect(page.locator("text=Globala antaganden")).toBeVisible();
   });
 
   test("should toggle Global Assumptions and show/hide sliders", async ({
@@ -27,36 +25,26 @@ test.describe("Global Assumptions - Fast", () => {
   }) => {
     // Check initial state (disabled)
     const toggle = page.getByRole("checkbox", {
-      name: /Disabled|Enabled|Inaktiverad|Aktiverad/i,
+      name: "Inaktiverad",
     });
     await expect(toggle).toBeVisible();
-    await expect(
-      page.locator("text=/Disabled|Inaktiverad/i").first()
-    ).toBeVisible();
+    await expect(page.locator("text=Inaktiverad").first()).toBeVisible();
 
     // Sliders should not be visible when disabled
     const globalAssumptionsCard = page
-      .locator("text=/Global Assumptions|Globala antaganden/i")
+      .locator("text=Globala antaganden")
       .locator("..");
     const slidersInCard = globalAssumptionsCard.locator('input[type="range"]');
     expect(await slidersInCard.count()).toBe(0);
 
     // Enable the toggle
     await toggle.click();
-    await expect(
-      page.locator("text=/Enabled|Aktiverad/i").first()
-    ).toBeVisible();
+    await expect(page.locator("text=Aktiverad").first()).toBeVisible();
 
     // Sliders should now be visible
-    await expect(
-      page.locator("text=/Income Growth|Inkomsttillväxt/i")
-    ).toBeVisible();
-    await expect(
-      page.locator("text=/Expense Growth|Utgiftstillväxt/i")
-    ).toBeVisible();
-    await expect(
-      page.locator("text=/Investment Return|Investeringsavkastning/i")
-    ).toBeVisible();
+    await expect(page.locator("text=Inkomsttillväxt")).toBeVisible();
+    await expect(page.locator("text=Utgiftstillväxt")).toBeVisible();
+    await expect(page.locator("text=Investeringsavkastning")).toBeVisible();
   });
 
   test("should enable sliders and allow adjustments", async ({ page }) => {
@@ -66,20 +54,14 @@ test.describe("Global Assumptions - Fast", () => {
 
     // Enable the toggle
     const toggle = page.getByRole("checkbox", {
-      name: /Disabled|Inaktiverad/i,
+      name: "Inaktiverad",
     });
     await toggle.click();
 
     // Wait for sliders to appear
-    await expect(
-      page.locator("text=/Income Growth|Inkomsttillväxt/i")
-    ).toBeVisible();
-    await expect(
-      page.locator("text=/Expense Growth|Utgiftstillväxt/i")
-    ).toBeVisible();
-    await expect(
-      page.locator("text=/Investment Return|Investeringsavkastning/i")
-    ).toBeVisible();
+    await expect(page.locator("text=Inkomsttillväxt")).toBeVisible();
+    await expect(page.locator("text=Utgiftstillväxt")).toBeVisible();
+    await expect(page.locator("text=Investeringsavkastning")).toBeVisible();
 
     // Should now have sliders (Income Growth, Expense Growth, Investment Return)
     const enabledSliders = await page.locator('input[type="range"]').count();
@@ -96,7 +78,7 @@ test.describe("Global Assumptions - Fast", () => {
     await page.waitForTimeout(1500); // Wait for onMounted initialization
 
     // Show the data table
-    const showTableBtn = page.getByRole("button", { name: /Show Table/i });
+    const showTableBtn = page.getByRole("button", { name: "Visa tabell" });
     await showTableBtn.click();
 
     // Wait for table to be visible
@@ -132,7 +114,7 @@ test.describe("Global Assumptions - Fast", () => {
 
   test("should show projection data in table", async ({ page }) => {
     // Show the data table
-    const showTableButton = page.getByRole("button", { name: /Visa tabell/i });
+    const showTableButton = page.getByRole("button", { name: "Visa tabell" });
     await showTableButton.click();
 
     // Wait for table to appear
@@ -149,7 +131,7 @@ test.describe("Global Assumptions - Fast", () => {
 
   test("should not scroll to top when adjusting sliders", async ({ page }) => {
     // Enable assumptions
-    const toggle = page.getByRole("checkbox", { name: /Inaktiverad/i });
+    const toggle = page.getByRole("checkbox", { name: "Inaktiverad" });
     await toggle.click();
     await page.waitForTimeout(500);
 

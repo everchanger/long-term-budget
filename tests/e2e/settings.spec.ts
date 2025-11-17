@@ -104,7 +104,7 @@ test.describe("Settings Page", () => {
     await page.waitForLoadState("networkidle");
     await expect(page).toHaveURL(/\/settings/);
     await expect(
-      page.getByRole("heading", { name: /Inställningar/i })
+      page.getByRole("heading", { name: "Inställningar" })
     ).toBeVisible();
   });
 });

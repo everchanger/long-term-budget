@@ -2,7 +2,7 @@
   <UModal v-model:open="isOpen">
     <template #header>
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-        {{ isEditing ? "Edit" : "Add" }} Savings Account
+        {{ isEditing ? $t("savings.editAccount") : $t("savings.addAccount") }}
       </h3>
     </template>
 

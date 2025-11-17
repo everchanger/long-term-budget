@@ -67,9 +67,9 @@ test.describe("Financial Projections", () => {
         page.getByRole("button", { name: /Nettoförmögenhet/i })
       ).toBeVisible();
       await expect(
-        page.getByRole("button", { name: /Tillgångar/i })
+        page.getByRole("button", { name: "Tillgångar" })
       ).toBeVisible();
-      await expect(page.getByRole("button", { name: /Skuld/i })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Skuld" })).toBeVisible();
     });
 
     test("should display 10-year summary", async ({ page }) => {
@@ -113,9 +113,7 @@ test.describe("Financial Projections", () => {
       await toggle.click();
 
       // Wait for sliders to appear
-      await expect(
-        page.locator("text=/Income Growth|Inkomsttillväxt/i")
-      ).toBeVisible();
+      await expect(page.locator("text=Inkomsttillväxt")).toBeVisible();
 
       // Check for sliders (Income Growth, Expense Growth, Investment Return)
       const sliderCount = await page.locator('input[type="range"]').count();
@@ -130,11 +128,11 @@ test.describe("Financial Projections", () => {
       await page.goto(`${BASE_URL}/projections`);
 
       const assetsBtn = page.getByRole("button", {
-        name: /Tillgångar/i,
+        name: "Tillgångar",
       });
-      const debtBtn = page.getByRole("button", { name: /Skuld/i });
+      const debtBtn = page.getByRole("button", { name: "Skuld" });
       const netWorthBtn = page.getByRole("button", {
-        name: /Nettoförmögenhet/i,
+        name: "Nettoförmögenhet",
       });
 
       // Click Assets button

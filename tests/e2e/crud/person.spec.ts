@@ -22,7 +22,7 @@ test.describe("Person CRUD", () => {
 
     // Wait for modal to open
     await expect(
-      page.getByRole("heading", { name: /add member/i })
+      page.getByRole("heading", { name: "Lägg till medlem" })
     ).toBeVisible();
 
     // Fill in person details
@@ -34,7 +34,7 @@ test.describe("Person CRUD", () => {
 
     // Wait for modal to close
     await expect(
-      page.getByRole("heading", { name: /add member/i })
+      page.getByRole("heading", { name: "Lägg till medlem" })
     ).not.toBeVisible();
 
     // Verify new person appears in the list
@@ -61,13 +61,13 @@ test.describe("Person CRUD", () => {
     // First, create a person to delete
     await page.getByTestId("add-person-button").click();
     await expect(
-      page.getByRole("heading", { name: /add member/i })
+      page.getByRole("heading", { name: "Lägg till medlem" })
     ).toBeVisible();
     await page.getByTestId("person-name-input").fill("To Be Deleted");
     await page.getByTestId("person-age-input").fill("25");
     await page.getByTestId("person-modal-submit-button").click();
     await expect(
-      page.getByRole("heading", { name: /add member/i })
+      page.getByRole("heading", { name: "Lägg till medlem" })
     ).not.toBeVisible();
 
     // Verify person was created
@@ -94,7 +94,7 @@ test.describe("Person CRUD", () => {
 
     // Wait for delete confirmation modal
     await expect(
-      page.getByRole("heading", { name: /delete member/i })
+      page.getByRole("heading", { name: "Ta bort medlem" })
     ).toBeVisible();
 
     // Confirm deletion
@@ -102,7 +102,7 @@ test.describe("Person CRUD", () => {
 
     // Wait for modal to close
     await expect(
-      page.getByRole("heading", { name: /delete member/i })
+      page.getByRole("heading", { name: "Ta bort medlem" })
     ).not.toBeVisible();
 
     // Verify person is no longer in the list
