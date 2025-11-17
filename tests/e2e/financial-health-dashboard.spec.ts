@@ -5,10 +5,13 @@ const BASE_URL =
   process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000";
 
 test.describe("Financial Health Dashboard - Fast", () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, context }) => {
+    // Use default Swedish locale
+    // Using default Swedish locale (SSR default)
+
     await page.goto(`${BASE_URL}/auth`);
-    await page.getByLabel("Email").fill(TEST_USER.email);
-    await page.getByLabel("Password").fill(TEST_USER.password);
+    await page.getByLabel(/E-post/i).fill(TEST_USER.email);
+    await page.getByLabel(/Lösenord/i).fill(TEST_USER.password);
     await page.getByTestId("auth-submit-button").click();
     await page.waitForURL(/\/(dashboard)?$/);
 
@@ -19,7 +22,7 @@ test.describe("Financial Health Dashboard - Fast", () => {
     // Wait for content to load by checking for the heading
     await expect(
       page.getByRole("heading", {
-        name: "Financial Health Dashboard",
+        name: /Instrumentpanel för finansiell hälsa/i,
         level: 1,
       })
     ).toBeVisible();
@@ -28,12 +31,15 @@ test.describe("Financial Health Dashboard - Fast", () => {
   test("should display all dashboard elements", async ({ page }) => {
     // Check page structure
     await expect(
-      page.getByText("Track your overall financial wellness")
+      page.getByText(/Följ din övergripande ekonomiska hälsa/i)
     ).toBeVisible();
 
     // Check all cards are present
     await expect(
-      page.getByRole("heading", { name: "Overall Financial Health", level: 2 })
+      page.getByRole("heading", {
+        name: /Övergripande finansiell hälsa/i,
+        level: 2,
+      })
     ).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Net Worth", level: 3 })
@@ -48,7 +54,7 @@ test.describe("Financial Health Dashboard - Fast", () => {
       page.getByRole("heading", { name: "Emergency Fund", level: 3 })
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Recommended Actions", level: 3 })
+      page.getByRole("heading", { name: /Rekommenderade åtgärder/i, level: 3 })
     ).toBeVisible();
   });
 
@@ -87,7 +93,9 @@ test.describe("Financial Health Dashboard - Fast", () => {
 
     // Dashboard should still be visible
     await expect(
-      page.getByRole("heading", { name: "Financial Health Dashboard" })
+      page.getByRole("heading", {
+        name: /Instrumentpanel för finansiell hälsa/i,
+      })
     ).toBeVisible();
   });
 
@@ -99,7 +107,9 @@ test.describe("Financial Health Dashboard - Fast", () => {
 
     // Wait for heading to ensure page is loaded
     await expect(
-      page.getByRole("heading", { name: "Financial Health Dashboard" })
+      page.getByRole("heading", {
+        name: /Instrumentpanel för finansiell hälsa/i,
+      })
     ).toBeVisible();
 
     // Check for card headings (use level to be more specific)

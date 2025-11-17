@@ -8,25 +8,25 @@ test.describe("i18n and Currency Support", () => {
     await page.goto(BASE_URL);
   });
 
-  test("should default to English locale", async ({ page }) => {
+  test("should default to Swedish locale", async ({ page }) => {
     // Wait for the page to load
     await page.waitForLoadState("networkidle");
 
-    // Check that English text is present (use .first() to handle multiple matches)
-    const signInText = page.getByText("Sign In").first();
+    // Check that Swedish text is present (use .first() to handle multiple matches)
+    const signInText = page.getByText("Logga in").first();
     await expect(signInText).toBeVisible();
   });
 
-  test("should display currency in USD format by default", async ({ page }) => {
+  test("should display currency in SEK format by default", async ({ page }) => {
     // Navigate to a page that would show currency
     // This test assumes there's some initial data or demo mode
     await page.waitForLoadState("networkidle");
 
-    // Look for dollar sign formatting
+    // Look for kr formatting (Swedish Krona)
     // This is a basic check - you may need to adjust based on your actual app structure
-    const dollarSign = page.locator("text=/\\$/").first();
-    if ((await dollarSign.count()) > 0) {
-      await expect(dollarSign).toBeVisible();
+    const krText = page.locator("text=/kr/").first();
+    if ((await krText.count()) > 0) {
+      await expect(krText).toBeVisible();
     }
   });
 
@@ -57,8 +57,8 @@ test.describe("i18n and Currency Support", () => {
     await page.goto(BASE_URL);
     await page.waitForLoadState("networkidle");
 
-    // Check that Swedish or English text is present (use .first() to handle multiple matches)
-    const signInText = page.getByText(/Logga in|Sign In/).first();
+    // Check that Swedish text is present (use .first() to handle multiple matches)
+    const signInText = page.getByText("Logga in").first();
     await expect(signInText).toBeVisible();
   });
 

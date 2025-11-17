@@ -83,7 +83,9 @@
             <div v-if="enableGlobalAssumptions" class="space-y-4">
               <div>
                 <div class="flex justify-between mb-2">
-                  <label class="text-sm font-medium">Income Growth</label>
+                  <label class="text-sm font-medium">{{
+                    $t("projections.incomeGrowth")
+                  }}</label>
                   <span class="text-sm font-semibold">{{
                     formatPercent(incomeGrowth)
                   }}</span>
@@ -101,7 +103,9 @@
 
               <div>
                 <div class="flex justify-between mb-2">
-                  <label class="text-sm font-medium">Expense Growth</label>
+                  <label class="text-sm font-medium">{{
+                    $t("projections.expenseGrowth")
+                  }}</label>
                   <span class="text-sm font-semibold">{{
                     formatPercent(expenseGrowth)
                   }}</span>
@@ -119,7 +123,9 @@
 
               <div>
                 <div class="flex justify-between mb-2">
-                  <label class="text-sm font-medium">Investment Return</label>
+                  <label class="text-sm font-medium">{{
+                    $t("projections.investmentReturn")
+                  }}</label>
                   <span class="text-sm font-semibold">{{
                     formatPercent(investmentReturn)
                   }}</span>

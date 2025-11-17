@@ -5,41 +5,58 @@ const BASE_URL =
   process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000";
 
 test.describe("Global Assumptions - Fast", () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, context }) => {
+    // Use default Swedish locale
+    // Using default Swedish locale (SSR default)
+
     await page.goto(`${BASE_URL}/auth`);
-    await page.getByLabel("Email").fill(TEST_USER.email);
-    await page.getByLabel("Password").fill(TEST_USER.password);
+    await page.getByLabel(/Email|E-post/i).fill(TEST_USER.email);
+    await page.getByLabel(/Password|Lösenord/i).fill(TEST_USER.password);
     await page.getByTestId("auth-submit-button").click();
     await page.waitForURL(/\/(dashboard)?$/);
     await page.goto(`${BASE_URL}/projections`);
 
     // Wait for the page to load by checking for the Global Assumptions card
-    await expect(page.locator("text=Global Assumptions")).toBeVisible();
+    await expect(
+      page.locator("text=/Global Assumptions|Globala antaganden/i")
+    ).toBeVisible();
   });
 
   test("should toggle Global Assumptions and show/hide sliders", async ({
     page,
   }) => {
     // Check initial state (disabled)
-    const toggle = page.getByRole("checkbox", { name: /Disabled|Enabled/ });
+    const toggle = page.getByRole("checkbox", {
+      name: /Disabled|Enabled|Inaktiverad|Aktiverad/i,
+    });
     await expect(toggle).toBeVisible();
-    await expect(page.locator("text=Disabled").first()).toBeVisible();
+    await expect(
+      page.locator("text=/Disabled|Inaktiverad/i").first()
+    ).toBeVisible();
 
     // Sliders should not be visible when disabled
     const globalAssumptionsCard = page
-      .locator("text=Global Assumptions")
+      .locator("text=/Global Assumptions|Globala antaganden/i")
       .locator("..");
     const slidersInCard = globalAssumptionsCard.locator('input[type="range"]');
     expect(await slidersInCard.count()).toBe(0);
 
     // Enable the toggle
     await toggle.click();
-    await expect(page.locator("text=Enabled").first()).toBeVisible();
+    await expect(
+      page.locator("text=/Enabled|Aktiverad/i").first()
+    ).toBeVisible();
 
     // Sliders should now be visible
-    await expect(page.locator("text=Income Growth")).toBeVisible();
-    await expect(page.locator("text=Expense Growth")).toBeVisible();
-    await expect(page.locator("text=Investment Return")).toBeVisible();
+    await expect(
+      page.locator("text=/Income Growth|Inkomsttillväxt/i")
+    ).toBeVisible();
+    await expect(
+      page.locator("text=/Expense Growth|Utgiftstillväxt/i")
+    ).toBeVisible();
+    await expect(
+      page.locator("text=/Investment Return|Investeringsavkastning/i")
+    ).toBeVisible();
   });
 
   test("should enable sliders and allow adjustments", async ({ page }) => {
@@ -48,13 +65,21 @@ test.describe("Global Assumptions - Fast", () => {
     expect(initialSliders).toBe(0);
 
     // Enable the toggle
-    const toggle = page.getByRole("checkbox", { name: /Disabled/ });
+    const toggle = page.getByRole("checkbox", {
+      name: /Disabled|Inaktiverad/i,
+    });
     await toggle.click();
 
     // Wait for sliders to appear
-    await expect(page.locator("text=Income Growth")).toBeVisible();
-    await expect(page.locator("text=Expense Growth")).toBeVisible();
-    await expect(page.locator("text=Investment Return")).toBeVisible();
+    await expect(
+      page.locator("text=/Income Growth|Inkomsttillväxt/i")
+    ).toBeVisible();
+    await expect(
+      page.locator("text=/Expense Growth|Utgiftstillväxt/i")
+    ).toBeVisible();
+    await expect(
+      page.locator("text=/Investment Return|Investeringsavkastning/i")
+    ).toBeVisible();
 
     // Should now have sliders (Income Growth, Expense Growth, Investment Return)
     const enabledSliders = await page.locator('input[type="range"]').count();
@@ -107,24 +132,24 @@ test.describe("Global Assumptions - Fast", () => {
 
   test("should show projection data in table", async ({ page }) => {
     // Show the data table
-    const showTableButton = page.getByRole("button", { name: /Show Table/i });
+    const showTableButton = page.getByRole("button", { name: /Visa tabell/i });
     await showTableButton.click();
 
     // Wait for table to appear
     await expect(page.locator("table")).toBeVisible();
 
-    // Check that we have year rows (Year 0 through Year 9)
-    await expect(page.locator("text=Year 0")).toBeVisible();
-    await expect(page.locator("text=Year 9")).toBeVisible();
+    // Check that we have year rows (År 0 through År 9)
+    await expect(page.locator("text=År 0")).toBeVisible();
+    await expect(page.locator("text=År 9")).toBeVisible();
 
     // Check that table has financial data (look for currency values)
-    const currencyValues = await page.locator('td:has-text("$")').count();
+    const currencyValues = await page.locator('td:has-text("kr")').count();
     expect(currencyValues).toBeGreaterThan(0);
   });
 
   test("should not scroll to top when adjusting sliders", async ({ page }) => {
     // Enable assumptions
-    const toggle = page.getByRole("checkbox", { name: /Disabled/ });
+    const toggle = page.getByRole("checkbox", { name: /Inaktiverad/i });
     await toggle.click();
     await page.waitForTimeout(500);
 

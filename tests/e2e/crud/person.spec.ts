@@ -39,7 +39,7 @@ test.describe("Person CRUD", () => {
 
     // Verify new person appears in the list
     await expect(page.getByText("Jane Smith")).toBeVisible();
-    await expect(page.getByText("Age: 28")).toBeVisible();
+    await expect(page.getByText("Ålder: 28")).toBeVisible();
   });
 
   test("should delete a person", async ({ page, sessionCookie }) => {
@@ -78,7 +78,7 @@ test.describe("Person CRUD", () => {
     const manageButton = page
       .locator('[data-testid*="person-"][data-testid*="-manage-button"]')
       .filter({
-        hasText: /manage finances/i,
+        hasText: /hantera ekonomi/i,
       })
       .last();
 

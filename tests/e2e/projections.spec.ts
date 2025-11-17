@@ -5,11 +5,14 @@ const BASE_URL =
   process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000";
 
 test.describe("Financial Projections", () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, context }) => {
+    // Use default Swedish locale
+    // Using default Swedish locale (SSR default)
+
     // Sign in
     await page.goto(`${BASE_URL}/auth`);
-    await page.getByLabel("Email").fill(TEST_USER.email);
-    await page.getByLabel("Password").fill(TEST_USER.password);
+    await page.getByLabel(/E-post/i).fill(TEST_USER.email);
+    await page.getByLabel(/Lösenord/i).fill(TEST_USER.password);
     await page.getByTestId("auth-submit-button").click();
     await page.waitForURL(/\/(dashboard)?$/);
   });
@@ -20,15 +23,19 @@ test.describe("Financial Projections", () => {
 
       // Check that stored financial data card is visible
       await expect(
-        page.getByRole("heading", { name: "Stored Financial Data" })
+        page.getByRole("heading", {
+          name: /Lagrad finansiell data/i,
+        })
       ).toBeVisible();
 
       // Should show the 4 main metrics
-      const netWorthText = page.locator("text=Net Worth").first();
+      const netWorthText = page.locator("text=/Nettoförmögenhet/i").first();
       await expect(netWorthText).toBeVisible();
-      await expect(page.locator("text=Monthly Income").first()).toBeVisible();
-      await expect(page.locator("text=Monthly Expenses").first()).toBeVisible();
-      await expect(page.locator("text=Total Debt").first()).toBeVisible();
+      await expect(page.locator("text=/Månadsinkomst/i").first()).toBeVisible();
+      await expect(
+        page.locator("text=/Månadskostnader/i").first()
+      ).toBeVisible();
+      await expect(page.locator("text=/Total skuld/i").first()).toBeVisible();
     });
 
     test("should NOT display adjusted values card initially", async ({
@@ -38,7 +45,7 @@ test.describe("Financial Projections", () => {
 
       // Adjusted projection values should not be visible when no adjustments made
       const adjustedHeading = page.getByRole("heading", {
-        name: "Adjusted Projection Values",
+        name: /Justerade projektionsvärden/i,
       });
       await expect(adjustedHeading).not.toBeVisible();
     });
@@ -50,28 +57,38 @@ test.describe("Financial Projections", () => {
 
       // Check chart is present
       await expect(
-        page.getByRole("heading", { name: "10-Year Financial Projection" })
+        page.getByRole("heading", {
+          name: /10-årig finansiell prognos/i,
+        })
       ).toBeVisible();
 
       // Check view toggle buttons
       await expect(
-        page.getByRole("button", { name: "Net Worth" })
+        page.getByRole("button", { name: /Nettoförmögenhet/i })
       ).toBeVisible();
-      await expect(page.getByRole("button", { name: "Assets" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Debt" })).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: /Tillgångar/i })
+      ).toBeVisible();
+      await expect(page.getByRole("button", { name: /Skuld/i })).toBeVisible();
     });
 
     test("should display 10-year summary", async ({ page }) => {
       await page.goto(`${BASE_URL}/projections`);
 
       await expect(
-        page.getByRole("heading", { name: "10-Year Summary" })
+        page.getByRole("heading", {
+          name: /10-årssammanfattning/i,
+        })
       ).toBeVisible();
       await expect(
-        page.locator("text=Starting Net Worth").first()
+        page.locator("text=/Startande nettoförmögenhet/i").first()
       ).toBeVisible();
-      await expect(page.locator("text=Ending Net Worth").first()).toBeVisible();
-      await expect(page.locator("text=Total Growth").first()).toBeVisible();
+      await expect(
+        page.locator("text=/Slutlig nettoförmögenhet/i").first()
+      ).toBeVisible();
+      await expect(
+        page.locator("text=/Total tillväxt/i").first()
+      ).toBeVisible();
     });
 
     test("should display global assumptions sliders when enabled", async ({
@@ -80,7 +97,9 @@ test.describe("Financial Projections", () => {
       await page.goto(`${BASE_URL}/projections`);
 
       await expect(
-        page.getByRole("heading", { name: "Global Assumptions" })
+        page.getByRole("heading", {
+          name: /Globala antaganden/i,
+        })
       ).toBeVisible();
 
       // Initially disabled - no sliders
@@ -88,11 +107,15 @@ test.describe("Financial Projections", () => {
       expect(initialSliders).toBe(0);
 
       // Enable the toggle
-      const toggle = page.getByRole("checkbox", { name: /Disabled/ });
+      const toggle = page.getByRole("checkbox", {
+        name: /Inaktiverad/i,
+      });
       await toggle.click();
 
       // Wait for sliders to appear
-      await expect(page.locator("text=Income Growth")).toBeVisible();
+      await expect(
+        page.locator("text=/Income Growth|Inkomsttillväxt/i")
+      ).toBeVisible();
 
       // Check for sliders (Income Growth, Expense Growth, Investment Return)
       const sliderCount = await page.locator('input[type="range"]').count();
@@ -106,9 +129,13 @@ test.describe("Financial Projections", () => {
     }) => {
       await page.goto(`${BASE_URL}/projections`);
 
-      const assetsBtn = page.getByRole("button", { name: "Assets" });
-      const debtBtn = page.getByRole("button", { name: "Debt" });
-      const netWorthBtn = page.getByRole("button", { name: "Net Worth" });
+      const assetsBtn = page.getByRole("button", {
+        name: /Tillgångar/i,
+      });
+      const debtBtn = page.getByRole("button", { name: /Skuld/i });
+      const netWorthBtn = page.getByRole("button", {
+        name: /Nettoförmögenhet/i,
+      });
 
       // Click Assets button
       await assetsBtn.click();
@@ -124,7 +151,9 @@ test.describe("Financial Projections", () => {
 
       // All buttons should be clickable and page should not crash
       await expect(
-        page.getByRole("heading", { name: "10-Year Financial Projection" })
+        page.getByRole("heading", {
+          name: /10-årig finansiell prognos/i,
+        })
       ).toBeVisible();
     });
   });
@@ -169,7 +198,9 @@ test.describe("Financial Projections", () => {
 
             // Adjusted projection values card should now be visible
             await expect(
-              page.getByRole("heading", { name: "Adjusted Projection Values" })
+              page.getByRole("heading", {
+                name: /Justerade projektionsvärden/i,
+              })
             ).toBeVisible({ timeout: 10000 });
           }
         }
@@ -188,8 +219,10 @@ test.describe("Financial Projections", () => {
       };
 
       // Get initial monthly income from stored data
-      await page.waitForSelector("text=Stored Financial Data");
-      const monthlyIncomeLocator = page.locator("text=Monthly Income").first();
+      await page.waitForSelector("text=/Lagrad finansiell data/i");
+      const monthlyIncomeLocator = page
+        .locator("text=/Månadsinkomst/i")
+        .first();
       await monthlyIncomeLocator.waitFor({ state: "visible", timeout: 10000 });
       const parentDiv = monthlyIncomeLocator.locator("..");
       const storedIncomeText = await parentDiv.innerText();
@@ -233,16 +266,16 @@ test.describe("Financial Projections", () => {
 
             // Check for adjusted values card
             const adjustedHeading = page.getByRole("heading", {
-              name: "Adjusted Projection Values",
+              name: /Justerade projektionsvärden/i,
             });
             await expect(adjustedHeading).toBeVisible({ timeout: 10000 });
 
             // Get adjusted monthly income
             const adjustedCard = page
-              .locator("text=Adjusted Projection Values")
+              .locator("text=/Justerade projektionsvärden/i")
               .locator("..");
             const adjustedIncomeSection = adjustedCard
-              .locator("text=Monthly Income")
+              .locator("text=/Månadsinkomst/i")
               .locator("..");
             const adjustedIncomeText = await adjustedIncomeSection.innerText();
             const adjustedMonthlyIncome = extractAmount(adjustedIncomeText);
@@ -274,18 +307,20 @@ test.describe("Financial Projections", () => {
       await page.goto(`${BASE_URL}/projections`);
 
       // Wait for page to load
-      await expect(page.locator("text=Global Assumptions")).toBeVisible();
+      await expect(page.locator("text=/Globala antaganden/i")).toBeVisible();
 
       // Enable Global Assumptions first
-      const toggle = page.getByRole("checkbox", { name: /Disabled/ });
+      const toggle = page.getByRole("checkbox", {
+        name: /Inaktiverad/i,
+      });
       await toggle.click();
 
       // Wait for sliders to appear
-      await expect(page.locator("text=Income Growth")).toBeVisible();
+      await expect(page.locator("text=/Inkomsttillväxt/i")).toBeVisible();
       await page.waitForTimeout(500);
 
       // Wait for initial projection to load
-      await page.waitForSelector("text=10-Year Summary");
+      await page.waitForSelector("text=/10-årssammanfattning/i");
       await page.waitForTimeout(1000);
 
       // Find income growth slider (first range input after enabling toggle)

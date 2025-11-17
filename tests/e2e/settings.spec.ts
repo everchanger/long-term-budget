@@ -10,16 +10,20 @@ test.describe("Settings Page", () => {
     await page.waitForLoadState("networkidle");
 
     // Check for settings title
-    await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Inställningar" })
+    ).toBeVisible();
 
     // Check for language label
-    await expect(page.getByText("Language").first()).toBeVisible();
+    await expect(page.getByText("Språk").first()).toBeVisible();
 
     // Check for currency label
-    await expect(page.getByText("Currency").first()).toBeVisible();
+    await expect(page.getByText("Valuta").first()).toBeVisible();
 
     // Check for save button (should be disabled initially)
-    const saveButton = page.getByRole("button", { name: "Save Changes" });
+    const saveButton = page.getByRole("button", {
+      name: "Spara ändringar",
+    });
     await expect(saveButton).toBeVisible();
     await expect(saveButton).toBeDisabled();
   });
@@ -30,10 +34,12 @@ test.describe("Settings Page", () => {
     await page.goto(`${BASE_URL}/settings`);
     await page.waitForLoadState("networkidle");
 
-    // Check that language select shows 'sv' (default)
+    // Check that language select shows 'sv' (test user's saved preference)
     const languageSelect = page.getByTestId("language-select");
     await expect(languageSelect).toBeVisible();
-    await expect(languageSelect).toContainText("sv");
+    // Check the selected value, not the text content
+    const selectedValue = await languageSelect.inputValue();
+    expect(selectedValue).toBe("sv");
   });
 
   test("should display current currency selection", async ({
@@ -42,7 +48,7 @@ test.describe("Settings Page", () => {
     await page.goto(`${BASE_URL}/settings`);
     await page.waitForLoadState("networkidle");
 
-    // Check that currency select shows 'SEK' (default)
+    // Check that currency select shows 'SEK' (test user's saved preference)
     const currencySelect = page.getByTestId("currency-select");
     await expect(currencySelect).toBeVisible();
     await expect(currencySelect).toContainText("SEK");
@@ -75,7 +81,9 @@ test.describe("Settings Page", () => {
     await page.waitForLoadState("networkidle");
 
     // Save button should be disabled initially
-    const saveButton = page.getByRole("button", { name: "Save Changes" });
+    const saveButton = page.getByRole("button", {
+      name: /Spara ändringar/i,
+    });
     await expect(saveButton).toBeDisabled();
   });
 
@@ -86,13 +94,17 @@ test.describe("Settings Page", () => {
     await page.waitForLoadState("networkidle");
 
     // Should have settings link in navigation
-    const settingsLink = page.getByRole("link", { name: "Settings" });
+    const settingsLink = page.getByRole("link", {
+      name: /Inställningar/i,
+    });
     await expect(settingsLink).toBeVisible();
 
     // Click it and verify we go to settings page
     await settingsLink.click();
     await page.waitForLoadState("networkidle");
     await expect(page).toHaveURL(/\/settings/);
-    await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /Inställningar/i })
+    ).toBeVisible();
   });
 });

@@ -162,7 +162,6 @@
     "managePersonSources": "Manage {name}'s Income Sources",
     "noSources": "No income sources",
     "addFirstSource": "Add {name}'s first income source to get started.",
-    "addSource": "Add Income Source",
     "editSource": "Edit Income Source",
     "nameRequired": "Name *",
     "namePlaceholder": "e.g., Salary, Freelance, etc.",
@@ -218,7 +217,6 @@
     "noLoans": "No loans yet",
     "addLoansToTrack": "Add loans and debts to track payments and balances.",
     "balanceLabel": "balance",
-    "addLoan": "Add Loan",
     "editLoan": "Edit Loan",
     "nameRequired": "Name *",
     "namePlaceholder": "e.g., Mortgage, Credit Card, etc.",
@@ -280,7 +278,6 @@
     "debtBalance": "Debt Balance",
     "originalDebt": "Original Debt",
     "totalSaved": "Total Saved",
-    "totalDebtPaid": "Total Debt Paid",
     "yearlyData": "Yearly Data",
     "dataTable": "Data Table",
     "reachedNetWorth": "Reached {amount} net worth",
@@ -289,7 +286,6 @@
     "year": "Year",
     "investments": "Investments",
     "debt": "Debt",
-    "month": "Month",
     "flowingInEachMonth": "flowing in each month",
     "annual": "Annual"
   },
@@ -393,11 +389,14 @@
   },
   "settings": {
     "title": "Settings",
+    "description": "Manage your preferences and settings",
     "preferences": "Preferences",
     "language": "Language",
     "currency": "Currency",
+    "saveChanges": "Save Changes",
     "updateSuccess": "Settings updated successfully",
-    "updateError": "Failed to update settings"
+    "updateError": "Failed to update settings",
+    "updateFailed": "Failed to update settings"
   },
   "budget": {
     "title": "Budget",
@@ -443,15 +442,6 @@
     "weekly": "Weekly",
     "biWeekly": "Bi-weekly"
   },
-  "settings": {
-    "title": "Settings",
-    "description": "Manage your language and currency preferences",
-    "language": "Language",
-    "currency": "Currency",
-    "saveChanges": "Save Changes",
-    "updateSuccess": "Settings updated successfully",
-    "updateFailed": "Failed to update settings"
-  },
   "budgetExpenses": {
     "addExpense": "Add Budget Expense",
     "editExpense": "Edit Budget Expense",
@@ -484,13 +474,6 @@
       "other": "Other",
       "otherDesc": "Miscellaneous expenses"
     }
-  },
-  "person": {
-    "editPerson": "Edit Person",
-    "name": "Name",
-    "namePlaceholder": "Enter person's name",
-    "age": "Age",
-    "agePlaceholder": "Enter age (optional)"
   },
   "savingsGoals": {
     "title": "Savings Goals",

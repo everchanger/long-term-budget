@@ -157,7 +157,7 @@ export const test = base.extend<{
   },
 
   authenticatedPage: async ({ page, sessionCookie }, use) => {
-    // Set the session cookie on the page context
+    // Set the session cookie
     await page.context().addCookies([
       {
         name: "better-auth.session_token",
@@ -172,6 +172,13 @@ export const test = base.extend<{
     // Navigate to home page (already authenticated)
     await page.goto("/");
     await page.waitForLoadState("networkidle");
+
+    // Wait for the user preferences to load
+    // The useUserPreferences composable fetches on mount, so give it time
+    // await page.waitForTimeout(1000);
+
+    // // Reload to ensure preferences are fully applied
+    // await page.reload({ waitUntil: "networkidle" });
 
     await use(page);
   },

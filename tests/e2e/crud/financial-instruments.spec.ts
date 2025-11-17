@@ -15,15 +15,19 @@ test.describe("Financial Instruments CRUD", () => {
 
     await expect(page).toHaveURL("/economy");
     await expect(
-      page.getByRole("heading", { name: "Your Economy Overview" })
+      page.getByRole("heading", {
+        name: /Your Economy Overview|Din ekonomiska översikt/i,
+      })
     ).toBeVisible();
 
     // Verify core sections are present (these are always visible regardless of data)
     await expect(
-      page.getByRole("heading", { name: "Members", exact: true })
+      page.getByRole("heading", { name: /^Members$|^Medlemmar$/i })
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Fixed Monthly Expenses" })
+      page.getByRole("heading", {
+        name: /Fixed Monthly Expenses|Fasta månadskostnader/i,
+      })
     ).toBeVisible();
 
     // Verify "Add First Member" button is visible for empty household
@@ -46,7 +50,7 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Should be on Income Sources tab by default
       await expect(
-        page.getByRole("tab", { name: "Income Sources" })
+        page.getByRole("tab", { name: /Income Sources|Inkomstkällor/i })
       ).toBeVisible();
 
       // Click "Add Income Source" button
@@ -54,7 +58,7 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Wait for modal to open
       await expect(
-        page.getByRole("heading", { name: /add income source/i })
+        page.getByRole("heading", { name: /Lägg till inkomstkälla/i })
       ).toBeVisible();
 
       // Fill in income details
@@ -68,16 +72,15 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Wait for modal to close
       await expect(
-        page.getByRole("heading", { name: /add income source/i })
+        page.getByRole("heading", { name: /Lägg till inkomstkälla/i })
       ).not.toBeVisible();
 
       // Verify new income source appears in the list (use heading to avoid toast notification)
       await expect(
         page.getByRole("heading", { name: "New Salary", exact: true })
       ).toBeVisible();
-      await expect(
-        page.getByText("$6000.00 monthly", { exact: true })
-      ).toBeVisible();
+      // Verify amount - Swedish format with non-breaking space
+      await expect(page.getByText("6 000 kr")).toBeVisible();
     } finally {
       await cleanupTestData(request, sessionCookie, testData.person.id);
     }
@@ -99,7 +102,7 @@ test.describe("Financial Instruments CRUD", () => {
       await page.waitForSelector(
         `[data-testid="income-${testData.income.id}-edit-button"]`
       );
-      await expect(page.getByText("$5000.00 monthly")).toBeVisible();
+      await expect(page.getByText("5 000 kr Månatlig")).toBeVisible();
 
       // Click delete button for income
       await page
@@ -107,7 +110,7 @@ test.describe("Financial Instruments CRUD", () => {
         .click();
 
       // Verify income is removed (no confirmation dialog - deletes immediately)
-      await expect(page.getByText("$5000.00 monthly")).not.toBeVisible();
+      await expect(page.getByText("5 000 kr Månatlig")).not.toBeVisible();
     } finally {
       await cleanupTestData(request, sessionCookie, testData.person.id);
     }
@@ -131,7 +134,7 @@ test.describe("Financial Instruments CRUD", () => {
         page.getByRole("heading", { name: testData.person.name, exact: true })
       ).toBeVisible();
       await expect(
-        page.getByRole("tab", { name: "Income Sources" })
+        page.getByRole("tab", { name: /Income Sources|Inkomstkällor/i })
       ).toBeVisible();
 
       // Wait for income data to load
@@ -140,7 +143,7 @@ test.describe("Financial Instruments CRUD", () => {
       );
 
       // Verify initial income amount
-      await expect(page.getByText(/\$5,?000/).first()).toBeVisible();
+      await expect(page.getByText("5 000 kr Månatlig")).toBeVisible();
 
       // Click edit button for the income source
       await page
@@ -149,7 +152,7 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Wait for modal to open
       await expect(
-        page.getByRole("heading", { name: "Edit Income Source" })
+        page.getByRole("heading", { name: /Redigera inkomstkälla/i })
       ).toBeVisible({ timeout: 10000 });
 
       // Update the amount from $5000 to $5500
@@ -162,14 +165,11 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Wait for modal to close
       await expect(
-        page.getByRole("heading", { name: "Edit Income Source" })
+        page.getByRole("heading", { name: /Redigera inkomstkälla/i })
       ).not.toBeVisible();
 
       // Verify the income was updated
-      await expect(page.getByText("$5500.00 monthly")).toBeVisible();
-
-      // Verify the income was updated by checking for the new amount
-      await expect(page.getByText("$5500.00").first()).toBeVisible();
+      await expect(page.getByText("5 500 kr Månatlig")).toBeVisible();
     } finally {
       await cleanupTestData(request, sessionCookie, testData.person.id);
     }
@@ -190,14 +190,14 @@ test.describe("Financial Instruments CRUD", () => {
       await page.waitForLoadState("networkidle");
 
       // Click Savings tab
-      await page.getByRole("tab", { name: "Savings" }).click();
+      await page.getByRole("tab", { name: /Savings|Sparande/i }).click();
 
       // Click "Add Savings Account" button
       await page.getByTestId("add-savings-button").click();
 
       // Wait for modal to open
       await expect(
-        page.getByRole("heading", { name: /add savings account/i })
+        page.getByRole("heading", { name: /Add Savings Account/i })
       ).toBeVisible();
 
       // Fill in savings account details
@@ -218,14 +218,14 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Wait for modal to close
       await expect(
-        page.getByRole("heading", { name: /add savings account/i })
+        page.getByRole("heading", { name: /Add Savings Account/i })
       ).not.toBeVisible();
 
       // Verify new savings account appears
       await expect(
         page.getByRole("heading", { name: "New Savings" })
       ).toBeVisible();
-      await expect(page.getByText(/\$10,?000/)).toBeVisible();
+      await expect(page.getByText("10 000 kr")).toBeVisible();
     } finally {
       await cleanupTestData(request, sessionCookie, testData.person.id);
     }
@@ -244,7 +244,7 @@ test.describe("Financial Instruments CRUD", () => {
       await page.waitForLoadState("networkidle");
 
       // Click Savings tab
-      await page.getByRole("tab", { name: "Savings" }).click();
+      await page.getByRole("tab", { name: /Savings|Sparande/i }).click();
 
       // Wait for savings account to load
       await page.waitForSelector(
@@ -280,7 +280,7 @@ test.describe("Financial Instruments CRUD", () => {
       await page.waitForLoadState("networkidle");
 
       // Click on Savings tab
-      await page.getByRole("tab", { name: "Savings" }).click();
+      await page.getByRole("tab", { name: /Savings|Sparande/i }).click();
 
       // Wait for savings data to load
       await page.waitForSelector(
@@ -288,7 +288,7 @@ test.describe("Financial Instruments CRUD", () => {
       );
 
       // Verify initial monthly deposit
-      await expect(page.getByText("Monthly Deposit: $300")).toBeVisible();
+      await expect(page.getByText("Månadsinsättning: 300 kr")).toBeVisible();
 
       // Click edit button for the savings account
       await page
@@ -297,7 +297,7 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Wait for modal to open
       await expect(
-        page.getByRole("heading", { name: "Edit Savings Account" })
+        page.getByRole("heading", { name: /Edit Savings Account/i })
       ).toBeVisible();
 
       // Update the monthly deposit from $300 to $400
@@ -319,11 +319,11 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Wait for modal to close
       await expect(
-        page.getByRole("heading", { name: "Edit Savings Account" })
+        page.getByRole("heading", { name: /Edit Savings Account/i })
       ).not.toBeVisible();
 
-      // Verify the monthly deposit was updated to $400
-      await expect(page.getByText("Monthly Deposit: $400")).toBeVisible({
+      // Verify the monthly deposit was updated to 400 kr
+      await expect(page.getByText("Månadsinsättning: 400 kr")).toBeVisible({
         timeout: 5000,
       });
     } finally {
@@ -342,14 +342,14 @@ test.describe("Financial Instruments CRUD", () => {
       await page.waitForLoadState("networkidle");
 
       // Click Loans & Debts tab
-      await page.getByRole("tab", { name: "Loans & Debts" }).click();
+      await page.getByRole("tab", { name: /Lån/i }).click();
 
       // Click "Add Loan" button
       await page.getByTestId("add-loan-button").click();
 
       // Wait for modal to open
       await expect(
-        page.getByRole("heading", { name: /add loan/i })
+        page.getByRole("heading", { name: /Lägg till lån/i })
       ).toBeVisible();
 
       // Fill in loan details
@@ -371,14 +371,14 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Wait for modal to close
       await expect(
-        page.getByRole("heading", { name: /add loan/i })
+        page.getByRole("heading", { name: /Lägg till lån/i })
       ).not.toBeVisible();
 
       // Verify new loan appears
       await expect(
         page.getByRole("heading", { name: "New Loan" })
       ).toBeVisible();
-      await expect(page.getByText(/\$30,?000/)).toBeVisible();
+      await expect(page.getByText("30 000 kr")).toBeVisible();
     } finally {
       await cleanupTestData(request, sessionCookie, testData.person.id);
     }
@@ -393,7 +393,7 @@ test.describe("Financial Instruments CRUD", () => {
       await page.waitForLoadState("networkidle");
 
       // Click Loans & Debts tab
-      await page.getByRole("tab", { name: "Loans & Debts" }).click();
+      await page.getByRole("tab", { name: /Lån/i }).click();
 
       // Wait for loan to load
       await page.waitForSelector(
@@ -423,7 +423,7 @@ test.describe("Financial Instruments CRUD", () => {
       await page.waitForLoadState("networkidle");
 
       // Click on Loans & Debts tab
-      await page.getByRole("tab", { name: "Loans & Debts" }).click();
+      await page.getByRole("tab", { name: /Lån/i }).click();
 
       // Wait for loan data to load
       await page.waitForSelector(
@@ -431,14 +431,14 @@ test.describe("Financial Instruments CRUD", () => {
       );
 
       // Verify initial monthly payment
-      await expect(page.getByText("Monthly Payment: $400")).toBeVisible();
+      await expect(page.getByText("Månadsbetalning: 400 kr")).toBeVisible();
 
       // Click edit button for the loan
       await page.getByTestId(`loan-${testData.loan.id}-edit-button`).click();
 
       // Wait for modal to open
       await expect(
-        page.getByRole("heading", { name: "Edit Loan/Debt" })
+        page.getByRole("heading", { name: /Redigera lån/i })
       ).toBeVisible();
 
       // Update the monthly payment from $400 to $450
@@ -459,11 +459,11 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Wait for modal to close
       await expect(
-        page.getByRole("heading", { name: "Edit Loan/Debt" })
+        page.getByRole("heading", { name: /Redigera lån/i })
       ).not.toBeVisible();
 
       // Verify the monthly payment was updated
-      await expect(page.getByText(/Monthly Payment.*450/)).toBeVisible({
+      await expect(page.getByText(/Månadsbetalning.*450/)).toBeVisible({
         timeout: 10000,
       });
     } finally {
@@ -490,7 +490,7 @@ test.describe("Financial Instruments CRUD", () => {
 
       // Step 1: Update Income
       await expect(
-        page.getByRole("tab", { name: "Income Sources" })
+        page.getByRole("tab", { name: /Income Sources|Inkomstkällor/i })
       ).toBeVisible();
       await page.waitForSelector(
         `[data-testid="income-${testData.income.id}-edit-button"]`
@@ -500,10 +500,10 @@ test.describe("Financial Instruments CRUD", () => {
         .click();
       await page.getByTestId("income-amount-input").fill("5500.00");
       await page.getByTestId("income-modal-submit-button").click();
-      await expect(page.getByText("$5500.00 monthly")).toBeVisible();
+      await expect(page.getByText("5 500 kr Månatlig")).toBeVisible();
 
       // Step 2: Update Savings
-      await page.getByRole("tab", { name: "Savings" }).click();
+      await page.getByRole("tab", { name: /Savings|Sparande/i }).click();
       await page.waitForSelector(
         `[data-testid="savings-${testData.savings.id}-edit-button"]`
       );
@@ -520,13 +520,13 @@ test.describe("Financial Instruments CRUD", () => {
         page.getByTestId("savings-modal-submit-button").click(),
       ]);
 
-      // Verify the monthly deposit was updated to $400
-      await expect(page.getByText("Monthly Deposit: $400")).toBeVisible({
+      // Verify the monthly deposit was updated to 400 kr
+      await expect(page.getByText("Månadsinsättning: 400 kr")).toBeVisible({
         timeout: 5000,
       });
 
       // Step 3: Update Loan
-      await page.getByRole("tab", { name: "Loans & Debts" }).click();
+      await page.getByRole("tab", { name: /Lån/i }).click();
       await page.waitForSelector(
         `[data-testid="loan-${testData.loan.id}-edit-button"]`
       );
@@ -539,19 +539,21 @@ test.describe("Financial Instruments CRUD", () => {
         ),
         page.getByTestId("loan-modal-submit-button").click(),
       ]);
-      await expect(page.getByText(/Monthly Payment.*450/)).toBeVisible({
+      await expect(page.getByText(/Månadsbetalning.*450/)).toBeVisible({
         timeout: 10000,
       });
 
       // Step 4: Verify all changes persisted
-      await page.getByRole("tab", { name: "Income Sources" }).click();
-      await expect(page.getByText("$5500.00 monthly")).toBeVisible();
+      await page
+        .getByRole("tab", { name: /Income Sources|Inkomstkällor/i })
+        .click();
+      await expect(page.getByText("5 500 kr Månatlig")).toBeVisible();
 
-      await page.getByRole("tab", { name: "Savings" }).click();
-      await expect(page.getByText("Monthly Deposit: $400")).toBeVisible();
+      await page.getByRole("tab", { name: /Savings|Sparande/i }).click();
+      await expect(page.getByText("Månadsinsättning: 400 kr")).toBeVisible();
 
-      await page.getByRole("tab", { name: "Loans & Debts" }).click();
-      await expect(page.getByText("Monthly Payment: $450")).toBeVisible();
+      await page.getByRole("tab", { name: /Lån/i }).click();
+      await expect(page.getByText("Månadsbetalning: 450 kr")).toBeVisible();
     } finally {
       await cleanupTestData(request, sessionCookie, testData.person.id);
     }
