@@ -8,106 +8,71 @@
 
     <template #body>
       <div class="space-y-4">
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            for="savings-name"
-          >
-            Account Name *
-          </label>
-          <input
+        <UFormField label="Account Name" name="name" required>
+          <UInput
             id="savings-name"
             v-model="formState.name"
             type="text"
             placeholder="e.g., Emergency Fund, High Yield Savings, etc."
-            required
+            icon="i-lucide-wallet"
             data-testid="savings-name-input"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            for="savings-balance"
-          >
-            Current Balance *
-          </label>
-          <input
+        <UFormField label="Current Balance" name="currentBalance" required>
+          <UInput
             id="savings-balance"
             v-model="formState.currentBalance"
             type="number"
             step="0.01"
             min="0"
             placeholder="0.00"
-            required
+            icon="i-lucide-dollar-sign"
             data-testid="savings-current-balance-input"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            for="savings-interest-rate"
-          >
-            Interest Rate (%)
-          </label>
-          <input
+        <UFormField label="Interest Rate (%)" name="interestRate">
+          <UInput
             id="savings-interest-rate"
             v-model="formState.interestRate"
             type="number"
             step="0.01"
             min="0"
             placeholder="2.50"
+            icon="i-lucide-percent"
             data-testid="savings-interest-rate-input"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            for="savings-monthly-deposit"
-          >
-            Monthly Deposit
-          </label>
-          <input
+        <UFormField
+          label="Monthly Deposit"
+          hint="Amount you contribute to this account each month"
+          name="monthlyDeposit"
+        >
+          <UInput
             id="savings-monthly-deposit"
             v-model="formState.monthlyDeposit"
             type="number"
             step="0.01"
             min="0"
             placeholder="0.00"
+            icon="i-lucide-calendar-plus"
             data-testid="savings-monthly-deposit-input"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Amount you contribute to this account each month
-          </p>
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            for="savings-account-type"
-          >
-            Account Type
-          </label>
-          <select
+        <UFormField label="Account Type" name="accountType">
+          <USelect
             id="savings-account-type"
             v-model="formState.accountType"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-          >
-            <option value="">Select type</option>
-            <option value="savings">Savings Account</option>
-            <option value="high-yield">High Yield Savings</option>
-            <option value="money-market">Money Market</option>
-            <option value="cd">Certificate of Deposit</option>
-            <option value="checking">Checking Account</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
+            :items="accountTypeOptions"
+            placeholder="Select type"
+            value-key="value"
+            label-key="label"
+            :ui="{ content: 'min-w-fit' }"
+          />
+        </UFormField>
       </div>
     </template>
 
@@ -129,6 +94,7 @@
 
 <script setup lang="ts">
 import type { z } from "zod";
+import type { SelectItem } from "@nuxt/ui";
 import type {
   SelectSavingsAccount,
   insertSavingsAccountSchema,
@@ -156,6 +122,20 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<Emits>();
+
+// Account type options with icons
+const accountTypeOptions: SelectItem[] = [
+  { label: "Savings Account", value: "savings", icon: "i-lucide-piggy-bank" },
+  {
+    label: "High Yield Savings",
+    value: "high-yield",
+    icon: "i-lucide-trending-up",
+  },
+  { label: "Money Market", value: "money-market", icon: "i-lucide-banknote" },
+  { label: "Certificate of Deposit", value: "cd", icon: "i-lucide-file-badge" },
+  { label: "Checking Account", value: "checking", icon: "i-lucide-wallet" },
+  { label: "Other", value: "other", icon: "i-lucide-circle-help" },
+];
 
 // Reactive form state
 const formState = reactive<FormState>({

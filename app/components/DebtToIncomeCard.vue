@@ -48,9 +48,8 @@
       </div>
 
       <!-- Breakdown -->
-      <div
-        class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700"
-      >
+      <USeparator />
+      <div class="grid grid-cols-2 gap-4">
         <div>
           <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
             Monthly Debt Payments
@@ -70,7 +69,8 @@
       </div>
 
       <!-- Guidance -->
-      <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+      <USeparator />
+      <div>
         <p class="text-xs text-gray-500 dark:text-gray-400">
           {{ getGuidanceText(data.debtToIncome.ratio) }}
         </p>

@@ -1,773 +1,677 @@
 <template>
-  <div>
-    <div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 py-8">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header -->
-        <div class="mb-8">
-          <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">
-            {{ $t("navigation.economyOverview") }}
-          </h1>
+  <UPage>
+    <UPageHeader :title="$t('navigation.economyOverview')" />
+
+    <UPageBody>
+      <div v-if="userHousehold" class="space-y-6">
+        <!-- Financial Story CTA -->
+        <div
+          class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-800 p-6"
+        >
+          <div class="flex items-start justify-between">
+            <div class="flex items-start space-x-3">
+              <div
+                class="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center flex-shrink-0"
+              >
+                <UIcon
+                  name="i-heroicons-sparkles"
+                  class="w-6 h-6 text-blue-600 dark:text-blue-400"
+                />
+              </div>
+              <div>
+                <h3
+                  class="text-lg font-semibold text-neutral-900 dark:text-white mb-1"
+                >
+                  {{ $t("navigation.financialStory") }}
+                </h3>
+                <p class="text-sm text-neutral-600 dark:text-neutral-300">
+                  {{ $t("economy.financialStoryDescription") }}
+                </p>
+              </div>
+            </div>
+            <UButton
+              to="/financial-story"
+              color="primary"
+              icon="i-heroicons-arrow-right"
+              trailing
+            >
+              {{ $t("economy.viewStory") }}
+            </UButton>
+          </div>
         </div>
 
-        <!-- Main Content -->
-        <div v-if="userHousehold" class="space-y-6">
-          <!-- Financial Story CTA -->
-          <div
-            class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-800 p-6"
-          >
-            <div class="flex items-start justify-between">
-              <div class="flex items-start space-x-3">
-                <div
-                  class="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center flex-shrink-0"
-                >
-                  <UIcon
-                    name="i-heroicons-sparkles"
-                    class="w-6 h-6 text-blue-600 dark:text-blue-400"
-                  />
-                </div>
-                <div>
-                  <h3
-                    class="text-lg font-semibold text-neutral-900 dark:text-white mb-1"
-                  >
-                    {{ $t("navigation.financialStory") }}
-                  </h3>
-                  <p class="text-sm text-neutral-600 dark:text-neutral-300">
-                    {{ $t("economy.financialStoryDescription") }}
+        <!-- Overview Stats -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          <div>
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+              {{ $t("household.created") }}
+            </p>
+            <p class="font-semibold text-lg text-neutral-900 dark:text-white">
+              {{ new Date(userHousehold.createdAt).toLocaleDateString() }}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+              {{ $t("household.members") }}
+            </p>
+            <p class="font-semibold text-lg text-neutral-900 dark:text-white">
+              {{ householdMembersText }}
+            </p>
+          </div>
+
+          <div v-if="financialSummary">
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+              {{ $t("financialHealth.netWorth") }}
+            </p>
+            <p
+              class="font-semibold text-lg"
+              :class="
+                netWorth >= 0
+                  ? 'text-neutral-900 dark:text-neutral-100'
+                  : 'text-neutral-700 dark:text-neutral-300'
+              "
+            >
+              {{ formatCurrency(netWorth) }}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+              {{ $t("household.planning") }}
+            </p>
+            <UButton
+              to="/scenarios"
+              variant="ghost"
+              size="sm"
+              class="p-0 h-auto text-left justify-start font-semibold text-lg"
+            >
+              {{ $t("household.viewScenarios") }}
+            </UButton>
+          </div>
+        </div>
+
+        <!-- Members Section -->
+        <UCard>
+          <template #header>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <UIcon
+                  name="i-heroicons-users"
+                  class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
+                />
+                <h3 class="text-lg font-semibold">
+                  {{ $t("household.members") }}
+                </h3>
+              </div>
+              <UButton
+                v-if="householdMembers.length > 0"
+                size="sm"
+                variant="soft"
+                icon="i-heroicons-plus"
+                data-testid="add-person-button"
+                @click="openAddPersonModal"
+              >
+                {{ $t("household.addMember") }}
+              </UButton>
+            </div>
+          </template>
+          <div v-if="householdMembers.length > 0" class="space-y-4">
+            <UCard
+              v-for="member in householdMembers"
+              :key="member.id"
+              class="hover:shadow-md transition-shadow"
+            >
+              <div class="flex items-center mb-4 sm:mb-0">
+                <UAvatar
+                  :text="member.name.charAt(0).toUpperCase()"
+                  size="lg"
+                  class="mr-4"
+                />
+                <div class="flex-grow">
+                  <p class="font-semibold text-lg">
+                    {{ member.name }}
+                  </p>
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                    {{
+                      member.age
+                        ? `${$t("person.age")}: ${member.age}`
+                        : $t("household.ageNotSpecified")
+                    }}
                   </p>
                 </div>
               </div>
-              <UButton
-                to="/financial-story"
-                color="primary"
-                icon="i-heroicons-arrow-right"
-                trailing
-              >
-                {{ $t("economy.viewStory") }}
-              </UButton>
-            </div>
+              <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
+                <UButton
+                  :to="`/persons/${member.id}`"
+                  size="lg"
+                  variant="solid"
+                  icon="i-heroicons-chart-bar"
+                  class="w-full sm:w-auto justify-center"
+                  :data-testid="`person-${member.id}-manage-button`"
+                >
+                  {{ $t("household.manageFinances") }}
+                </UButton>
+                <UButton
+                  size="lg"
+                  variant="soft"
+                  color="error"
+                  icon="i-heroicons-trash"
+                  class="w-full sm:w-auto justify-center"
+                  :data-testid="`person-${member.id}-delete-button`"
+                  @click="openDeletePersonModal(member)"
+                  >{{ $t("common.delete") }}</UButton
+                >
+              </div>
+            </UCard>
           </div>
 
-          <!-- Overview Stats -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <div>
-              <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                {{ $t("household.created") }}
-              </p>
-              <p class="font-semibold text-lg text-neutral-900 dark:text-white">
-                {{ new Date(userHousehold.createdAt).toLocaleDateString() }}
-              </p>
+          <div v-else class="text-center py-12">
+            <div
+              class="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <UIcon
+                name="i-heroicons-user-group"
+                class="w-8 h-8 text-neutral-400"
+              />
             </div>
+            <h4
+              class="text-lg font-medium text-neutral-900 dark:text-white mb-2"
+            >
+              {{ $t("household.noMembersYet") }}
+            </h4>
+            <p class="text-neutral-600 dark:text-neutral-400 mb-6">
+              {{ $t("household.addFirstMemberDesc") }}
+            </p>
+            <UButton
+              variant="soft"
+              icon="i-heroicons-plus"
+              data-testid="add-person-button"
+              @click="openAddPersonModal"
+            >
+              {{ $t("household.addFirstMember") }}
+            </UButton>
+          </div>
+        </UCard>
 
-            <div>
-              <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                {{ $t("household.members") }}
-              </p>
-              <p class="font-semibold text-lg text-neutral-900 dark:text-white">
-                {{ householdMembersText }}
-              </p>
+        <!-- Financial Summary Section -->
+        <UCard v-if="financialSummary && householdMembers.length > 0">
+          <template #header>
+            <div class="flex items-center gap-3">
+              <UIcon
+                name="i-heroicons-chart-bar"
+                class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
+              />
+              <div>
+                <h3 class="text-lg font-semibold">
+                  {{ $t("household.financialOverview") }}
+                </h3>
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                  {{ $t("household.combinedFinances") }}
+                </p>
+              </div>
             </div>
-
-            <div v-if="financialSummary">
-              <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                {{ $t("financialHealth.netWorth") }}
-              </p>
+          </template>
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"
+          >
+            <!-- Monthly Income -->
+            <UCard>
               <p
-                class="font-semibold text-lg"
-                :class="
-                  netWorth >= 0
-                    ? 'text-neutral-900 dark:text-neutral-100'
-                    : 'text-neutral-700 dark:text-neutral-300'
-                "
+                class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
+              >
+                {{ $t("household.monthlyIncome") }}
+              </p>
+              <p class="text-2xl font-bold mt-2">
+                {{ formatCurrency(financialSummary.totalMonthlyIncome) }}
+              </p>
+              <p class="text-xs text-neutral-500 dark:text-neutral-500 mt-1">
+                {{ formatCurrency(financialSummary.totalAnnualIncome) }}
+                {{ $t("household.annually") }}
+              </p>
+            </UCard>
+
+            <!-- Total Savings -->
+            <UCard>
+              <p
+                class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
+              >
+                {{ $t("household.totalSavings") }}
+              </p>
+              <p class="text-2xl font-bold text-neutral-900 dark:text-white">
+                {{ formatCurrency(financialSummary.totalSavings) }}
+              </p>
+              <p class="text-xs text-neutral-500 dark:text-neutral-500">
+                {{ financialSummary.savingsAccountsCount }}
+                {{ $t("household.accounts") }}
+              </p>
+            </UCard>
+
+            <!-- Total Debt -->
+            <UCard>
+              <p
+                class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
+              >
+                {{ $t("household.totalDebt") }}
+              </p>
+              <p class="text-2xl font-bold text-neutral-900 dark:text-white">
+                {{ formatCurrency(financialSummary.totalDebt) }}
+              </p>
+              <p class="text-xs text-neutral-500 dark:text-neutral-500">
+                {{ financialSummary.loansCount }}
+                {{ $t("loans.title").toLowerCase() }}
+              </p>
+            </UCard>
+          </div>
+
+          <!-- Net Worth Summary -->
+          <div
+            class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-lg border border-neutral-200 dark:border-neutral-700"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div
+                  class="w-12 h-12 bg-neutral-100 dark:bg-neutral-700 rounded-xl flex items-center justify-center mr-4"
+                >
+                  <UIcon
+                    name="i-heroicons-trophy"
+                    class="w-6 h-6 text-neutral-600 dark:text-neutral-400"
+                  />
+                </div>
+                <div>
+                  <p
+                    class="text-lg font-medium text-neutral-900 dark:text-white"
+                  >
+                    {{ $t("household.estimatedNetWorth") }}
+                  </p>
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                    {{ $t("household.savingsMinusDebt") }}
+                  </p>
+                </div>
+              </div>
+              <p
+                class="text-3xl font-bold text-neutral-900 dark:text-neutral-100"
               >
                 {{ formatCurrency(netWorth) }}
               </p>
             </div>
-
-            <div>
-              <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                {{ $t("household.planning") }}
-              </p>
-              <UButton
-                to="/scenarios"
-                variant="ghost"
-                size="sm"
-                class="p-0 h-auto text-left justify-start font-semibold text-lg"
-              >
-                {{ $t("household.viewScenarios") }}
-              </UButton>
-            </div>
           </div>
+        </UCard>
 
-          <!-- Members Section -->
-          <div
-            class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700"
-          >
-            <div
-              class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700"
-            >
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <div
-                    class="w-8 h-8 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3"
-                  >
-                    <UIcon
-                      name="i-heroicons-users"
-                      class="w-4 h-4 text-neutral-600 dark:text-neutral-400"
-                    />
-                  </div>
-                  <h3
-                    class="text-lg font-medium text-neutral-900 dark:text-white"
-                  >
-                    {{ $t("household.members") }}
-                  </h3>
-                </div>
-                <UButton
-                  v-if="householdMembers.length > 0"
-                  size="sm"
-                  variant="soft"
-                  icon="i-heroicons-plus"
-                  data-testid="add-person-button"
-                  @click="openAddPersonModal"
-                >
-                  {{ $t("household.addMember") }}
-                </UButton>
-              </div>
-            </div>
-
-            <div class="p-6">
-              <div v-if="householdMembers.length > 0" class="space-y-4">
-                <div
-                  v-for="member in householdMembers"
-                  :key="member.id"
-                  class="p-6 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <div class="flex items-center mb-4 sm:mb-0">
-                    <div
-                      class="w-12 h-12 bg-neutral-200 dark:bg-neutral-700 rounded-full flex items-center justify-center mr-4"
-                    >
-                      <span
-                        class="text-neutral-700 dark:text-neutral-300 font-semibold"
-                        >{{ member.name.charAt(0).toUpperCase() }}</span
-                      >
-                    </div>
-                    <div class="flex-grow">
-                      <p
-                        class="font-semibold text-lg text-neutral-900 dark:text-white"
-                      >
-                        {{ member.name }}
-                      </p>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                        {{
-                          member.age
-                            ? `${$t("person.age")}: ${member.age}`
-                            : $t("household.ageNotSpecified")
-                        }}
-                      </p>
-                    </div>
-                  </div>
-                  <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
-                    <UButton
-                      :to="`/persons/${member.id}`"
-                      size="lg"
-                      variant="solid"
-                      icon="i-heroicons-chart-bar"
-                      class="w-full sm:w-auto justify-center"
-                      :data-testid="`person-${member.id}-manage-button`"
-                    >
-                      {{ $t("household.manageFinances") }}
-                    </UButton>
-                    <UButton
-                      size="lg"
-                      variant="soft"
-                      color="error"
-                      icon="i-heroicons-trash"
-                      class="w-full sm:w-auto justify-center"
-                      :data-testid="`person-${member.id}-delete-button`"
-                      @click="openDeletePersonModal(member)"
-                      >{{ $t("common.delete") }}</UButton
-                    >
-                  </div>
-                </div>
-              </div>
-
-              <div v-else class="text-center py-12">
-                <div
-                  class="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4"
-                >
-                  <UIcon
-                    name="i-heroicons-user-group"
-                    class="w-8 h-8 text-neutral-400"
-                  />
-                </div>
-                <h4
-                  class="text-lg font-medium text-neutral-900 dark:text-white mb-2"
-                >
-                  {{ $t("household.noMembersYet") }}
-                </h4>
-                <p class="text-neutral-600 dark:text-neutral-400 mb-6">
-                  {{ $t("household.addFirstMemberDesc") }}
-                </p>
-                <UButton
-                  variant="soft"
-                  icon="i-heroicons-plus"
-                  data-testid="add-person-button"
-                  @click="openAddPersonModal"
-                >
-                  {{ $t("household.addFirstMember") }}
-                </UButton>
-              </div>
-            </div>
-          </div>
-
-          <!-- Financial Summary Section -->
-          <div
-            v-if="financialSummary && householdMembers.length > 0"
-            class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700"
-          >
-            <div
-              class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700"
-            >
-              <div class="flex items-center">
-                <div
-                  class="w-8 h-8 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3"
-                >
-                  <UIcon
-                    name="i-heroicons-chart-bar"
-                    class="w-4 h-4 text-neutral-600 dark:text-neutral-400"
-                  />
-                </div>
-                <div>
-                  <h3
-                    class="text-lg font-medium text-neutral-900 dark:text-white"
-                  >
-                    {{ $t("household.financialOverview") }}
-                  </h3>
-                  <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                    {{ $t("household.combinedFinances") }}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div class="p-6">
-              <div
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"
-              >
-                <!-- Monthly Income -->
-                <div
-                  class="bg-neutral-50 dark:bg-neutral-900 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700"
-                >
-                  <div>
-                    <p
-                      class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
-                    >
-                      {{ $t("household.monthlyIncome") }}
-                    </p>
-                    <p
-                      class="text-2xl font-bold text-neutral-900 dark:text-white"
-                    >
-                      {{ formatCurrency(financialSummary.totalMonthlyIncome) }}
-                    </p>
-                    <p class="text-xs text-neutral-500 dark:text-neutral-500">
-                      {{ formatCurrency(financialSummary.totalAnnualIncome) }}
-                      {{ $t("household.annually") }}
-                    </p>
-                  </div>
-                </div>
-
-                <!-- Total Savings -->
-                <div
-                  class="bg-neutral-50 dark:bg-neutral-900 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700"
-                >
-                  <div>
-                    <p
-                      class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
-                    >
-                      {{ $t("household.totalSavings") }}
-                    </p>
-                    <p
-                      class="text-2xl font-bold text-neutral-900 dark:text-white"
-                    >
-                      {{ formatCurrency(financialSummary.totalSavings) }}
-                    </p>
-                    <p class="text-xs text-neutral-500 dark:text-neutral-500">
-                      {{ financialSummary.savingsAccountsCount }}
-                      {{ $t("household.accounts") }}
-                    </p>
-                  </div>
-                </div>
-
-                <!-- Total Debt -->
-                <div
-                  class="bg-neutral-50 dark:bg-neutral-900 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700"
-                >
-                  <div>
-                    <p
-                      class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
-                    >
-                      {{ $t("household.totalDebt") }}
-                    </p>
-                    <p
-                      class="text-2xl font-bold text-neutral-900 dark:text-white"
-                    >
-                      {{ formatCurrency(financialSummary.totalDebt) }}
-                    </p>
-                    <p class="text-xs text-neutral-500 dark:text-neutral-500">
-                      {{ financialSummary.loansCount }}
-                      {{ $t("loans.title").toLowerCase() }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Net Worth Summary -->
-              <div
-                class="bg-neutral-50 dark:bg-neutral-800 p-6 rounded-lg border border-neutral-200 dark:border-neutral-700"
-              >
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center">
-                    <div
-                      class="w-12 h-12 bg-neutral-100 dark:bg-neutral-700 rounded-xl flex items-center justify-center mr-4"
-                    >
-                      <UIcon
-                        name="i-heroicons-trophy"
-                        class="w-6 h-6 text-neutral-600 dark:text-neutral-400"
-                      />
-                    </div>
-                    <div>
-                      <p
-                        class="text-lg font-medium text-neutral-900 dark:text-white"
-                      >
-                        {{ $t("household.estimatedNetWorth") }}
-                      </p>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                        {{ $t("household.savingsMinusDebt") }}
-                      </p>
-                    </div>
-                  </div>
-                  <p
-                    class="text-3xl font-bold text-neutral-900 dark:text-neutral-100"
-                  >
-                    {{ formatCurrency(netWorth) }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Budget Expenses Section -->
-          <div
-            v-if="userHousehold"
-            class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700"
-          >
-            <div
-              class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700"
-            >
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <div
-                    class="w-8 h-8 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3"
-                  >
-                    <UIcon
-                      name="i-heroicons-currency-dollar"
-                      class="w-4 h-4 text-neutral-600 dark:text-neutral-400"
-                    />
-                  </div>
-                  <div>
-                    <h3
-                      class="text-lg font-medium text-neutral-900 dark:text-white"
-                    >
-                      {{ $t("household.fixedMonthlyExpenses") }}
-                    </h3>
-                    <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                      {{ $t("household.rentUtilitiesEtc") }}
-                    </p>
-                  </div>
-                </div>
-                <UButton
-                  size="sm"
-                  variant="soft"
-                  icon="i-heroicons-plus"
-                  data-testid="add-budget-expense-button"
-                  @click="openBudgetExpenseModal()"
-                >
-                  {{ $t("household.addExpense") }}
-                </UButton>
-              </div>
-            </div>
-
-            <div class="p-6">
-              <div v-if="budgetExpensesLoading" class="text-center py-8">
-                <UIcon
-                  name="i-heroicons-arrow-path"
-                  class="animate-spin h-6 w-6 mx-auto mb-2 text-neutral-600"
-                />
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                  {{ $t("household.loadingExpenses") }}
-                </p>
-              </div>
-
-              <div
-                v-else-if="budgetExpenses.length === 0"
-                class="text-center py-8"
-              >
+        <!-- Budget Expenses Section -->
+        <UCard v-if="userHousehold">
+          <template #header>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
                 <UIcon
                   name="i-heroicons-currency-dollar"
-                  class="h-12 w-12 mx-auto mb-3 text-neutral-400"
+                  class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
                 />
-                <p class="text-neutral-600 dark:text-neutral-400 mb-2">
-                  {{ $t("household.noBudgetExpenses") }}
-                </p>
-                <p class="text-sm text-neutral-500 dark:text-neutral-500">
-                  {{ $t("household.addFixedExpenses") }}
-                </p>
-              </div>
-
-              <div v-else class="space-y-3">
-                <TransitionGroup name="list" tag="div" class="space-y-3">
-                  <div
-                    v-for="expense in budgetExpenses"
-                    :key="expense.id"
-                    class="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg transition-all hover:shadow-md"
-                    :data-testid="`budget-expense-${expense.id}`"
-                  >
-                    <div class="flex items-center gap-3">
-                      <div
-                        class="w-10 h-10 bg-white dark:bg-neutral-800 rounded-lg flex items-center justify-center"
-                      >
-                        <UIcon
-                          :name="getCategoryIcon(expense.category)"
-                          class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
-                        />
-                      </div>
-                      <div>
-                        <p class="font-medium text-neutral-900 dark:text-white">
-                          {{ expense.name }}
-                        </p>
-                        <p
-                          class="text-sm text-neutral-600 dark:text-neutral-400"
-                        >
-                          {{ formatCurrency(parseFloat(expense.amount))
-                          }}{{ $t("time.perMonth") }}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                      <UButton
-                        variant="ghost"
-                        size="sm"
-                        icon="i-heroicons-pencil"
-                        :data-testid="`edit-budget-expense-${expense.id}`"
-                        @click="openBudgetExpenseModal(expense)"
-                      />
-                      <UButton
-                        variant="ghost"
-                        size="sm"
-                        icon="i-heroicons-trash"
-                        :data-testid="`delete-budget-expense-${expense.id}`"
-                        @click="confirmDeleteBudgetExpense(expense)"
-                      />
-                    </div>
-                  </div>
-                </TransitionGroup>
-
-                <!-- Total -->
-                <div
-                  class="pt-3 border-t border-neutral-200 dark:border-neutral-700"
-                >
-                  <div class="flex items-center justify-between mb-2">
-                    <p
-                      class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
-                    >
-                      {{ $t("economy.totalMonthlyExpenses") }}
-                    </p>
-                    <p
-                      class="text-lg font-bold text-neutral-900 dark:text-white"
-                    >
-                      {{ formatCurrency(totalMonthlyExpenses) }}
-                    </p>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <p class="text-xs text-neutral-500 dark:text-neutral-500">
-                      {{ $t("economy.projectedAnnualCost") }}
-                    </p>
-                    <p
-                      class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
-                    >
-                      {{ formatCurrency(totalMonthlyExpenses * 12) }}
-                    </p>
-                  </div>
+                <div>
+                  <h3 class="text-lg font-semibold">
+                    {{ $t("household.fixedMonthlyExpenses") }}
+                  </h3>
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                    {{ $t("household.rentUtilitiesEtc") }}
+                  </p>
                 </div>
               </div>
+              <UButton
+                size="sm"
+                variant="soft"
+                icon="i-heroicons-plus"
+                data-testid="add-budget-expense-button"
+                @click="openBudgetExpenseModal()"
+              >
+                {{ $t("household.addExpense") }}
+              </UButton>
             </div>
+          </template>
+
+          <div v-if="budgetExpensesLoading" class="text-center py-8">
+            <UIcon
+              name="i-heroicons-arrow-path"
+              class="animate-spin h-6 w-6 mx-auto mb-2 text-neutral-600"
+            />
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+              {{ $t("household.loadingExpenses") }}
+            </p>
           </div>
 
-          <!-- Savings Goals Section -->
-          <div
-            v-if="userHousehold && householdMembers.length > 0"
-            class="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700"
-          >
-            <div
-              class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700"
-            >
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
+          <div v-else-if="budgetExpenses.length === 0" class="text-center py-8">
+            <UIcon
+              name="i-heroicons-currency-dollar"
+              class="h-12 w-12 mx-auto mb-3 text-neutral-400"
+            />
+            <p class="text-neutral-600 dark:text-neutral-400 mb-2">
+              {{ $t("household.noBudgetExpenses") }}
+            </p>
+            <p class="text-sm text-neutral-500 dark:text-neutral-500">
+              {{ $t("household.addFixedExpenses") }}
+            </p>
+          </div>
+
+          <div v-else class="space-y-3">
+            <TransitionGroup name="list" tag="div" class="space-y-3">
+              <div
+                v-for="expense in budgetExpenses"
+                :key="expense.id"
+                class="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg transition-all hover:shadow-md"
+                :data-testid="`budget-expense-${expense.id}`"
+              >
+                <div class="flex items-center gap-3">
                   <div
-                    class="w-8 h-8 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center mr-3"
+                    class="w-10 h-10 bg-white dark:bg-neutral-800 rounded-lg flex items-center justify-center"
                   >
                     <UIcon
-                      name="i-heroicons-flag"
-                      class="w-4 h-4 text-neutral-600 dark:text-neutral-400"
+                      :name="getCategoryIcon(expense.category)"
+                      class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
                     />
                   </div>
                   <div>
-                    <h3
-                      class="text-lg font-medium text-neutral-900 dark:text-white"
-                    >
-                      {{ $t("savingsGoals.title") }}
-                    </h3>
+                    <p class="font-medium text-neutral-900 dark:text-white">
+                      {{ expense.name }}
+                    </p>
                     <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                      {{ $t("savingsGoals.trackYourObjectives") }}
+                      {{ formatCurrency(parseFloat(expense.amount))
+                      }}{{ $t("time.perMonth") }}
                     </p>
                   </div>
                 </div>
-                <UButton
-                  size="sm"
-                  variant="soft"
-                  icon="i-heroicons-plus"
-                  @click="() => openSavingsGoalModal()"
-                >
-                  {{ $t("savingsGoals.addGoal") }}
-                </UButton>
-              </div>
-            </div>
 
-            <div class="p-6">
-              <div v-if="savingsGoalsLoading" class="text-center py-8">
-                <UIcon
-                  name="i-heroicons-arrow-path"
-                  class="animate-spin h-6 w-6 mx-auto mb-2 text-neutral-600"
-                />
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                  {{ $t("savingsGoals.loadingGoals") }}
-                </p>
-              </div>
-
-              <div v-else-if="activeGoals.length > 0" class="space-y-4">
-                <div
-                  v-for="goal in activeGoals"
-                  :key="goal.id"
-                  class="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-700"
-                >
-                  <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center">
-                      <div class="mr-3">
-                        <h4
-                          class="font-semibold text-neutral-900 dark:text-white"
-                        >
-                          {{ goal.name }}
-                        </h4>
-                        <p
-                          v-if="goal.description"
-                          class="text-sm text-neutral-600 dark:text-neutral-400"
-                        >
-                          {{ goal.description }}
-                        </p>
-                      </div>
-                      <div v-if="goal.priority" class="flex items-center">
-                        <UBadge
-                          :color="
-                            goal.priority === 3
-                              ? 'error'
-                              : goal.priority === 2
-                              ? 'warning'
-                              : 'success'
-                          "
-                          size="sm"
-                        >
-                          {{
-                            goal.priority === 3
-                              ? "High"
-                              : goal.priority === 2
-                              ? "Medium"
-                              : "Low"
-                          }}
-                          Priority
-                        </UBadge>
-                      </div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                      <UButton
-                        size="sm"
-                        variant="ghost"
-                        icon="i-heroicons-pencil"
-                        @click="editSavingsGoal(goal)"
-                      />
-                      <UButton
-                        size="sm"
-                        variant="ghost"
-                        color="error"
-                        icon="i-heroicons-trash"
-                        @click="deleteSavingsGoal(goal.id)"
-                      />
-                    </div>
-                  </div>
-
-                  <!-- Progress Bar -->
-                  <div class="mb-3">
-                    <div class="flex justify-between text-sm mb-1">
-                      <span class="text-neutral-600 dark:text-neutral-400">{{
-                        $t("savingsGoals.progress")
-                      }}</span>
-                      <span class="font-medium"
-                        >{{ getGoalProgress(goal).toFixed(1) }}%</span
-                      >
-                    </div>
-                    <div
-                      class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2"
-                    >
-                      <div
-                        class="bg-neutral-600 dark:bg-neutral-400 h-2 rounded-full transition-all duration-300"
-                        :style="{
-                          width: `${Math.min(getGoalProgress(goal), 100)}%`,
-                        }"
-                      />
-                    </div>
-                    <div
-                      class="flex justify-between text-xs text-neutral-500 dark:text-neutral-500 mt-1"
-                    >
-                      <span>{{ formatCurrency(goal.currentAmount) }}</span>
-                      <span>{{
-                        formatCurrency(parseFloat(goal.targetAmount))
-                      }}</span>
-                    </div>
-                  </div>
-
-                  <!-- Goal Details -->
-                  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <p class="text-neutral-600 dark:text-neutral-400">
-                        {{ $t("savingsGoals.remaining") }}
-                      </p>
-                      <p class="font-medium">
-                        {{ formatCurrency(getRemainingAmount(goal)) }}
-                      </p>
-                    </div>
-                    <div v-if="goal.category">
-                      <p class="text-neutral-600 dark:text-neutral-400">
-                        {{ $t("savingsGoals.category") }}
-                      </p>
-                      <p class="font-medium capitalize">
-                        {{ goal.category.replace("-", " ") }}
-                      </p>
-                    </div>
-                    <div
-                      v-if="
-                        financialSummary &&
-                        financialSummary.totalMonthlyIncome > 0
-                      "
-                    >
-                      <p class="text-neutral-600 dark:text-neutral-400">
-                        {{ $t("savingsGoals.timeToGoal") }}
-                      </p>
-                      <p class="font-medium">
-                        {{ getEstimatedCompletionTime(goal) || "N/A" }}
-                      </p>
-                    </div>
-                  </div>
-
-                  <!-- Quick Actions -->
-                  <div
-                    class="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700"
-                  >
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center space-x-2">
-                        <UButton
-                          v-if="getGoalProgress(goal) >= 100"
-                          size="sm"
-                          variant="soft"
-                          color="success"
-                          @click="markGoalAsCompleted(goal)"
-                        >
-                          {{ $t("savingsGoals.markComplete") }}
-                        </UButton>
-                      </div>
-                      <p class="text-xs text-neutral-500 dark:text-neutral-500">
-                        {{ $t("savingsGoals.created") }}
-                        {{ new Date(goal.createdAt).toLocaleDateString() }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Summary Stats -->
-                <div
-                  class="mt-6 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700"
-                >
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="text-center">
-                      <p
-                        class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
-                      >
-                        {{ formatCurrency(parseFloat(totalTargetAmount)) }}
-                      </p>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                        {{ $t("savingsGoals.totalGoalAmount") }}
-                      </p>
-                    </div>
-                    <div class="text-center">
-                      <p
-                        class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
-                      >
-                        {{ formatCurrency(parseFloat(totalCurrentAmount)) }}
-                      </p>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                        {{ $t("savingsGoals.totalSaved") }}
-                      </p>
-                    </div>
-                    <div class="text-center">
-                      <p
-                        class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
-                      >
-                        {{ totalProgress.toFixed(1) }}%
-                      </p>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                        {{ $t("savingsGoals.overallProgress") }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div v-else class="text-center py-12">
-                <div
-                  class="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4"
-                >
-                  <UIcon
-                    name="i-heroicons-flag"
-                    class="w-8 h-8 text-neutral-600 dark:text-neutral-400"
+                <div class="flex items-center gap-2">
+                  <UButton
+                    variant="ghost"
+                    size="sm"
+                    icon="i-heroicons-pencil"
+                    :data-testid="`edit-budget-expense-${expense.id}`"
+                    @click="openBudgetExpenseModal(expense)"
+                  />
+                  <UButton
+                    variant="ghost"
+                    size="sm"
+                    icon="i-heroicons-trash"
+                    :data-testid="`delete-budget-expense-${expense.id}`"
+                    @click="confirmDeleteBudgetExpense(expense)"
                   />
                 </div>
-                <h4
-                  class="text-lg font-medium text-neutral-900 dark:text-white mb-2"
+              </div>
+            </TransitionGroup>
+
+            <!-- Total -->
+            <USeparator />
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <p
+                  class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
                 >
-                  {{ $t("savingsGoals.noGoalsYet") }}
-                </h4>
-                <p class="text-neutral-600 dark:text-neutral-400 mb-6">
-                  {{ $t("savingsGoals.setFirstGoal") }}
+                  {{ $t("economy.totalMonthlyExpenses") }}
                 </p>
-                <UButton
-                  variant="soft"
-                  icon="i-heroicons-plus"
-                  @click="() => openSavingsGoalModal()"
+                <p class="text-lg font-bold text-neutral-900 dark:text-white">
+                  {{ formatCurrency(totalMonthlyExpenses) }}
+                </p>
+              </div>
+              <div class="flex items-center justify-between">
+                <p class="text-xs text-neutral-500 dark:text-neutral-500">
+                  {{ $t("economy.projectedAnnualCost") }}
+                </p>
+                <p
+                  class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
                 >
-                  {{ $t("savingsGoals.createFirstGoal") }}
-                </UButton>
+                  {{ formatCurrency(totalMonthlyExpenses * 12) }}
+                </p>
               </div>
             </div>
           </div>
-        </div>
+        </UCard>
+
+        <!-- Savings Goals Section -->
+        <UCard v-if="userHousehold && householdMembers.length > 0">
+          <template #header>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <UIcon
+                  name="i-heroicons-flag"
+                  class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
+                />
+                <div>
+                  <h3 class="text-lg font-semibold">
+                    {{ $t("savingsGoals.title") }}
+                  </h3>
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                    {{ $t("savingsGoals.trackYourObjectives") }}
+                  </p>
+                </div>
+              </div>
+              <UButton
+                size="sm"
+                variant="soft"
+                icon="i-heroicons-plus"
+                @click="() => openSavingsGoalModal()"
+              >
+                {{ $t("savingsGoals.addGoal") }}
+              </UButton>
+            </div>
+          </template>
+
+          <div v-if="savingsGoalsLoading" class="text-center py-8">
+            <UIcon
+              name="i-heroicons-arrow-path"
+              class="animate-spin h-6 w-6 mx-auto mb-2 text-neutral-600"
+            />
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+              {{ $t("savingsGoals.loadingGoals") }}
+            </p>
+          </div>
+
+          <div v-else-if="activeGoals.length > 0" class="space-y-4">
+            <div
+              v-for="goal in activeGoals"
+              :key="goal.id"
+              class="p-4 bg-neutral-50 dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-700"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center">
+                  <div class="mr-3">
+                    <h4 class="font-semibold text-neutral-900 dark:text-white">
+                      {{ goal.name }}
+                    </h4>
+                    <p
+                      v-if="goal.description"
+                      class="text-sm text-neutral-600 dark:text-neutral-400"
+                    >
+                      {{ goal.description }}
+                    </p>
+                  </div>
+                  <div v-if="goal.priority" class="flex items-center">
+                    <UBadge
+                      :color="
+                        goal.priority === 3
+                          ? 'error'
+                          : goal.priority === 2
+                          ? 'warning'
+                          : 'success'
+                      "
+                      size="sm"
+                    >
+                      {{
+                        goal.priority === 3
+                          ? "High"
+                          : goal.priority === 2
+                          ? "Medium"
+                          : "Low"
+                      }}
+                      Priority
+                    </UBadge>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <UButton
+                    size="sm"
+                    variant="ghost"
+                    icon="i-heroicons-pencil"
+                    @click="editSavingsGoal(goal)"
+                  />
+                  <UButton
+                    size="sm"
+                    variant="ghost"
+                    color="error"
+                    icon="i-heroicons-trash"
+                    @click="deleteSavingsGoal(goal.id)"
+                  />
+                </div>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="mb-3">
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-neutral-600 dark:text-neutral-400">{{
+                    $t("savingsGoals.progress")
+                  }}</span>
+                  <span class="font-medium"
+                    >{{ getGoalProgress(goal).toFixed(1) }}%</span
+                  >
+                </div>
+                <div
+                  class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2"
+                >
+                  <div
+                    class="bg-neutral-600 dark:bg-neutral-400 h-2 rounded-full transition-all duration-300"
+                    :style="{
+                      width: `${Math.min(getGoalProgress(goal), 100)}%`,
+                    }"
+                  />
+                </div>
+                <div
+                  class="flex justify-between text-xs text-neutral-500 dark:text-neutral-500 mt-1"
+                >
+                  <span>{{ formatCurrency(goal.currentAmount) }}</span>
+                  <span>{{
+                    formatCurrency(parseFloat(goal.targetAmount))
+                  }}</span>
+                </div>
+              </div>
+
+              <!-- Goal Details -->
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <p class="text-neutral-600 dark:text-neutral-400">
+                    {{ $t("savingsGoals.remaining") }}
+                  </p>
+                  <p class="font-medium">
+                    {{ formatCurrency(getRemainingAmount(goal)) }}
+                  </p>
+                </div>
+                <div v-if="goal.category">
+                  <p class="text-neutral-600 dark:text-neutral-400">
+                    {{ $t("savingsGoals.category") }}
+                  </p>
+                  <p class="font-medium capitalize">
+                    {{ goal.category.replace("-", " ") }}
+                  </p>
+                </div>
+                <div
+                  v-if="
+                    financialSummary && financialSummary.totalMonthlyIncome > 0
+                  "
+                >
+                  <p class="text-neutral-600 dark:text-neutral-400">
+                    {{ $t("savingsGoals.timeToGoal") }}
+                  </p>
+                  <p class="font-medium">
+                    {{ getEstimatedCompletionTime(goal) || "N/A" }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Quick Actions -->
+              <USeparator />
+              <div class="mt-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
+                    <UButton
+                      v-if="getGoalProgress(goal) >= 100"
+                      size="sm"
+                      variant="soft"
+                      color="success"
+                      @click="markGoalAsCompleted(goal)"
+                    >
+                      {{ $t("savingsGoals.markComplete") }}
+                    </UButton>
+                  </div>
+                  <p class="text-xs text-neutral-500 dark:text-neutral-500">
+                    {{ $t("savingsGoals.created") }}
+                    {{ new Date(goal.createdAt).toLocaleDateString() }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div
+              class="mt-6 p-4 bg-neutral-50 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700"
+            >
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="text-center">
+                  <p
+                    class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
+                  >
+                    {{ formatCurrency(parseFloat(totalTargetAmount)) }}
+                  </p>
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                    {{ $t("savingsGoals.totalGoalAmount") }}
+                  </p>
+                </div>
+                <div class="text-center">
+                  <p
+                    class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
+                  >
+                    {{ formatCurrency(parseFloat(totalCurrentAmount)) }}
+                  </p>
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                    {{ $t("savingsGoals.totalSaved") }}
+                  </p>
+                </div>
+                <div class="text-center">
+                  <p
+                    class="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
+                  >
+                    {{ totalProgress.toFixed(1) }}%
+                  </p>
+                  <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                    {{ $t("savingsGoals.overallProgress") }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="text-center py-12">
+            <div
+              class="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <UIcon
+                name="i-heroicons-flag"
+                class="w-8 h-8 text-neutral-600 dark:text-neutral-400"
+              />
+            </div>
+            <h4
+              class="text-lg font-medium text-neutral-900 dark:text-white mb-2"
+            >
+              {{ $t("savingsGoals.noGoalsYet") }}
+            </h4>
+            <p class="text-neutral-600 dark:text-neutral-400 mb-6">
+              {{ $t("savingsGoals.setFirstGoal") }}
+            </p>
+            <UButton
+              variant="soft"
+              icon="i-heroicons-plus"
+              @click="() => openSavingsGoalModal()"
+            >
+              {{ $t("savingsGoals.createFirstGoal") }}
+            </UButton>
+          </div>
+        </UCard>
       </div>
 
       <!-- Savings Goal Modal -->
@@ -893,8 +797,8 @@
           </div>
         </template>
       </UModal>
-    </div>
-  </div>
+    </UPageBody>
+  </UPage>
 </template>
 
 <script setup lang="ts">
@@ -902,12 +806,12 @@ import type { ApiSuccessResponse } from "~~/server/utils/api-response";
 import type { BudgetExpense } from "~/composables/useBudgetExpenses";
 import { getCategoryIcon } from "~~/utils/budget-categories";
 
-const { t } = useI18n();
 const { formatCurrency } = useFormatters();
 
 // Page metadata
 definePageMeta({
   title: "Economy",
+  middleware: "auth",
   requiresAuth: true,
 });
 
@@ -1271,18 +1175,24 @@ const confirmDeleteBudgetExpense = async (expense: BudgetExpense) => {
 // Handle savings goal submission
 const handleSavingsGoalSubmit = async (formData: {
   name: string;
-  description: string;
+  description?: string;
   targetAmount: string;
   priority: number;
-  category: string;
+  category?: string;
   savingsAccountIds: number[];
 }) => {
   isSavingsGoalSubmitting.value = true;
   try {
+    const submitData = {
+      ...formData,
+      description: formData.description || "",
+      category: formData.category || "general",
+    };
+
     if (editingSavingsGoal.value) {
-      await updateSavingsGoal(editingSavingsGoal.value.id, formData);
+      await updateSavingsGoal(editingSavingsGoal.value.id, submitData);
     } else {
-      await createSavingsGoal(formData);
+      await createSavingsGoal(submitData);
     }
     closeSavingsGoalModal();
   } catch (error) {

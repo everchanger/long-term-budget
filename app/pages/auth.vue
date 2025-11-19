@@ -1,3 +1,134 @@
+<script setup lang="ts">
+import * as z from "zod";
+import type { AuthFormField, FormSubmitEvent } from "@nuxt/ui";
+
+// Set the page layout to use the auth layout (no container)
+definePageMeta({
+  layout: "auth",
+});
+
+const { signIn, signUp, getSession } = useAuth();
+const { t } = useI18n();
+
+const isSignUp = ref(false);
+const loading = ref(false);
+const error = ref("");
+
+// Check if user is already authenticated and redirect to economy page
+onMounted(async () => {
+  try {
+    const sessionData = await getSession();
+    if (sessionData.data) {
+      await navigateTo("/economy");
+    }
+  } catch (error) {
+    console.log("Session check failed:", error);
+  }
+});
+
+// Define validation schema
+const signInSchema = z.object({
+  email: z.string().email(t("auth.invalidEmail")),
+  password: z.string().min(1, t("auth.passwordRequired")),
+});
+
+const signUpSchema = z.object({
+  name: z.string().min(2, t("auth.nameRequired")),
+  email: z.string().email(t("auth.invalidEmail")),
+  password: z.string().min(8, t("auth.passwordMinLength")),
+});
+
+const authSchema = computed(() =>
+  isSignUp.value ? signUpSchema : signInSchema
+);
+
+type SignInSchema = z.infer<typeof signInSchema>;
+type SignUpSchema = z.infer<typeof signUpSchema>;
+type AuthSchema = SignInSchema | SignUpSchema;
+
+// Define form fields dynamically based on isSignUp
+const fields = computed((): AuthFormField[] => {
+  const baseFields: AuthFormField[] = [
+    {
+      name: "email",
+      type: "email",
+      label: t("auth.email"),
+      placeholder: t("auth.enterEmail"),
+      required: true,
+    },
+    {
+      name: "password",
+      type: "password",
+      label: t("auth.password"),
+      placeholder: t("auth.enterPassword"),
+      required: true,
+    },
+  ];
+
+  if (isSignUp.value) {
+    return [
+      {
+        name: "name",
+        type: "text",
+        label: t("auth.name"),
+        placeholder: t("auth.enterFullName"),
+        required: true,
+      },
+      ...baseFields,
+    ];
+  }
+
+  return baseFields;
+});
+
+const handleSubmit = async (event: FormSubmitEvent<AuthSchema>) => {
+  if (loading.value) return;
+
+  loading.value = true;
+  error.value = "";
+
+  try {
+    if (isSignUp.value) {
+      await signUp.email(
+        {
+          email: event.data.email,
+          password: event.data.password,
+          name: (event.data as { name?: string }).name || "",
+        },
+        {
+          onSuccess: () => {
+            navigateTo("/economy");
+          },
+          onError: (ctx: { error: { message?: string } }) => {
+            error.value = ctx.error.message || t("auth.failedToCreateAccount");
+          },
+        }
+      );
+    } else {
+      await signIn.email(
+        {
+          email: event.data.email,
+          password: event.data.password,
+        },
+        {
+          onSuccess: () => {
+            navigateTo("/economy");
+          },
+          onError: (ctx: { error: { message?: string } }) => {
+            error.value = ctx.error.message || t("auth.failedToSignIn");
+          },
+        }
+      );
+    }
+  } catch (err: unknown) {
+    console.error("Auth error:", err);
+    error.value = err instanceof Error ? err.message : "An error occurred";
+  } finally {
+    loading.value = false;
+  }
+};
+</script>
+
 <template>
   <div class="py-12">
     <div class="max-w-md w-full mx-auto space-y-8 px-4">
@@ -15,7 +146,7 @@
         </p>
       </div>
 
-      <UCard class="border-0 bg-gray-50 dark:bg-gray-800/50 w-full">
+      <UPageCard class="w-full">
         <template #header>
           <div class="flex justify-center space-x-1">
             <UButton
@@ -35,78 +166,34 @@
           </div>
         </template>
 
-        <form class="space-y-6" @submit.prevent="handleSubmit">
-          <UAlert
-            v-if="error"
-            :title="error"
-            color="error"
-            variant="soft"
-            :close-button="{
-              icon: 'i-heroicons-x-mark-20-solid',
-              color: 'red',
-              variant: 'link',
-              padded: false,
-            }"
-            @close="error = ''"
-          />
-
-          <!-- Name field -->
-          <UFormField
-            v-if="isSignUp"
-            :label="$t('auth.name')"
-            name="name"
-            required
-          >
-            <UInput
-              id="name"
-              v-model="name"
-              type="text"
-              :placeholder="$t('auth.enterFullName')"
-              icon="i-heroicons-user"
-              required
+        <UAuthForm
+          :fields="fields"
+          :schema="authSchema"
+          :loading="loading"
+          :submit="{
+            label: isSignUp ? $t('auth.createAccount') : $t('auth.signIn'),
+            icon: isSignUp
+              ? 'i-heroicons-user-plus'
+              : 'i-heroicons-arrow-right-on-rectangle',
+          }"
+          @submit="handleSubmit"
+        >
+          <template #validation>
+            <UAlert
+              v-if="error"
+              :title="error"
+              color="error"
+              variant="soft"
+              :close-button="{
+                icon: 'i-heroicons-x-mark-20-solid',
+                color: 'red',
+                variant: 'link',
+                padded: false,
+              }"
+              @close="error = ''"
             />
-          </UFormField>
-
-          <UFormField :label="$t('auth.email')" name="email" required>
-            <UInput
-              id="email"
-              v-model="email"
-              type="email"
-              :placeholder="$t('auth.enterEmail')"
-              icon="i-heroicons-envelope"
-              required
-              data-testid="auth-email-input"
-            />
-          </UFormField>
-
-          <UFormField :label="$t('auth.password')" name="password" required>
-            <UInput
-              id="password"
-              v-model="password"
-              type="password"
-              :placeholder="$t('auth.enterPassword')"
-              icon="i-heroicons-lock-closed"
-              required
-              data-testid="auth-password-input"
-            />
-          </UFormField>
-
-          <UButton
-            type="submit"
-            :loading="loading"
-            :disabled="loading"
-            block
-            size="lg"
-            :icon="
-              isSignUp
-                ? 'i-heroicons-user-plus'
-                : 'i-heroicons-arrow-right-on-rectangle'
-            "
-            data-testid="auth-submit-button"
-          >
-            {{ isSignUp ? $t("auth.createAccount") : $t("auth.signIn") }}
-          </UButton>
-        </form>
+          </template>
+        </UAuthForm>
 
         <template #footer>
           <div class="text-center text-sm text-gray-500 dark:text-gray-400">
@@ -123,95 +210,7 @@
             />
           </div>
         </template>
-      </UCard>
+      </UPageCard>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-// Set the page layout to use the default layout for consistent styling
-definePageMeta({
-  layout: "default",
-});
-
-const { signIn, signUp, getSession } = useAuth();
-const { t } = useI18n();
-
-const email = ref("");
-const password = ref("");
-const name = ref("");
-const isSignUp = ref(false);
-const loading = ref(false);
-const error = ref("");
-
-// Check if user is already authenticated and redirect to homepage
-onMounted(async () => {
-  try {
-    const sessionData = await getSession();
-    if (sessionData.data) {
-      // User is already signed in, redirect to homepage
-      await navigateTo("/");
-    }
-  } catch (error) {
-    // If there's an error getting session, let them stay on auth page
-    console.log("Session check failed:", error);
-  }
-});
-
-const handleSubmit = async () => {
-  if (loading.value) return;
-
-  loading.value = true;
-  error.value = "";
-
-  try {
-    if (isSignUp.value) {
-      await signUp.email(
-        {
-          email: email.value,
-          password: password.value,
-          name: name.value,
-        },
-        {
-          onRequest: () => {
-            console.log("SignUp request");
-          },
-          onSuccess: () => {
-            console.log("SignUp success");
-            navigateTo("/");
-          },
-          onError: (ctx: { error: { message?: string } }) => {
-            console.error("SignUp error:", ctx);
-            error.value = ctx.error.message || t("auth.failedToCreateAccount");
-          },
-        }
-      );
-    } else {
-      await signIn.email(
-        {
-          email: email.value,
-          password: password.value,
-        },
-        {
-          onRequest: () => {
-            console.log("SignIn request");
-          },
-          onSuccess: () => {
-            console.log("SignIn success");
-            navigateTo("/");
-          },
-          onError: (ctx: { error: { message?: string } }) => {
-            console.error("SignIn error:", ctx);
-            error.value = ctx.error.message || t("auth.failedToSignIn");
-          },
-        }
-      );
-    }
-  } catch (err: unknown) {
-    console.error("Auth error:", err);
-    error.value = err instanceof Error ? err.message : "An error occurred";
-  } finally {
-    loading.value = false;
-  }
-};
-</script>

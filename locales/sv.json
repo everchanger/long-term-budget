@@ -26,7 +26,7 @@
     "name": "Namn"
   },
   "navigation": {
-    "home": "Hem",
+    "home": "Översikt",
     "dashboard": "Översikt",
     "economy": "Ekonomi",
     "projections": "Prognoser",
@@ -173,6 +173,7 @@
     "year": "År",
     "investments": "Investeringar",
     "debt": "Skuld",
+    "enableToAdjust": "Aktivera för att justera antaganden",
     "month": "Månad",
     "flowingInEachMonth": "kommer in varje månad",
     "annual": "Årlig"

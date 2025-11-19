@@ -12,101 +12,71 @@
 
     <template #body>
       <div class="space-y-4">
-        <div>
-          <label
-            for="expense-name"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("budgetExpenses.name") }} *
-          </label>
-          <input
+        <UFormField
+          :label="$t('budgetExpenses.name') + ' *'"
+          name="expense-name"
+          required
+          :error="
+            touched.name && !formState.name.trim()
+              ? $t('budgetExpenses.nameRequired')
+              : undefined
+          "
+        >
+          <UInput
             id="expense-name"
             v-model="formState.name"
             type="text"
             :placeholder="$t('budgetExpenses.namePlaceholder')"
-            required
             data-testid="budget-expense-name-input"
-            :class="[
-              'w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white',
-              touched.name && !formState.name.trim()
-                ? 'border-red-500 dark:border-red-500'
-                : 'border-gray-300 dark:border-gray-600',
-            ]"
+            icon="i-lucide-shopping-cart"
             @blur="touched.name = true"
           />
-          <p
-            v-if="touched.name && !formState.name.trim()"
-            class="mt-1 text-sm text-red-600 dark:text-red-400"
-          >
-            {{ $t("budgetExpenses.nameRequired") }}
-          </p>
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            for="expense-category"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("budgetExpenses.category") }} *
-          </label>
-          <select
+        <UFormField
+          :label="$t('budgetExpenses.category') + ' *'"
+          name="expense-category"
+          required
+          :hint="$t(`budgetExpenses.categories.${formState.category}Desc`)"
+        >
+          <USelect
             id="expense-category"
             v-model="formState.category"
-            required
             data-testid="budget-expense-category-select"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-          >
-            <option
-              v-for="category in BUDGET_EXPENSE_CATEGORIES"
-              :key="category.value"
-              :value="category.value"
-            >
-              {{ $t(`budgetExpenses.categories.${category.value}`) }}
-            </option>
-          </select>
-          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-            {{ $t(`budgetExpenses.categories.${formState.category}Desc`) }}
-          </p>
-        </div>
+            :options="
+              BUDGET_EXPENSE_CATEGORIES.map((cat) => ({
+                value: cat.value,
+                label: $t(`budgetExpenses.categories.${cat.value}`),
+                icon: cat.icon,
+              }))
+            "
+            option-attribute="label"
+            value-attribute="value"
+          />
+        </UFormField>
 
-        <div>
-          <label
-            for="expense-amount"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("budgetExpenses.monthlyAmount") }} *
-          </label>
-          <input
+        <UFormField
+          :label="$t('budgetExpenses.monthlyAmount') + ' *'"
+          name="expense-amount"
+          required
+          :error="
+            touched.amount && !formState.amount
+              ? $t('budgetExpenses.amountRequired')
+              : undefined
+          "
+        >
+          <UInput
             id="expense-amount"
             v-model="formState.amount"
             type="number"
             step="0.01"
             min="0"
             placeholder="0.00"
-            required
             data-testid="budget-expense-amount-input"
-            :class="[
-              'w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white',
-              touched.amount &&
-              (!formState.amount || parseFloat(formState.amount) <= 0)
-                ? 'border-red-500 dark:border-red-500'
-                : 'border-gray-300 dark:border-gray-600',
-            ]"
+            icon="i-lucide-dollar-sign"
             @blur="touched.amount = true"
           />
-          <p
-            v-if="touched.amount && !formState.amount"
-            class="mt-1 text-sm text-red-600 dark:text-red-400"
-          >
-            {{ $t("budgetExpenses.amountRequired") }}
-          </p>
-          <p
-            v-else-if="touched.amount && parseFloat(formState.amount) <= 0"
-            class="mt-1 text-sm text-red-600 dark:text-red-400"
-          >
-            {{ $t("budgetExpenses.amountMustBePositive") }}
-          </p>
-        </div>
+        </UFormField>
       </div>
     </template>
 

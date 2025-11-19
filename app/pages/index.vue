@@ -1,3 +1,25 @@
+<script setup lang="ts">
+definePageMeta({
+  layout: "auth",
+  title: "Long-Term Budget Planner",
+});
+
+const { getSession } = useAuth();
+
+onMounted(async () => {
+  // If user is logged in, redirect to economy page
+  try {
+    const sessionData = await getSession();
+    if (sessionData?.data) {
+      await navigateTo("/economy");
+    }
+  } catch (error) {
+    // User not logged in, stay on landing page
+    console.log("Session check failed:", error);
+  }
+});
+</script>
+
 <template>
   <div class="py-12">
     <!-- Hero Section -->
@@ -102,9 +124,4 @@
   </div>
 </template>
 
-<script setup lang="ts">
-// Page meta
-definePageMeta({
-  title: "Long-Term Budget Planner",
-});
-</script>
+<script setup lang="ts"></script>

@@ -1,545 +1,490 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-3xl font-bold">{{ $t("projections.title") }}</h1>
-    </div>
+  <UPage>
+    <UPageHeader :title="$t('projections.title')" />
 
-    <div v-if="!userHousehold" class="text-center py-12">
-      <p class="text-gray-500">
-        {{ $t("projections.noHousehold") }}
-      </p>
-    </div>
+    <UPageBody>
+      <div v-if="!userHousehold" class="text-center py-12">
+        <p class="text-gray-500">
+          {{ $t("projections.noHousehold") }}
+        </p>
+      </div>
 
-    <div v-else-if="loading" class="text-center py-12">
-      <div
-        class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"
-      />
-      <p class="mt-4 text-gray-500">
-        {{ $t("projections.generatingProjections") }}
-      </p>
-    </div>
+      <div v-else-if="loading" class="text-center py-12">
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"
+        />
+        <p class="mt-4 text-gray-500">
+          {{ $t("projections.generatingProjections") }}
+        </p>
+      </div>
 
-    <div v-else-if="error" class="text-center py-12">
-      <p class="text-red-500">
-        {{ $t("projections.errorLoadingProjections") }}: {{ error.message }}
-      </p>
-    </div>
+      <div v-else-if="error" class="text-center py-12">
+        <p class="text-red-500">
+          {{ $t("projections.errorLoadingProjections") }}: {{ error.message }}
+        </p>
+      </div>
 
-    <template v-else-if="data">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Left Column: Instrument Editors -->
-        <div class="lg:col-span-1 space-y-4">
-          <UCard>
-            <template #header>
-              <h2 class="text-xl font-semibold">
-                {{ $t("projections.adjustInstruments") }}
-              </h2>
-              <p class="text-sm text-gray-500 mt-1">
-                {{ $t("projections.adjustInstrumentsDesc") }}
-              </p>
-            </template>
+      <template v-else-if="data">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left Column: Instrument Editors -->
+          <div class="lg:col-span-1 space-y-4">
+            <UCard>
+              <template #header>
+                <h2 class="text-xl font-semibold">
+                  {{ $t("projections.adjustInstruments") }}
+                </h2>
+                <p class="text-sm text-gray-500 mt-1">
+                  {{ $t("projections.adjustInstrumentsDesc") }}
+                </p>
+              </template>
 
-            <div class="space-y-3">
-              <PersonInstrumentsEditor
-                v-for="person in data.persons"
-                :key="person.person.id"
-                :person="person.person"
-                :income-sources="person.incomeSources as IncomeSource[]"
-                :savings-accounts="person.savingsAccounts as SavingsAccount[]"
-                :loans="person.loans as Loan[]"
-                :broker-accounts="person.brokerAccounts as BrokerAccount[]"
-                @update="handleInstrumentUpdate"
-              />
-            </div>
-          </UCard>
+              <div class="space-y-3">
+                <PersonInstrumentsEditor
+                  v-for="person in data.persons"
+                  :key="person.person.id"
+                  :person="person.person"
+                  :income-sources="person.incomeSources as IncomeSource[]"
+                  :savings-accounts="person.savingsAccounts as SavingsAccount[]"
+                  :loans="person.loans as Loan[]"
+                  :broker-accounts="person.brokerAccounts as BrokerAccount[]"
+                  @update="handleInstrumentUpdate"
+                />
+              </div>
+            </UCard>
 
-          <!-- Global Assumptions (Optional) -->
-          <UCard>
-            <template #header>
-              <div class="flex items-center justify-between">
+            <!-- Global Assumptions (Optional) -->
+            <UCard>
+              <template #header>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h2 class="text-lg font-semibold">
+                      {{ $t("projections.globalAssumptions") }}
+                    </h2>
+                    <p class="text-xs text-gray-500 mt-1">
+                      {{ $t("projections.globalAssumptionsDesc") }}
+                    </p>
+                  </div>
+                  <USwitch
+                    v-model="enableGlobalAssumptions"
+                    @update:model-value="debouncedUpdate"
+                  />
+                </div>
+              </template>
+              <div v-if="enableGlobalAssumptions" class="space-y-4">
+                <UFormField
+                  :label="$t('projections.incomeGrowth')"
+                  name="incomeGrowth"
+                >
+                  <template #hint>
+                    <span class="text-sm font-semibold">
+                      {{ formatPercent(incomeGrowth) }}
+                    </span>
+                  </template>
+                  <USlider
+                    v-model="incomeGrowth"
+                    :min="0"
+                    :max="10"
+                    :step="0.5"
+                    @update:model-value="debouncedUpdate"
+                  />
+                </UFormField>
+
+                <UFormField
+                  :label="$t('projections.expenseGrowth')"
+                  name="expenseGrowth"
+                >
+                  <template #hint>
+                    <span class="text-sm font-semibold">
+                      {{ formatPercent(expenseGrowth) }}
+                    </span>
+                  </template>
+                  <USlider
+                    v-model="expenseGrowth"
+                    :min="0"
+                    :max="10"
+                    :step="0.5"
+                    @update:model-value="debouncedUpdate"
+                  />
+                </UFormField>
+
+                <UFormField
+                  :label="$t('projections.investmentReturn')"
+                  name="investmentReturn"
+                >
+                  <template #hint>
+                    <span class="text-sm font-semibold">
+                      {{ formatPercent(investmentReturn) }}
+                    </span>
+                  </template>
+                  <USlider
+                    v-model="investmentReturn"
+                    :min="0"
+                    :max="15"
+                    :step="0.5"
+                    @update:model-value="debouncedUpdate"
+                  />
+                </UFormField>
+              </div>
+              <div
+                v-else
+                class="text-center py-8 text-gray-500 dark:text-gray-400 text-sm"
+              >
+                {{ $t("projections.enableToAdjust") }}
+              </div>
+            </UCard>
+          </div>
+
+          <!-- Right Column: Chart and Summary -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- Current State (Database Values) -->
+            <UCard>
+              <template #header>
                 <div>
-                  <h2 class="text-lg font-semibold">
-                    {{ $t("projections.globalAssumptions") }}
+                  <h2 class="text-xl font-semibold">
+                    {{ $t("projections.storedFinancialData") }}
                   </h2>
-                  <p class="text-xs text-gray-500 mt-1">
-                    {{ $t("projections.globalAssumptionsDesc") }}
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {{ $t("projections.storedFinancialDataDesc") }}
                   </p>
                 </div>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <span class="text-sm text-gray-600">{{
-                    enableGlobalAssumptions
-                      ? $t("projections.enabled")
-                      : $t("projections.disabled")
-                  }}</span>
-                  <input
-                    v-model="enableGlobalAssumptions"
-                    type="checkbox"
-                    class="w-10 h-5 rounded-full appearance-none bg-gray-300 relative cursor-pointer transition-colors checked:bg-primary-500 before:content-[''] before:absolute before:w-4 before:h-4 before:rounded-full before:bg-white before:top-0.5 before:left-0.5 before:transition-transform checked:before:translate-x-5"
-                    @change="debouncedUpdate"
-                  />
-                </label>
-              </div>
-            </template>
-            <div v-if="enableGlobalAssumptions" class="space-y-4">
-              <div>
-                <div class="flex justify-between mb-2">
-                  <label class="text-sm font-medium">{{
-                    $t("projections.incomeGrowth")
-                  }}</label>
-                  <span class="text-sm font-semibold">{{
-                    formatPercent(incomeGrowth)
-                  }}</span>
+              </template>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ $t("projections.netWorth") }}
+                  </div>
+                  <div
+                    class="text-2xl font-bold"
+                    :class="
+                      (originalCurrentState?.netWorth ?? 0) >= 0
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-red-600 dark:text-red-400'
+                    "
+                  >
+                    {{ formatCurrency(originalCurrentState?.netWorth ?? 0) }}
+                  </div>
                 </div>
-                <input
-                  v-model.number="incomeGrowth"
-                  type="range"
-                  min="0"
-                  max="10"
-                  step="0.5"
-                  class="w-full"
-                  @input="debouncedUpdate"
-                />
+                <div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ $t("projections.monthlyIncome") }}
+                  </div>
+                  <div class="text-2xl font-bold">
+                    {{
+                      formatCurrency(originalCurrentState?.monthlyIncome ?? 0)
+                    }}
+                  </div>
+                </div>
+                <div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ $t("projections.monthlyExpenses") }}
+                  </div>
+                  <div class="text-2xl font-bold">
+                    {{
+                      formatCurrency(originalCurrentState?.monthlyExpenses ?? 0)
+                    }}
+                  </div>
+                </div>
+                <div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ $t("projections.totalDebt") }}
+                  </div>
+                  <div
+                    class="text-2xl font-bold text-red-600 dark:text-red-400"
+                  >
+                    {{ formatCurrency(originalCurrentState?.debt ?? 0) }}
+                  </div>
+                </div>
               </div>
+            </UCard>
 
-              <div>
-                <div class="flex justify-between mb-2">
-                  <label class="text-sm font-medium">{{
-                    $t("projections.expenseGrowth")
-                  }}</label>
-                  <span class="text-sm font-semibold">{{
-                    formatPercent(expenseGrowth)
-                  }}</span>
+            <!-- Projected Starting Values (With Adjustments) -->
+            <UCard
+              v-if="
+                Object.keys(instrumentAdjustments).length > 0 &&
+                data.projection.dataPoints.length > 0
+              "
+            >
+              <template #header>
+                <div>
+                  <h2 class="text-xl font-semibold">
+                    {{ $t("projections.adjustedProjectionValues") }}
+                  </h2>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {{ $t("projections.adjustedProjectionValuesDesc") }}
+                  </p>
                 </div>
-                <input
-                  v-model.number="expenseGrowth"
-                  type="range"
-                  min="0"
-                  max="10"
-                  step="0.5"
-                  class="w-full"
-                  @input="debouncedUpdate"
-                />
+              </template>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                    Net Worth
+                  </div>
+                  <div
+                    class="text-2xl font-bold"
+                    :class="data.projection.dataPoints[0]!.netWorth >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
+                  >
+                    {{
+                      formatCurrency(data.projection.dataPoints[0]!.netWorth)
+                    }}
+                  </div>
+                </div>
+                <div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                    Monthly Income
+                  </div>
+                  <div class="text-2xl font-bold">
+                    {{
+                      formatCurrency(
+                        data.projection.dataPoints[0]!.monthlyIncome
+                      )
+                    }}
+                  </div>
+                </div>
+                <div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                    Monthly Expenses
+                  </div>
+                  <div class="text-2xl font-bold">
+                    {{
+                      formatCurrency(
+                        data.projection.dataPoints[0]!.monthlyExpenses
+                      )
+                    }}
+                  </div>
+                </div>
+                <div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                    Total Debt
+                  </div>
+                  <div
+                    class="text-2xl font-bold text-red-600 dark:text-red-400"
+                  >
+                    {{ formatCurrency(data.projection.dataPoints[0]!.debt) }}
+                  </div>
+                </div>
               </div>
+            </UCard>
 
-              <div>
-                <div class="flex justify-between mb-2">
-                  <label class="text-sm font-medium">{{
-                    $t("projections.investmentReturn")
-                  }}</label>
-                  <span class="text-sm font-semibold">{{
-                    formatPercent(investmentReturn)
-                  }}</span>
-                </div>
-                <input
-                  v-model.number="investmentReturn"
-                  type="range"
-                  min="0"
-                  max="15"
-                  step="0.5"
-                  class="w-full"
-                  @input="debouncedUpdate"
-                />
-              </div>
-            </div>
-          </UCard>
-        </div>
+            <!-- Projection Chart -->
+            <FinancialProjectionChartJS
+              :yearly-net-worth="getYearlyNetWorth()"
+              :yearly-savings="getYearlySavings()"
+              :yearly-investments="getYearlyInvestments()"
+              :yearly-debt="getYearlyDebt()"
+              :baseline-net-worth="
+                enableGlobalAssumptions
+                  ? baselineProjection?.yearlyNetWorth
+                  : undefined
+              "
+              :baseline-savings="
+                enableGlobalAssumptions
+                  ? baselineProjection?.yearlySavings
+                  : undefined
+              "
+              :baseline-investments="
+                enableGlobalAssumptions
+                  ? baselineProjection?.yearlyInvestments
+                  : undefined
+              "
+              :baseline-debt="
+                enableGlobalAssumptions
+                  ? baselineProjection?.yearlyDebt
+                  : undefined
+              "
+            />
 
-        <!-- Right Column: Chart and Summary -->
-        <div class="lg:col-span-2 space-y-6">
-          <!-- Current State (Database Values) -->
-          <UCard>
-            <template #header>
-              <div>
-                <h2 class="text-xl font-semibold">
-                  {{ $t("projections.storedFinancialData") }}
-                </h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {{ $t("projections.storedFinancialDataDesc") }}
-                </p>
-              </div>
-            </template>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                  {{ $t("projections.netWorth") }}
+            <!-- Data Table -->
+            <UCard>
+              <template #header>
+                <div class="flex items-center justify-between">
+                  <h2 class="text-xl font-semibold">
+                    {{ $t("projections.projectionData") }}
+                  </h2>
+                  <UButton
+                    :color="showDataTable ? 'primary' : 'neutral'"
+                    size="sm"
+                    @click="showDataTable = !showDataTable"
+                  >
+                    <UIcon
+                      :name="
+                        showDataTable
+                          ? 'i-heroicons-eye-slash'
+                          : 'i-heroicons-eye'
+                      "
+                      class="mr-1"
+                    />
+                    {{
+                      showDataTable
+                        ? $t("projections.hideTable")
+                        : $t("projections.showTable")
+                    }}
+                  </UButton>
                 </div>
-                <div
-                  class="text-2xl font-bold"
-                  :class="
-                    (originalCurrentState?.netWorth ?? 0) >= 0
-                      ? 'text-green-600 dark:text-green-400'
-                      : 'text-red-600 dark:text-red-400'
-                  "
-                >
-                  {{ formatCurrency(originalCurrentState?.netWorth ?? 0) }}
-                </div>
-              </div>
-              <div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                  {{ $t("projections.monthlyIncome") }}
-                </div>
-                <div class="text-2xl font-bold">
-                  {{ formatCurrency(originalCurrentState?.monthlyIncome ?? 0) }}
-                </div>
-              </div>
-              <div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                  {{ $t("projections.monthlyExpenses") }}
-                </div>
-                <div class="text-2xl font-bold">
+              </template>
+              <UTable
+                v-if="showDataTable"
+                :data="tableRows"
+                :columns="tableColumns as any"
+              >
+                <template #netWorth-cell="{ row }">
+                  <span
+                    :class="
+                      (row.original as ProjectionTableRow).netWorth >= 0
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-red-600 dark:text-red-400'
+                    "
+                  >
+                    {{
+                      formatCurrency(
+                        (row.original as ProjectionTableRow).netWorth
+                      )
+                    }}
+                  </span>
+                </template>
+                <template #savings-cell="{ row }">
                   {{
-                    formatCurrency(originalCurrentState?.monthlyExpenses ?? 0)
+                    formatCurrency((row.original as ProjectionTableRow).savings)
                   }}
-                </div>
-              </div>
-              <div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                  {{ $t("projections.totalDebt") }}
-                </div>
-                <div class="text-2xl font-bold text-red-600 dark:text-red-400">
-                  {{ formatCurrency(originalCurrentState?.debt ?? 0) }}
-                </div>
-              </div>
-            </div>
-          </UCard>
-
-          <!-- Projected Starting Values (With Adjustments) -->
-          <UCard
-            v-if="
-              Object.keys(instrumentAdjustments).length > 0 &&
-              data.projection.dataPoints.length > 0
-            "
-          >
-            <template #header>
-              <div>
-                <h2 class="text-xl font-semibold">
-                  {{ $t("projections.adjustedProjectionValues") }}
-                </h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {{ $t("projections.adjustedProjectionValuesDesc") }}
-                </p>
-              </div>
-            </template>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                  Net Worth
-                </div>
-                <div
-                  class="text-2xl font-bold"
-                  :class="data.projection.dataPoints[0]!.netWorth >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
-                >
-                  {{ formatCurrency(data.projection.dataPoints[0]!.netWorth) }}
-                </div>
-              </div>
-              <div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                  Monthly Income
-                </div>
-                <div class="text-2xl font-bold">
-                  {{
-                    formatCurrency(data.projection.dataPoints[0]!.monthlyIncome)
-                  }}
-                </div>
-              </div>
-              <div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                  Monthly Expenses
-                </div>
-                <div class="text-2xl font-bold">
+                </template>
+                <template #investments-cell="{ row }">
                   {{
                     formatCurrency(
-                      data.projection.dataPoints[0]!.monthlyExpenses
+                      (row.original as ProjectionTableRow).investments
                     )
                   }}
-                </div>
-              </div>
-              <div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">
-                  Total Debt
-                </div>
-                <div class="text-2xl font-bold text-red-600 dark:text-red-400">
-                  {{ formatCurrency(data.projection.dataPoints[0]!.debt) }}
-                </div>
-              </div>
-            </div>
-          </UCard>
-
-          <!-- Projection Chart -->
-          <FinancialProjectionChartJS
-            :yearly-net-worth="getYearlyNetWorth()"
-            :yearly-savings="getYearlySavings()"
-            :yearly-investments="getYearlyInvestments()"
-            :yearly-debt="getYearlyDebt()"
-            :baseline-net-worth="
-              enableGlobalAssumptions
-                ? baselineProjection?.yearlyNetWorth
-                : undefined
-            "
-            :baseline-savings="
-              enableGlobalAssumptions
-                ? baselineProjection?.yearlySavings
-                : undefined
-            "
-            :baseline-investments="
-              enableGlobalAssumptions
-                ? baselineProjection?.yearlyInvestments
-                : undefined
-            "
-            :baseline-debt="
-              enableGlobalAssumptions
-                ? baselineProjection?.yearlyDebt
-                : undefined
-            "
-          />
-
-          <!-- Data Table -->
-          <UCard>
-            <template #header>
-              <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold">
-                  {{ $t("projections.projectionData") }}
-                </h2>
-                <UButton
-                  :color="showDataTable ? 'primary' : 'neutral'"
-                  size="sm"
-                  @click="showDataTable = !showDataTable"
-                >
-                  <UIcon
-                    :name="
-                      showDataTable
-                        ? 'i-heroicons-eye-slash'
-                        : 'i-heroicons-eye'
+                </template>
+                <template #debt-cell="{ row }">
+                  <span
+                    :class="
+                      (row.original as ProjectionTableRow).debt > 0
+                        ? 'text-red-600 dark:text-red-400'
+                        : 'text-gray-500'
                     "
-                    class="mr-1"
-                  />
+                  >
+                    {{
+                      formatCurrency((row.original as ProjectionTableRow).debt)
+                    }}
+                  </span>
+                </template>
+                <template #monthlyIncome-cell="{ row }">
                   {{
-                    showDataTable
-                      ? $t("projections.hideTable")
-                      : $t("projections.showTable")
+                    formatCurrency(
+                      (row.original as ProjectionTableRow).monthlyIncome
+                    )
                   }}
-                </UButton>
-              </div>
-            </template>
-            <div v-if="showDataTable" class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead>
-                  <tr class="border-b dark:border-gray-700">
-                    <th class="text-left py-2 px-2 font-semibold">
-                      {{ $t("projections.year") }}
-                    </th>
-                    <th class="text-right py-2 px-2 font-semibold">
-                      {{ $t("projections.netWorth") }}
-                    </th>
-                    <th class="text-right py-2 px-2 font-semibold">
-                      {{ $t("savings.title") }}
-                    </th>
-                    <th class="text-right py-2 px-2 font-semibold">
-                      {{ $t("projections.investments") }}
-                    </th>
-                    <th class="text-right py-2 px-2 font-semibold">
-                      {{ $t("projections.debt") }}
-                    </th>
-                    <th class="text-right py-2 px-2 font-semibold">
-                      {{ $t("projections.monthlyIncome") }}
-                    </th>
-                    <th class="text-right py-2 px-2 font-semibold">
-                      {{ $t("projections.monthlyExpenses") }}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="year in 10"
-                    :key="year - 1"
-                    class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-                  >
-                    <td class="py-2 px-2 font-medium">
-                      {{ $t("projections.year") }} {{ year - 1 }}
-                    </td>
-                    <td
-                      class="text-right py-2 px-2"
-                      :class="
-                        getYearlyNetWorth()[year - 1] >= 0
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                      "
-                    >
-                      {{ formatCurrency(getYearlyNetWorth()[year - 1] ?? 0) }}
-                    </td>
-                    <td class="text-right py-2 px-2">
-                      {{ formatCurrency(getYearlySavings()[year - 1] ?? 0) }}
-                    </td>
-                    <td class="text-right py-2 px-2">
-                      {{
-                        formatCurrency(getYearlyInvestments()[year - 1] ?? 0)
-                      }}
-                    </td>
-                    <td
-                      class="text-right py-2 px-2"
-                      :class="
-                        (getYearlyDebt()[year - 1] ?? 0) > 0
-                          ? 'text-red-600 dark:text-red-400'
-                          : 'text-gray-500'
-                      "
-                    >
-                      {{ formatCurrency(getYearlyDebt()[year - 1] ?? 0) }}
-                    </td>
-                    <td class="text-right py-2 px-2">
-                      {{
-                        formatCurrency(
-                          data.projection.dataPoints[
-                            Math.min(
-                              (year - 1) * 12,
-                              data.projection.dataPoints.length - 1
-                            )
-                          ]?.monthlyIncome ?? 0
-                        )
-                      }}
-                    </td>
-                    <td class="text-right py-2 px-2">
-                      {{
-                        formatCurrency(
-                          data.projection.dataPoints[
-                            Math.min(
-                              (year - 1) * 12,
-                              data.projection.dataPoints.length - 1
-                            )
-                          ]?.monthlyExpenses ?? 0
-                        )
-                      }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div
-              v-else
-              class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm"
-            >
-              {{ $t("projections.clickShowTable") }}
-            </div>
-          </UCard>
-
-          <!-- Milestones -->
-          <UCard v-if="data.projection.milestones.length > 0">
-            <template #header>
-              <h2 class="text-xl font-semibold">
-                {{ $t("projections.keyMilestones") }}
-              </h2>
-            </template>
-            <div class="space-y-3">
+                </template>
+                <template #monthlyExpenses-cell="{ row }">
+                  {{
+                    formatCurrency(
+                      (row.original as ProjectionTableRow).monthlyExpenses
+                    )
+                  }}
+                </template>
+              </UTable>
               <div
-                v-for="milestone in data.projection.milestones"
-                :key="milestone.month"
-                class="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800"
+                v-else
+                class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm"
               >
-                <div class="flex-shrink-0 mt-1">
-                  <UIcon
-                    :name="getMilestoneIcon(milestone.type)"
-                    class="w-5 h-5"
-                    :class="getMilestoneColor(milestone.type)"
-                  />
-                </div>
-                <div class="flex-1">
-                  <div class="font-medium">
-                    {{ getMilestoneDescription(milestone) }}
-                  </div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ formatMilestoneTime(milestone.month) }}
-                  </div>
-                  <div
-                    v-if="milestone.amount"
-                    class="text-sm font-semibold mt-1"
-                  >
-                    {{ formatCurrency(milestone.amount) }}
-                  </div>
-                </div>
+                {{ $t("projections.clickShowTable") }}
               </div>
-            </div>
-          </UCard>
+            </UCard>
 
-          <!-- Summary -->
-          <UCard>
-            <template #header>
-              <h2 class="text-xl font-semibold">
-                {{ $t("projections.summary") }}
-              </h2>
-            </template>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-4">
-                <div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ $t("projections.startingNetWorth") }}
+            <!-- Milestones -->
+            <UCard v-if="data.projection.milestones.length > 0">
+              <template #header>
+                <h2 class="text-xl font-semibold">
+                  {{ $t("projections.keyMilestones") }}
+                </h2>
+              </template>
+              <UTimeline :items="timelineItems" color="primary" />
+            </UCard>
+
+            <!-- Summary -->
+            <UCard>
+              <template #header>
+                <h2 class="text-xl font-semibold">
+                  {{ $t("projections.summary") }}
+                </h2>
+              </template>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                  <div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ $t("projections.startingNetWorth") }}
+                    </div>
+                    <div class="text-2xl font-bold">
+                      {{
+                        formatCurrency(data.projection.summary.startNetWorth)
+                      }}
+                    </div>
                   </div>
-                  <div class="text-2xl font-bold">
-                    {{ formatCurrency(data.projection.summary.startNetWorth) }}
+                  <div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ $t("projections.endingNetWorth") }}
+                    </div>
+                    <div
+                      class="text-2xl font-bold text-green-600 dark:text-green-400"
+                    >
+                      {{ formatCurrency(data.projection.summary.endNetWorth) }}
+                    </div>
+                  </div>
+                  <div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ $t("projections.totalGrowth") }}
+                    </div>
+                    <div
+                      class="text-2xl font-bold text-blue-600 dark:text-blue-400"
+                    >
+                      {{ formatCurrency(data.projection.summary.totalGrowth) }}
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ $t("projections.endingNetWorth") }}
+                <div class="space-y-4">
+                  <div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ $t("projections.totalSaved") }}
+                    </div>
+                    <div class="text-2xl font-bold">
+                      {{
+                        formatCurrency(
+                          data.projection.summary.totalSavingsAccumulated
+                        )
+                      }}
+                    </div>
                   </div>
-                  <div
-                    class="text-2xl font-bold text-green-600 dark:text-green-400"
-                  >
-                    {{ formatCurrency(data.projection.summary.endNetWorth) }}
+                  <div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ $t("projections.totalDebtPaid") }}
+                    </div>
+                    <div
+                      class="text-2xl font-bold text-green-600 dark:text-green-400"
+                    >
+                      {{
+                        formatCurrency(data.projection.summary.totalDebtPaid)
+                      }}
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ $t("projections.totalGrowth") }}
-                  </div>
-                  <div
-                    class="text-2xl font-bold text-blue-600 dark:text-blue-400"
-                  >
-                    {{ formatCurrency(data.projection.summary.totalGrowth) }}
+                  <div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ $t("projections.avgMonthlyCashFlow") }}
+                    </div>
+                    <div class="text-2xl font-bold">
+                      {{
+                        formatCurrency(
+                          data.projection.summary.averageMonthlyIncome -
+                            data.projection.summary.averageMonthlyExpenses
+                        )
+                      }}
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="space-y-4">
-                <div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ $t("projections.totalSaved") }}
-                  </div>
-                  <div class="text-2xl font-bold">
-                    {{
-                      formatCurrency(
-                        data.projection.summary.totalSavingsAccumulated
-                      )
-                    }}
-                  </div>
-                </div>
-                <div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ $t("projections.totalDebtPaid") }}
-                  </div>
-                  <div
-                    class="text-2xl font-bold text-green-600 dark:text-green-400"
-                  >
-                    {{ formatCurrency(data.projection.summary.totalDebtPaid) }}
-                  </div>
-                </div>
-                <div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ $t("projections.avgMonthlyCashFlow") }}
-                  </div>
-                  <div class="text-2xl font-bold">
-                    {{
-                      formatCurrency(
-                        data.projection.summary.averageMonthlyIncome -
-                          data.projection.summary.averageMonthlyExpenses
-                      )
-                    }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </UCard>
+            </UCard>
+          </div>
         </div>
-      </div>
-    </template>
-  </div>
+      </template>
+    </UPageBody>
+  </UPage>
 </template>
 
 <script setup lang="ts">
@@ -587,6 +532,52 @@ const investmentReturn = ref(8);
 // Data table visibility
 const showDataTable = ref(false);
 
+// Define table row type
+interface ProjectionTableRow {
+  year: string;
+  netWorth: number;
+  savings: number;
+  investments: number;
+  debt: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+}
+
+// Table columns
+const tableColumns = [
+  { accessorKey: "year", header: t("projections.year") },
+  { accessorKey: "netWorth", header: t("projections.netWorth") },
+  { accessorKey: "savings", header: t("savings.title") },
+  { accessorKey: "investments", header: t("projections.investments") },
+  { accessorKey: "debt", header: t("projections.debt") },
+  { accessorKey: "monthlyIncome", header: t("projections.monthlyIncome") },
+  { accessorKey: "monthlyExpenses", header: t("projections.monthlyExpenses") },
+];
+
+// Table rows
+const tableRows = computed<ProjectionTableRow[]>(() => {
+  if (!data.value) return [];
+
+  return Array.from({ length: 10 }, (_, i) => {
+    const year = i;
+    const monthIndex = Math.min(
+      year * 12,
+      data.value!.projection.dataPoints.length - 1
+    );
+    const dataPoint = data.value!.projection.dataPoints[monthIndex];
+
+    return {
+      year: `${t("projections.year")} ${year}`,
+      netWorth: getYearlyNetWorth()[year] ?? 0,
+      savings: getYearlySavings()[year] ?? 0,
+      investments: getYearlyInvestments()[year] ?? 0,
+      debt: getYearlyDebt()[year] ?? 0,
+      monthlyIncome: dataPoint?.monthlyIncome ?? 0,
+      monthlyExpenses: dataPoint?.monthlyExpenses ?? 0,
+    };
+  });
+});
+
 // Computed values that return 0 when disabled
 const activeIncomeGrowth = computed(() =>
   enableGlobalAssumptions.value ? incomeGrowth.value : 0
@@ -597,6 +588,30 @@ const activeExpenseGrowth = computed(() =>
 const activeInvestmentReturn = computed(() =>
   enableGlobalAssumptions.value ? investmentReturn.value : 0
 );
+
+// Timeline items for milestones
+const timelineItems = computed(() => {
+  if (!data.value) return [];
+
+  return data.value.projection.milestones.map((milestone, index) => {
+    const colorClass = getMilestoneColor(milestone.type);
+    // Extract color from text-xxx-xxx pattern
+    const bgClass = colorClass.replace("text-", "bg-");
+
+    return {
+      date: formatMilestoneTime(milestone.month),
+      title: getMilestoneDescription(milestone),
+      description: milestone.amount
+        ? formatCurrency(milestone.amount)
+        : undefined,
+      icon: getMilestoneIcon(milestone.type),
+      value: index,
+      ui: {
+        indicator: bgClass,
+      },
+    };
+  });
+});
 
 // Instrument adjustments
 interface InstrumentUpdate {

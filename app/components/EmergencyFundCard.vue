@@ -59,7 +59,8 @@
       </div>
 
       <!-- Current Balance -->
-      <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+      <USeparator />
+      <div>
         <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
           Current Savings Balance
         </p>
@@ -69,7 +70,8 @@
       </div>
 
       <!-- Guidance -->
-      <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+      <USeparator />
+      <div>
         <div class="flex items-start gap-2">
           <UIcon
             :name="getGuidanceIcon(data.emergencyFund.monthsOfExpenses)"

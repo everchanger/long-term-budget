@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto py-8 px-4">
+  <UPage>
     <!-- Loading State -->
     <div v-if="personLoading" class="text-center py-12">
       <UIcon
@@ -29,79 +29,75 @@
     </div>
 
     <!-- Person Details -->
-    <div v-else>
-      <!-- Header -->
-      <div class="mb-8">
-        <div class="flex items-center justify-between">
-          <div>
-            <UButton
-              to="/economy"
-              variant="ghost"
-              icon="i-heroicons-arrow-left"
-              class="mb-4"
-            >
-              {{ $t("navigation.economy") }}
-            </UButton>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-              {{ person.name }}
-            </h1>
-            <p class="text-gray-600 dark:text-gray-400">
-              {{
-                person.age
-                  ? `${$t("person.age")}: ${person.age}`
-                  : $t("household.ageNotSpecified")
-              }}
-            </p>
-          </div>
-          <div class="flex gap-2">
-            <UButton
-              variant="soft"
-              icon="i-heroicons-pencil"
-              @click="() => openEditPersonModal(person || null)"
-            >
-              {{ $t("common.edit") }}
-            </UButton>
-          </div>
-        </div>
-      </div>
+    <template v-else>
+      <UPageHeader
+        :title="person.name"
+        :description="
+          person.age
+            ? `${$t('person.age')}: ${person.age}`
+            : $t('household.ageNotSpecified')
+        "
+      >
+        <template #leading>
+          <UButton
+            to="/economy"
+            variant="ghost"
+            icon="i-heroicons-arrow-left"
+            size="sm"
+          >
+            {{ $t("navigation.economy") }}
+          </UButton>
+        </template>
+        <template #trailing>
+          <UButton
+            variant="soft"
+            icon="i-heroicons-pencil"
+            @click="() => openEditPersonModal(person || null)"
+          >
+            {{ $t("common.edit") }}
+          </UButton>
+        </template>
+      </UPageHeader>
 
-      <FinancialOverviewCards
-        :total-monthly-income="totalMonthlyIncome"
-        :total-savings="totalSavings"
-        :total-debt="totalDebt"
-        class="mb-8"
-      />
+      <UPageBody>
+        <FinancialOverviewCards
+          :total-monthly-income="totalMonthlyIncome"
+          :total-savings="totalSavings"
+          :total-debt="totalDebt"
+          class="mb-8"
+        />
 
-      <UCard>
-        <UTabs v-model="selectedTab" :items="financialTabs" class="w-full">
-          <template #content="{ item }">
-            <IncomeSourcesTab
-              v-if="item.value === 'income'"
-              :income-sources="incomeSources"
-              :loading="incomeSourcesLoading"
-              :person-name="person.name"
-              :person-id="personId"
-            />
+        <UCard>
+          <UTabs v-model="selectedTab" :items="financialTabs" class="w-full">
+            <template #content="{ item }">
+              <IncomeSourcesTab
+                v-if="item.value === 'income'"
+                :income-sources="incomeSources"
+                :loading="incomeSourcesLoading"
+                :person-name="person.name"
+                :person-id="personId"
+              />
 
-            <LoansTab
-              v-else-if="item.value === 'loans'"
-              :loans="loans"
-              :loading="loansLoading"
-              :person-name="person.name"
-              :person-id="personId"
-            />
+              <LoansTab
+                v-else-if="item.value === 'loans'"
+                :loans="loans"
+                :loading="loansLoading"
+                :person-name="person.name"
+                :person-id="personId"
+              />
 
-            <SavingsAccountsTab
-              v-else-if="item.value === 'savings'"
-              :savings-accounts="savingsAccounts"
-              :loading="savingsLoading"
-              :person-name="person.name"
-              :person-id="personId"
-            />
-          </template>
-        </UTabs>
-      </UCard>
-    </div>
+              <SavingsAccountsTab
+                v-else-if="item.value === 'savings'"
+                :savings-accounts="savingsAccounts"
+                :loading="savingsLoading"
+                :person-name="person.name"
+                :person-id="personId"
+              />
+            </template>
+          </UTabs>
+        </UCard>
+      </UPageBody>
+    </template>
 
     <EditPersonModal
       v-model:open="isEditPersonModalOpen"
@@ -110,7 +106,7 @@
       @submit="handleEditPersonSubmit"
       @cancel="closeEditPersonModal"
     />
-  </div>
+  </UPage>
 </template>
 
 <script setup lang="ts">

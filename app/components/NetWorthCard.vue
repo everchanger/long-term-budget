@@ -29,9 +29,8 @@
       </div>
 
       <!-- Breakdown -->
-      <div
-        class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700"
-      >
+      <USeparator />
+      <div class="grid grid-cols-2 gap-4">
         <div>
           <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Assets</p>
           <p class="text-lg font-semibold text-green-600 dark:text-green-400">
@@ -49,7 +48,8 @@
       </div>
 
       <!-- Detailed Breakdown -->
-      <div class="space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <USeparator />
+      <div class="space-y-2">
         <div class="flex items-center justify-between text-sm">
           <span
             class="text-gray-600 dark:text-gray-300 flex items-center gap-2"

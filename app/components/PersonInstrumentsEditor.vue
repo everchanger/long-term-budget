@@ -329,9 +329,8 @@
       </div>
 
       <!-- Action Buttons -->
-      <div
-        class="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700"
-      >
+      <USeparator />
+      <div class="flex gap-2">
         <UButton size="sm" color="primary" @click="applyChanges">{{
           $t("common.applyChanges")
         }}</UButton>

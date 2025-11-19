@@ -1,137 +1,134 @@
 <template>
-  <div class="container mx-auto p-4 sm:p-6 lg:p-8">
-    <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold mb-2">
-        {{ $t("financialHealth.dashboard") }}
-      </h1>
-      <p class="text-gray-600 dark:text-gray-400">
-        {{ $t("financialHealth.subtitle") }}
-      </p>
-    </div>
-
-    <!-- Loading State -->
-    <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <USkeleton v-for="i in 4" :key="i" class="h-64" />
-    </div>
-
-    <!-- Error State -->
-    <UAlert
-      v-else-if="error"
-      color="error"
-      variant="subtle"
-      :title="$t('financialHealth.failedToLoad')"
-      :description="error"
-      class="mb-6"
+  <UPage>
+    <UPageHeader
+      :title="$t('financialHealth.dashboard')"
+      :description="$t('financialHealth.subtitle')"
     />
 
-    <!-- Dashboard Content -->
-    <div v-else-if="data" class="space-y-6">
-      <!-- Overall Health Summary -->
-      <UCard>
-        <div class="flex items-center justify-between">
-          <div>
-            <h2 class="text-2xl font-bold mb-2">
-              {{ $t("financialHealth.overallFinancialHealth") }}
-            </h2>
-            <p class="text-gray-600 dark:text-gray-400">
-              {{ $t("financialHealth.overallHealthDesc") }}
-            </p>
-          </div>
-          <UBadge
-            :color="getStatusColor(data.summary.overallHealth)"
-            variant="solid"
-            size="xl"
-            class="text-lg px-4 py-2"
-          >
-            <UIcon
-              :name="getStatusIcon(data.summary.overallHealth)"
-              class="w-6 h-6 mr-2"
-            />
-            {{ getStatusText(data.summary.overallHealth) }}
-          </UBadge>
-        </div>
-      </UCard>
-
-      <!-- Key Metrics Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <NetWorthCard
-          :data="data"
-          :format-currency="formatCurrency"
-          :get-status-color="getStatusColor"
-          :get-status-text="getStatusText"
-        />
-
-        <CashFlowCard
-          :data="data"
-          :format-currency="formatCurrency"
-          :format-percent="formatPercent"
-          :get-status-color="getStatusColor"
-          :get-status-text="getStatusText"
-        />
-
-        <DebtToIncomeCard
-          :data="data"
-          :format-currency="formatCurrency"
-          :format-percent="formatPercent"
-          :get-status-color="getStatusColor"
-          :get-status-text="getStatusText"
-        />
-
-        <EmergencyFundCard
-          :data="data"
-          :format-currency="formatCurrency"
-          :get-status-color="getStatusColor"
-          :get-status-text="getStatusText"
-        />
+    <UPageBody>
+      <!-- Loading State -->
+      <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <USkeleton v-for="i in 4" :key="i" class="h-64" />
       </div>
 
-      <!-- Action Items / Recommendations -->
-      <UCard>
-        <template #header>
-          <h3 class="text-lg font-semibold">
-            {{ $t("financialHealth.recommendedActions") }}
-          </h3>
-        </template>
+      <!-- Error State -->
+      <UAlert
+        v-else-if="error"
+        color="error"
+        variant="subtle"
+        :title="$t('financialHealth.failedToLoad')"
+        :description="error"
+        class="mb-6"
+      />
 
-        <div class="space-y-3">
-          <div
-            v-for="recommendation in recommendations"
-            :key="recommendation.title"
-            class="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
-          >
-            <UIcon
-              :name="recommendation.icon"
-              class="w-5 h-5 mt-0.5"
-              :class="recommendation.iconColor"
-            />
-            <div class="flex-1">
-              <h4 class="font-semibold mb-1">{{ recommendation.title }}</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ recommendation.description }}
+      <!-- Dashboard Content -->
+      <div v-else-if="data" class="space-y-6">
+        <!-- Overall Health Summary -->
+        <UCard>
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-bold mb-2">
+                {{ $t("financialHealth.overallFinancialHealth") }}
+              </h2>
+              <p class="text-gray-600 dark:text-gray-400">
+                {{ $t("financialHealth.overallHealthDesc") }}
+              </p>
+            </div>
+            <UBadge
+              :color="getStatusColor(data.summary.overallHealth)"
+              variant="solid"
+              size="xl"
+              class="text-lg px-4 py-2"
+            >
+              <UIcon
+                :name="getStatusIcon(data.summary.overallHealth)"
+                class="w-6 h-6 mr-2"
+              />
+              {{ getStatusText(data.summary.overallHealth) }}
+            </UBadge>
+          </div>
+        </UCard>
+
+        <!-- Key Metrics Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <NetWorthCard
+            :data="data"
+            :format-currency="formatCurrency"
+            :get-status-color="getStatusColor"
+            :get-status-text="getStatusText"
+          />
+
+          <CashFlowCard
+            :data="data"
+            :format-currency="formatCurrency"
+            :format-percent="formatPercent"
+            :get-status-color="getStatusColor"
+            :get-status-text="getStatusText"
+          />
+
+          <DebtToIncomeCard
+            :data="data"
+            :format-currency="formatCurrency"
+            :format-percent="formatPercent"
+            :get-status-color="getStatusColor"
+            :get-status-text="getStatusText"
+          />
+
+          <EmergencyFundCard
+            :data="data"
+            :format-currency="formatCurrency"
+            :get-status-color="getStatusColor"
+            :get-status-text="getStatusText"
+          />
+        </div>
+
+        <!-- Action Items / Recommendations -->
+        <UCard>
+          <template #header>
+            <h3 class="text-lg font-semibold">
+              {{ $t("financialHealth.recommendedActions") }}
+            </h3>
+          </template>
+
+          <div class="space-y-3">
+            <div
+              v-for="recommendation in recommendations"
+              :key="recommendation.title"
+              class="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
+            >
+              <UIcon
+                :name="recommendation.icon"
+                class="w-5 h-5 mt-0.5"
+                :class="recommendation.iconColor"
+              />
+              <div class="flex-1">
+                <h4 class="font-semibold mb-1">{{ recommendation.title }}</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ recommendation.description }}
+                </p>
+              </div>
+            </div>
+
+            <div
+              v-if="recommendations.length === 0"
+              class="text-center py-8 text-gray-500 dark:text-gray-400"
+            >
+              <UIcon
+                name="i-heroicons-trophy"
+                class="w-12 h-12 mx-auto mb-2 text-green-500"
+              />
+              <p class="font-semibold">
+                {{ $t("financialHealth.excellentWork") }}
+              </p>
+              <p class="text-sm">
+                {{ $t("financialHealth.financesInGreatShape") }}
               </p>
             </div>
           </div>
-
-          <div
-            v-if="recommendations.length === 0"
-            class="text-center py-8 text-gray-500 dark:text-gray-400"
-          >
-            <UIcon
-              name="i-heroicons-trophy"
-              class="w-12 h-12 mx-auto mb-2 text-green-500"
-            />
-            <p class="font-semibold">
-              {{ $t("financialHealth.excellentWork") }}
-            </p>
-            <p class="text-sm">
-              {{ $t("financialHealth.financesInGreatShape") }}
-            </p>
-          </div>
-        </div>
-      </UCard>
-    </div>
-  </div>
+        </UCard>
+      </div>
+    </UPageBody>
+  </UPage>
 </template>
 
 <script setup lang="ts">

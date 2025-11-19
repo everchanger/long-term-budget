@@ -8,127 +8,89 @@
 
     <template #body>
       <div class="space-y-4">
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            for="loan-name"
-          >
-            {{ $t("loans.nameRequired") }}
-          </label>
-          <input
+        <UFormField :label="$t('loans.nameRequired')" name="name" required>
+          <UInput
             id="loan-name"
             v-model="formState.name"
             type="text"
             :placeholder="$t('loans.namePlaceholder')"
-            required
+            icon="i-lucide-file-text"
             data-testid="loan-name-input"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            for="loan-amount"
-          >
-            {{ $t("loans.originalAmountRequired") }}
-          </label>
-          <input
+        <UFormField
+          :label="$t('loans.originalAmountRequired')"
+          :hint="$t('loans.originalAmountHelp')"
+          name="originalAmount"
+          required
+        >
+          <UInput
             id="loan-amount"
             v-model="formState.originalAmount"
             type="number"
             step="0.01"
             min="0"
             placeholder="0.00"
-            required
+            icon="i-lucide-dollar-sign"
             data-testid="loan-principal-input"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {{ $t("loans.originalAmountHelp") }}
-          </p>
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            for="loan-current-balance"
-          >
-            {{ $t("loans.currentBalanceRequired") }}
-          </label>
-          <input
+        <UFormField
+          :label="$t('loans.currentBalanceRequired')"
+          :hint="$t('loans.currentBalanceHelp')"
+          name="currentBalance"
+          required
+        >
+          <UInput
             id="loan-current-balance"
             v-model="formState.currentBalance"
             type="number"
             step="0.01"
             min="0"
             placeholder="0.00"
-            required
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+            icon="i-lucide-wallet"
           />
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {{ $t("loans.currentBalanceHelp") }}
-          </p>
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            for="loan-interest-rate"
-          >
-            {{ $t("common.interestRate") }}
-          </label>
-          <input
+        <UFormField :label="$t('common.interestRate')" name="interestRate">
+          <UInput
             id="loan-interest-rate"
             v-model="formState.interestRate"
             type="number"
             step="0.01"
             min="0"
             placeholder="5.00"
+            icon="i-lucide-percent"
             data-testid="loan-interest-rate-input"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            for="loan-monthly-payment"
-          >
-            {{ $t("loans.monthlyPayment") }}
-          </label>
-          <input
+        <UFormField :label="$t('loans.monthlyPayment')" name="monthlyPayment">
+          <UInput
             id="loan-monthly-payment"
             v-model="formState.monthlyPayment"
             type="number"
             step="0.01"
             min="0"
             placeholder="0.00"
+            icon="i-lucide-calendar-days"
             data-testid="loan-monthly-payment-input"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            for="loan-type"
-          >
-            {{ $t("loans.loanType") }}
-          </label>
-          <select
+        <UFormField :label="$t('loans.loanType')" name="loanType">
+          <USelect
             id="loan-type"
             v-model="formState.loanType"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-          >
-            <option value="">{{ $t("loans.selectType") }}</option>
-            <option value="mortgage">{{ $t("loans.types.mortgage") }}</option>
-            <option value="personal">{{ $t("loans.types.personal") }}</option>
-            <option value="credit-card">{{ $t("loans.types.credit") }}</option>
-            <option value="auto">{{ $t("loans.types.auto") }}</option>
-            <option value="other">{{ $t("loans.types.other") }}</option>
-          </select>
-        </div>
+            :items="loanTypeOptions"
+            :placeholder="$t('loans.selectType')"
+            value-key="value"
+            label-key="label"
+            :ui="{ content: 'min-w-fit' }"
+          />
+        </UFormField>
       </div>
     </template>
 
@@ -153,6 +115,7 @@
 
 <script setup lang="ts">
 import type { z } from "zod";
+import type { SelectItem } from "@nuxt/ui";
 import type {
   SelectLoan,
   insertLoanSchema,
@@ -183,6 +146,32 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<Emits>();
+const { t } = useI18n();
+
+// Loan type options with icons
+const loanTypeOptions: SelectItem[] = [
+  {
+    label: t("loans.types.mortgage"),
+    value: "mortgage",
+    icon: "i-lucide-home",
+  },
+  {
+    label: t("loans.types.personal"),
+    value: "personal",
+    icon: "i-lucide-user",
+  },
+  {
+    label: t("loans.types.credit"),
+    value: "credit-card",
+    icon: "i-lucide-credit-card",
+  },
+  { label: t("loans.types.auto"), value: "auto", icon: "i-lucide-car" },
+  {
+    label: t("loans.types.other"),
+    value: "other",
+    icon: "i-lucide-circle-help",
+  },
+];
 
 // Reactive form state
 const formState = reactive<FormState>({

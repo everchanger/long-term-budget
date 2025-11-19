@@ -8,40 +8,27 @@
 
     <template #body>
       <div class="space-y-4">
-        <div>
-          <label
-            for="edit-person-name"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("person.name") }} *
-          </label>
-          <input
+        <UFormField :label="$t('person.name') + ' *'" name="name" required>
+          <UInput
             id="edit-person-name"
             v-model="formState.name"
             type="text"
             :placeholder="$t('person.namePlaceholder')"
-            required
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+            icon="i-lucide-user"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            for="edit-person-age"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("person.age") }}
-          </label>
-          <input
+        <UFormField :label="$t('person.age')" name="age">
+          <UInput
             id="edit-person-age"
             v-model="formState.age"
             type="number"
             :placeholder="$t('person.agePlaceholder')"
             min="0"
             max="120"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+            icon="i-lucide-cake"
           />
-        </div>
+        </UFormField>
       </div>
     </template>
 

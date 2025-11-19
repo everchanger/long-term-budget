@@ -31,7 +31,8 @@
       </div>
 
       <!-- Monthly Breakdown -->
-      <div class="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <USeparator />
+      <div class="space-y-3">
         <div class="flex items-center justify-between">
           <span
             class="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2"
@@ -79,7 +80,8 @@
       </div>
 
       <!-- Annual Summary -->
-      <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+      <USeparator />
+      <div>
         <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
           Annual Net Cash Flow
         </p>

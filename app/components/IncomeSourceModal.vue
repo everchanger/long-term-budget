@@ -8,64 +8,45 @@
 
     <template #body>
       <div class="space-y-4">
-        <div>
-          <label
-            for="income-name"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("income.nameRequired") }}
-          </label>
-          <input
+        <UFormField :label="$t('income.nameRequired')" name="name" required>
+          <UInput
             id="income-name"
             v-model="formState.name"
             type="text"
             :placeholder="$t('income.namePlaceholder')"
-            required
+            icon="i-lucide-briefcase"
             data-testid="income-source-input"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            for="income-amount"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("income.amountRequired") }}
-          </label>
-          <input
+        <UFormField :label="$t('income.amountRequired')" name="amount" required>
+          <UInput
             id="income-amount"
             v-model="formState.amount"
             type="number"
             step="0.01"
             min="0"
             placeholder="0.00"
-            required
+            icon="i-lucide-dollar-sign"
             data-testid="income-amount-input"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            for="income-frequency"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("income.frequencyRequired") }}
-          </label>
-          <select
+        <UFormField
+          :label="$t('income.frequencyRequired')"
+          name="frequency"
+          required
+        >
+          <USelect
             id="income-frequency"
             v-model="formState.frequency"
-            required
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-          >
-            <option value="">{{ $t("income.selectFrequency") }}</option>
-            <option value="monthly">{{ $t("time.monthly") }}</option>
-            <option value="yearly">{{ $t("time.yearly") }}</option>
-            <option value="weekly">{{ $t("time.weekly") }}</option>
-            <option value="bi-weekly">{{ $t("time.biWeekly") }}</option>
-          </select>
-        </div>
+            :items="frequencyOptions"
+            :placeholder="$t('income.selectFrequency')"
+            value-key="value"
+            label-key="label"
+            :ui="{ content: 'min-w-fit' }"
+          />
+        </UFormField>
       </div>
     </template>
 
@@ -89,6 +70,7 @@
 
 <script setup lang="ts">
 import type { z } from "zod";
+import type { SelectItem } from "@nuxt/ui";
 import type {
   SelectIncomeSource,
   insertIncomeSourceSchema,
@@ -116,6 +98,15 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<Emits>();
+const { t } = useI18n();
+
+// Frequency options with icons
+const frequencyOptions: SelectItem[] = [
+  { label: t("time.monthly"), value: "monthly", icon: "i-lucide-calendar" },
+  { label: t("time.yearly"), value: "yearly", icon: "i-lucide-calendar-days" },
+  { label: t("time.weekly"), value: "weekly", icon: "i-lucide-clock" },
+  { label: t("time.biWeekly"), value: "bi-weekly", icon: "i-lucide-clock" },
+];
 
 // Reactive form state
 const formState = reactive<FormState>({

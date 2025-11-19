@@ -11,116 +11,132 @@
     <template #body>
       <form class="space-y-6" @submit.prevent="handleSubmit">
         <!-- Goal Name -->
-        <div>
-          <label
-            for="goal-name"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("savingsGoals.goalNameRequired") }}
-          </label>
-          <input
+        <UFormField
+          :label="$t('savingsGoals.goalNameRequired')"
+          name="goal-name"
+          required
+        >
+          <UInput
             id="goal-name"
             v-model="formState.name"
             type="text"
-            required
             :placeholder="$t('savingsGoals.goalNamePlaceholder')"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+            icon="i-lucide-target"
           />
-        </div>
+        </UFormField>
 
         <!-- Description -->
-        <div>
-          <label
-            for="goal-description"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("savingsGoals.description") }}
-          </label>
-          <textarea
+        <UFormField
+          :label="$t('savingsGoals.description')"
+          name="goal-description"
+        >
+          <UTextarea
             id="goal-description"
             v-model="formState.description"
-            rows="3"
+            :rows="3"
             :placeholder="$t('savingsGoals.descriptionPlaceholder')"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
-        </div>
+        </UFormField>
 
         <!-- Target Amount -->
-        <div>
-          <label
-            for="goal-target-amount"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("savingsGoals.targetAmountRequired") }}
-          </label>
-          <input
+        <UFormField
+          :label="$t('savingsGoals.targetAmountRequired')"
+          name="goal-target-amount"
+          required
+        >
+          <UInput
             id="goal-target-amount"
             v-model="formState.targetAmount"
             type="number"
             step="0.01"
             min="0.01"
-            required
             placeholder="0.00"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+            icon="i-lucide-dollar-sign"
           />
-        </div>
+        </UFormField>
 
-        <div>
-          <label
-            for="goal-priority"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("savingsGoals.priority") }}
-          </label>
-          <select
+        <UFormField :label="$t('savingsGoals.priority')" name="goal-priority">
+          <USelect
             id="goal-priority"
             v-model="formState.priority"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-          >
-            <option value="1">{{ $t("savingsGoals.priorityLow") }}</option>
-            <option value="2">{{ $t("savingsGoals.priorityMedium") }}</option>
-            <option value="3">{{ $t("savingsGoals.priorityHigh") }}</option>
-          </select>
-        </div>
+            :options="[
+              {
+                value: '1',
+                label: $t('savingsGoals.priorityLow'),
+                icon: 'i-lucide-arrow-down',
+              },
+              {
+                value: '2',
+                label: $t('savingsGoals.priorityMedium'),
+                icon: 'i-lucide-minus',
+              },
+              {
+                value: '3',
+                label: $t('savingsGoals.priorityHigh'),
+                icon: 'i-lucide-arrow-up',
+              },
+            ]"
+            option-attribute="label"
+            value-attribute="value"
+          />
+        </UFormField>
 
         <!-- Category -->
-        <div>
-          <label
-            for="goal-category"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ $t("savingsGoals.category") }}
-          </label>
-          <select
+        <UFormField :label="$t('savingsGoals.category')" name="goal-category">
+          <USelect
             id="goal-category"
             v-model="formState.category"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-          >
-            <option value="">{{ $t("savingsGoals.selectCategory") }}</option>
-            <option value="Emergency Fund">
-              {{ $t("savingsGoals.categoryEmergencyFund") }}
-            </option>
-            <option value="Vacation">
-              {{ $t("savingsGoals.categoryVacation") }}
-            </option>
-            <option value="Car">{{ $t("savingsGoals.categoryCar") }}</option>
-            <option value="House">
-              {{ $t("savingsGoals.categoryHouse") }}
-            </option>
-            <option value="Education">
-              {{ $t("savingsGoals.categoryEducation") }}
-            </option>
-            <option value="Retirement">
-              {{ $t("savingsGoals.categoryRetirement") }}
-            </option>
-            <option value="Investment">
-              {{ $t("savingsGoals.categoryInvestment") }}
-            </option>
-            <option value="Other">
-              {{ $t("savingsGoals.categoryOther") }}
-            </option>
-          </select>
-        </div>
+            :options="[
+              {
+                value: '',
+                label: $t('savingsGoals.selectCategory'),
+                icon: 'i-lucide-list',
+              },
+              {
+                value: 'Emergency Fund',
+                label: $t('savingsGoals.categoryEmergencyFund'),
+                icon: 'i-lucide-shield',
+              },
+              {
+                value: 'Vacation',
+                label: $t('savingsGoals.categoryVacation'),
+                icon: 'i-lucide-plane',
+              },
+              {
+                value: 'Car',
+                label: $t('savingsGoals.categoryCar'),
+                icon: 'i-lucide-car',
+              },
+              {
+                value: 'House',
+                label: $t('savingsGoals.categoryHouse'),
+                icon: 'i-lucide-home',
+              },
+              {
+                value: 'Education',
+                label: $t('savingsGoals.categoryEducation'),
+                icon: 'i-lucide-graduation-cap',
+              },
+              {
+                value: 'Retirement',
+                label: $t('savingsGoals.categoryRetirement'),
+                icon: 'i-lucide-palm-tree',
+              },
+              {
+                value: 'Investment',
+                label: $t('savingsGoals.categoryInvestment'),
+                icon: 'i-lucide-trending-up',
+              },
+              {
+                value: 'Other',
+                label: $t('savingsGoals.categoryOther'),
+                icon: 'i-lucide-more-horizontal',
+              },
+            ]"
+            option-attribute="label"
+            value-attribute="value"
+          />
+        </UFormField>
 
         <!-- Linked Savings Accounts -->
         <div

@@ -51,10 +51,14 @@
     "enterEmail": "Ange din e-post",
     "enterPassword": "Ange ditt lösenord",
     "failedToCreateAccount": "Misslyckades med att skapa konto",
-    "failedToSignIn": "Misslyckades med att logga in"
+    "failedToSignIn": "Misslyckades med att logga in",
+    "nameRequired": "Namnet måste vara minst 2 tecken",
+    "invalidEmail": "Ogiltig e-postadress",
+    "passwordRequired": "Lösenord krävs",
+    "passwordMinLength": "Lösenordet måste vara minst 8 tecken"
   },
   "navigation": {
-    "home": "Hem",
+    "home": "Översikt",
     "dashboard": "Översikt",
     "overview": "Översikt",
     "economy": "Ekonomi",
@@ -267,6 +271,7 @@
     "globalAssumptionsDesc": "Tillämpa tillväxttakt och avkastning på prognoser",
     "enabled": "Aktiverad",
     "disabled": "Inaktiverad",
+    "enableToAdjust": "Aktivera för att justera antaganden",
     "incomeGrowth": "Inkomsttillväxt",
     "expenseGrowth": "Utgiftstillväxt",
     "investmentReturn": "Investeringsavkastning",
@@ -479,6 +484,7 @@
     "description": "Hantera dina preferenser och inställningar",
     "language": "Språk",
     "currency": "Valuta",
+    "theme": "Tema",
     "saveChanges": "Spara ändringar",
     "updateSuccess": "Inställningar uppdaterade",
     "updateFailed": "Misslyckades att uppdatera inställningar"

@@ -38,9 +38,8 @@
       </div>
 
       <!-- Summary stats -->
-      <div
-        class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700"
-      >
+      <USeparator />
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div>
           <div class="text-xs text-gray-500 dark:text-gray-400">
             {{ $t("projections.startingNetWorth") }}

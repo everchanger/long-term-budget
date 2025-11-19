@@ -51,10 +51,14 @@
     "enterEmail": "Enter your email",
     "enterPassword": "Enter your password",
     "failedToCreateAccount": "Failed to create account",
-    "failedToSignIn": "Failed to sign in"
+    "failedToSignIn": "Failed to sign in",
+    "nameRequired": "Name must be at least 2 characters",
+    "invalidEmail": "Invalid email address",
+    "passwordRequired": "Password is required",
+    "passwordMinLength": "Password must be at least 8 characters"
   },
   "navigation": {
-    "home": "Home",
+    "home": "Overview",
     "dashboard": "Dashboard",
     "overview": "Overview",
     "economy": "Economy",
@@ -393,6 +397,7 @@
     "preferences": "Preferences",
     "language": "Language",
     "currency": "Currency",
+    "theme": "Theme",
     "saveChanges": "Save Changes",
     "updateSuccess": "Settings updated successfully",
     "updateError": "Failed to update settings",

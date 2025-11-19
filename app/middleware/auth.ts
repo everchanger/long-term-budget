@@ -1,6 +1,12 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
   // Skip middleware on server-side rendering
-  if (process.server) return;
+  if (import.meta.server) return;
+
+  // Allow public routes
+  const publicRoutes = ["/auth", "/"];
+  if (publicRoutes.includes(to.path)) {
+    return;
+  }
 
   const { getSession } = useAuth();
 

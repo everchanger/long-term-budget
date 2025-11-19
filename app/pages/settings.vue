@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { SelectItem } from "@nuxt/ui";
 import { useUserPreferences } from "~/composables/useUserPreferences";
 
 definePageMeta({
@@ -9,16 +10,16 @@ const toast = useToast();
 const { t } = useI18n();
 const { locale, currency, setLocale, setCurrency } = useUserPreferences();
 
-// Language options
-const languageOptions = [
-  { value: "sv", text: "Svenska" },
-  { value: "en", text: "English" },
+// Language options with icons
+const languageOptions: SelectItem[] = [
+  { label: "Svenska", value: "sv", icon: "i-lucide-languages" },
+  { label: "English", value: "en", icon: "i-lucide-languages" },
 ];
 
-// Currency options
-const currencyOptions = [
-  { value: "SEK", text: "SEK (kr)" },
-  { value: "USD", text: "USD ($)" },
+// Currency options with icons
+const currencyOptions: SelectItem[] = [
+  { label: "SEK (kr)", value: "SEK", icon: "i-lucide-coins" },
+  { label: "USD ($)", value: "USD", icon: "i-lucide-dollar-sign" },
 ];
 
 // Track if we're saving
@@ -74,73 +75,51 @@ const hasChanges = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-          {{ $t("settings.title") }}
-        </h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">
-          {{ $t("settings.description") }}
-        </p>
-      </div>
+  <UPage>
+    <UPageHeader
+      :title="$t('settings.title')"
+      :description="$t('settings.description')"
+    />
 
+    <UPageBody>
       <!-- Settings Card -->
       <UCard>
         <div class="space-y-6">
           <!-- Language Selection -->
-          <div>
-            <label
-              for="language"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
-              {{ $t("settings.language") }}
-            </label>
-            <select
-              id="language"
+          <UFormField :label="$t('settings.language')" name="language">
+            <USelect
               v-model="selectedLanguage"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              :items="languageOptions"
+              value-key="value"
+              label-key="label"
+              :ui="{ content: 'min-w-fit' }"
               data-testid="language-select"
-            >
-              <option
-                v-for="option in languageOptions"
-                :key="option.value"
-                :value="option.value"
-              >
-                {{ option.text }}
-              </option>
-            </select>
-          </div>
+            />
+          </UFormField>
 
           <!-- Currency Selection -->
-          <div>
-            <label
-              for="currency"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
-              {{ $t("settings.currency") }}
-            </label>
-            <select
-              id="currency"
+          <UFormField :label="$t('settings.currency')" name="currency">
+            <USelect
               v-model="selectedCurrency"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              :items="currencyOptions"
+              value-key="value"
+              label-key="label"
+              :ui="{ content: 'min-w-fit' }"
               data-testid="currency-select"
-            >
-              <option
-                v-for="option in currencyOptions"
-                :key="option.value"
-                :value="option.value"
-              >
-                {{ option.text }}
-              </option>
-            </select>
-          </div>
+            />
+          </UFormField>
+
+          <USeparator />
+
+          <!-- Theme Selection -->
+          <UFormField :label="$t('settings.theme')" name="theme">
+            <UColorModeSelect />
+          </UFormField>
+
+          <USeparator />
 
           <!-- Save Button -->
-          <div
-            class="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700"
-          >
+          <div class="flex justify-end">
             <UButton
               color="primary"
               :loading="isSaving"
@@ -152,6 +131,6 @@ const hasChanges = computed(() => {
           </div>
         </div>
       </UCard>
-    </div>
-  </div>
+    </UPageBody>
+  </UPage>
 </template>

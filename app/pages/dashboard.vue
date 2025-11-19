@@ -1,227 +1,238 @@
 <template>
-  <div>
+  <UPage>
     <!-- Page Header -->
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-          {{ $t("dashboard.title") }}
-        </h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">
-          {{ $t("dashboard.description") }}
-        </p>
-      </div>
-      <div class="flex items-center gap-4">
-        <UButton
-          color="gray"
-          icon="i-heroicons-arrow-right-on-rectangle"
-          @click="handleSignOut"
-        >
-          {{ $t("auth.signOut") }}
-        </UButton>
-        <UButton icon="i-heroicons-plus" size="lg" @click="isModalOpen = true">
-          {{ $t("dashboard.addUser") }}
-        </UButton>
-      </div>
-    </div>
-
-    <!-- Users List -->
-    <UCard>
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-            {{ $t("dashboard.allUsers", { count: users?.length || 0 }) }}
-          </h2>
+    <UPageHeader
+      :title="$t('dashboard.title')"
+      :description="$t('dashboard.description')"
+    >
+      <template #trailing>
+        <div class="flex items-center gap-4">
           <UButton
-            v-if="users && users.length > 0"
-            variant="soft"
-            icon="i-heroicons-arrow-path"
-            size="sm"
-            @click="refresh()"
+            color="gray"
+            icon="i-heroicons-arrow-right-on-rectangle"
+            @click="handleSignOut"
           >
-            {{ $t("common.refresh") }}
+            {{ $t("auth.signOut") }}
+          </UButton>
+          <UButton
+            icon="i-heroicons-plus"
+            size="lg"
+            @click="isModalOpen = true"
+          >
+            {{ $t("dashboard.addUser") }}
           </UButton>
         </div>
       </template>
+    </UPageHeader>
 
-      <!-- Loading State -->
-      <div v-if="pending" class="flex justify-center py-12">
-        <div class="text-center">
-          <div
-            class="i-heroicons-arrow-path animate-spin text-3xl text-blue-600 mb-4"
-          />
-          <p class="text-gray-500 dark:text-gray-400">
-            {{ $t("dashboard.loadingUsers") }}
-          </p>
-        </div>
-      </div>
+    <UPageBody>
+      <!-- Users List -->
+      <UCard>
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+              {{ $t("dashboard.allUsers", { count: users?.length || 0 }) }}
+            </h2>
+            <UButton
+              v-if="users && users.length > 0"
+              variant="soft"
+              icon="i-heroicons-arrow-path"
+              size="sm"
+              @click="refresh()"
+            >
+              {{ $t("common.refresh") }}
+            </UButton>
+          </div>
+        </template>
 
-      <!-- Error State -->
-      <UAlert
-        v-else-if="error"
-        icon="i-heroicons-exclamation-triangle"
-        color="red"
-        variant="subtle"
-        :title="$t('dashboard.errorLoadingUsers')"
-        :description="error.message"
-      />
-
-      <!-- Users Table -->
-      <ClientOnly>
-        <div v-if="!pending && !error">
-          <UTable v-if="users && users.length > 0" :data="users" class="w-full">
-            <template #actions-data="{ row }">
-              <UDropdownMenu :items="getUserActions(row)">
-                <UButton
-                  variant="ghost"
-                  icon="i-heroicons-ellipsis-horizontal-20-solid"
-                />
-              </UDropdownMenu>
-            </template>
-
-            <template #createdAt-data="{ row }">
-              <span class="text-sm text-gray-500 dark:text-gray-400">
-                {{ formatDate(row.createdAt) }}
-              </span>
-            </template>
-          </UTable>
-
-          <div v-else class="text-center py-12">
+        <!-- Loading State -->
+        <div v-if="pending" class="flex justify-center py-12">
+          <div class="text-center">
             <div
-              class="i-heroicons-users text-6xl text-gray-400 mb-4 mx-auto"
+              class="i-heroicons-arrow-path animate-spin text-3xl text-blue-600 mb-4"
             />
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              {{ $t("dashboard.noUsers") }}
-            </h3>
-            <p class="text-gray-500 dark:text-gray-400 mb-6">
-              {{ $t("dashboard.getStarted") }}
+            <p class="text-gray-500 dark:text-gray-400">
+              {{ $t("dashboard.loadingUsers") }}
             </p>
-            <UButton icon="i-heroicons-plus" @click="isModalOpen = true">
-              {{ $t("dashboard.addFirstUser") }}
-            </UButton>
           </div>
         </div>
-      </ClientOnly>
-    </UCard>
 
-    <!-- Add User Modal -->
-    <UModal v-model:open="isModalOpen">
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-medium">{{ $t("dashboard.addNewUser") }}</h3>
-          <UButton
-            variant="ghost"
-            icon="i-heroicons-x-mark"
-            @click="isModalOpen = false"
-          />
-        </div>
-      </template>
+        <!-- Error State -->
+        <UAlert
+          v-else-if="error"
+          icon="i-heroicons-exclamation-triangle"
+          color="red"
+          variant="subtle"
+          :title="$t('dashboard.errorLoadingUsers')"
+          :description="error.message"
+        />
 
-      <template #body>
-        <UForm
-          :schema="userSchema"
-          :state="newUser"
-          class="space-y-4"
-          @submit="createUser"
-        >
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >{{ $t("auth.name") }}</label
+        <!-- Users Table -->
+        <ClientOnly>
+          <div v-if="!pending && !error">
+            <UTable
+              v-if="users && users.length > 0"
+              :data="users"
+              class="w-full"
             >
-            <UInput
-              v-model="newUser.name"
-              :placeholder="$t('dashboard.enterUserName')"
-              icon="i-heroicons-user"
-              required
+              <template #actions-data="{ row }">
+                <UDropdownMenu :items="getUserActions(row)">
+                  <UButton
+                    variant="ghost"
+                    icon="i-heroicons-ellipsis-horizontal-20-solid"
+                  />
+                </UDropdownMenu>
+              </template>
+
+              <template #createdAt-data="{ row }">
+                <span class="text-sm text-gray-500 dark:text-gray-400">
+                  {{ formatDate(row.createdAt) }}
+                </span>
+              </template>
+            </UTable>
+
+            <div v-else class="text-center py-12">
+              <div
+                class="i-heroicons-users text-6xl text-gray-400 mb-4 mx-auto"
+              />
+              <h3
+                class="text-lg font-medium text-gray-900 dark:text-white mb-2"
+              >
+                {{ $t("dashboard.noUsers") }}
+              </h3>
+              <p class="text-gray-500 dark:text-gray-400 mb-6">
+                {{ $t("dashboard.getStarted") }}
+              </p>
+              <UButton icon="i-heroicons-plus" @click="isModalOpen = true">
+                {{ $t("dashboard.addFirstUser") }}
+              </UButton>
+            </div>
+          </div>
+        </ClientOnly>
+      </UCard>
+
+      <!-- Add User Modal -->
+      <UModal v-model:open="isModalOpen">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-medium">
+              {{ $t("dashboard.addNewUser") }}
+            </h3>
+            <UButton
+              variant="ghost"
+              icon="i-heroicons-x-mark"
+              @click="isModalOpen = false"
             />
           </div>
+        </template>
 
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >{{ $t("auth.email") }}</label
-            >
-            <UInput
-              v-model="newUser.email"
-              type="email"
-              :placeholder="$t('dashboard.enterEmailAddress')"
-              icon="i-heroicons-envelope"
-              required
+        <template #body>
+          <UForm
+            :schema="userSchema"
+            :state="newUser"
+            class="space-y-4"
+            @submit="createUser"
+          >
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >{{ $t("auth.name") }}</label
+              >
+              <UInput
+                v-model="newUser.name"
+                :placeholder="$t('dashboard.enterUserName')"
+                icon="i-heroicons-user"
+                required
+              />
+            </div>
+
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >{{ $t("auth.email") }}</label
+              >
+              <UInput
+                v-model="newUser.email"
+                type="email"
+                :placeholder="$t('dashboard.enterEmailAddress')"
+                icon="i-heroicons-envelope"
+                required
+              />
+            </div>
+            <div class="flex justify-end space-x-3 pt-4">
+              <UButton variant="soft" @click="isModalOpen = false">
+                {{ $t("common.cancel") }}
+              </UButton>
+              <UButton type="submit" :loading="isCreating">
+                {{ $t("dashboard.createUser") }}
+              </UButton>
+            </div>
+          </UForm>
+        </template>
+      </UModal>
+
+      <!-- Edit User Modal -->
+      <UModal v-model="isEditModalOpen">
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-medium">{{ $t("dashboard.editUser") }}</h3>
+            <UButton
+              variant="ghost"
+              icon="i-heroicons-x-mark"
+              @click="isEditModalOpen = false"
             />
           </div>
-          <div class="flex justify-end space-x-3 pt-4">
-            <UButton variant="soft" @click="isModalOpen = false">
-              {{ $t("common.cancel") }}
-            </UButton>
-            <UButton type="submit" :loading="isCreating">
-              {{ $t("dashboard.createUser") }}
-            </UButton>
-          </div>
-        </UForm>
-      </template>
-    </UModal>
+        </template>
 
-    <!-- Edit User Modal -->
-    <UModal v-model="isEditModalOpen">
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-medium">{{ $t("dashboard.editUser") }}</h3>
-          <UButton
-            variant="ghost"
-            icon="i-heroicons-x-mark"
-            @click="isEditModalOpen = false"
-          />
-        </div>
-      </template>
+        <template #body>
+          <UForm
+            :schema="editUserSchema"
+            :state="editingUser"
+            class="space-y-4"
+            @submit="updateUser"
+          >
+            <div class="space-y-2">
+              <label
+                for="edit-name"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >{{ $t("auth.name") }} *</label
+              >
+              <UInput
+                id="edit-name"
+                v-model="editingUser.name"
+                :placeholder="$t('dashboard.enterUserName')"
+                icon="i-heroicons-user"
+              />
+            </div>
 
-      <template #body>
-        <UForm
-          :schema="editUserSchema"
-          :state="editingUser"
-          class="space-y-4"
-          @submit="updateUser"
-        >
-          <div class="space-y-2">
-            <label
-              for="edit-name"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >{{ $t("auth.name") }} *</label
-            >
-            <UInput
-              id="edit-name"
-              v-model="editingUser.name"
-              :placeholder="$t('dashboard.enterUserName')"
-              icon="i-heroicons-user"
-            />
-          </div>
+            <div class="space-y-2">
+              <label
+                for="edit-email"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >{{ $t("auth.email") }} *</label
+              >
+              <UInput
+                id="edit-email"
+                v-model="editingUser.email"
+                type="email"
+                :placeholder="$t('dashboard.enterEmailAddress')"
+                icon="i-heroicons-envelope"
+              />
+            </div>
 
-          <div class="space-y-2">
-            <label
-              for="edit-email"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >{{ $t("auth.email") }} *</label
-            >
-            <UInput
-              id="edit-email"
-              v-model="editingUser.email"
-              type="email"
-              :placeholder="$t('dashboard.enterEmailAddress')"
-              icon="i-heroicons-envelope"
-            />
-          </div>
-
-          <div class="flex justify-end space-x-3 pt-4">
-            <UButton variant="soft" @click="isEditModalOpen = false">
-              {{ $t("common.cancel") }}
-            </UButton>
-            <UButton type="submit" :loading="isUpdating">
-              {{ $t("dashboard.updateUser") }}
-            </UButton>
-          </div>
-        </UForm>
-      </template>
-    </UModal>
-  </div>
+            <div class="flex justify-end space-x-3 pt-4">
+              <UButton variant="soft" @click="isEditModalOpen = false">
+                {{ $t("common.cancel") }}
+              </UButton>
+              <UButton type="submit" :loading="isUpdating">
+                {{ $t("dashboard.updateUser") }}
+              </UButton>
+            </div>
+          </UForm>
+        </template>
+      </UModal>
+    </UPageBody>
+  </UPage>
 </template>
 
 <script setup lang="ts">
