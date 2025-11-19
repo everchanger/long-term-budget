@@ -93,8 +93,8 @@ CREATE TABLE "users" (
 	"email" varchar(255) NOT NULL,
 	"email_verified" boolean DEFAULT false NOT NULL,
 	"image" text,
-	"locale" varchar(10) DEFAULT 'en' NOT NULL,
-	"currency" varchar(3) DEFAULT 'USD' NOT NULL,
+	"locale" varchar(10) DEFAULT 'sv' NOT NULL,
+	"currency" varchar(3) DEFAULT 'SEK' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "users_email_unique" UNIQUE("email")

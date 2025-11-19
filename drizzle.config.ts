@@ -2,7 +2,7 @@ import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   schema: "./database/schema/*",
-  out: "./migrations",
+  out: "./database/migrations",
   dialect: "postgresql",
   dbCredentials: {
     host: process.env.NUXT_DB_HOST || "localhost",

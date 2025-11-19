@@ -1,1 +1,0 @@
-ALTER TABLE "budget_expenses" ADD COLUMN "category" varchar(50) DEFAULT 'other' NOT NULL;
