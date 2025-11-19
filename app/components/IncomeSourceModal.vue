@@ -8,7 +8,7 @@
 
     <template #body>
       <div class="space-y-4">
-        <UFormField :label="$t('income.nameRequired')" name="name" required>
+        <UFormField :label="$t('common.name')" name="name" required>
           <UInput
             id="income-name"
             v-model="formState.name"
@@ -19,7 +19,7 @@
           />
         </UFormField>
 
-        <UFormField :label="$t('income.amountRequired')" name="amount" required>
+        <UFormField :label="$t('income.amount')" name="amount" required>
           <UInput
             id="income-amount"
             v-model="formState.amount"
@@ -32,11 +32,7 @@
           />
         </UFormField>
 
-        <UFormField
-          :label="$t('income.frequencyRequired')"
-          name="frequency"
-          required
-        >
+        <UFormField :label="$t('income.frequency')" name="frequency" required>
           <USelect
             id="income-frequency"
             v-model="formState.frequency"

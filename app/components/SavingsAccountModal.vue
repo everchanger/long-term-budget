@@ -8,18 +8,22 @@
 
     <template #body>
       <div class="space-y-4">
-        <UFormField label="Account Name" name="name" required>
+        <UFormField :label="$t('common.name')" name="name" required>
           <UInput
             id="savings-name"
             v-model="formState.name"
             type="text"
-            placeholder="e.g., Emergency Fund, High Yield Savings, etc."
+            :placeholder="$t('savings.namePlaceholder')"
             icon="i-lucide-wallet"
             data-testid="savings-name-input"
           />
         </UFormField>
 
-        <UFormField label="Current Balance" name="currentBalance" required>
+        <UFormField
+          :label="$t('savings.currentBalance')"
+          name="currentBalance"
+          required
+        >
           <UInput
             id="savings-balance"
             v-model="formState.currentBalance"
@@ -32,7 +36,7 @@
           />
         </UFormField>
 
-        <UFormField label="Interest Rate (%)" name="interestRate">
+        <UFormField :label="$t('common.interestRate')" name="interestRate">
           <UInput
             id="savings-interest-rate"
             v-model="formState.interestRate"
@@ -46,8 +50,8 @@
         </UFormField>
 
         <UFormField
-          label="Monthly Deposit"
-          hint="Amount you contribute to this account each month"
+          :label="$t('savings.monthlyDeposit')"
+          :description="$t('savings.monthlyDepositHelp')"
           name="monthlyDeposit"
         >
           <UInput
@@ -62,12 +66,12 @@
           />
         </UFormField>
 
-        <UFormField label="Account Type" name="accountType">
+        <UFormField :label="$t('savings.accountType')" name="accountType">
           <USelect
             id="savings-account-type"
             v-model="formState.accountType"
             :items="accountTypeOptions"
-            placeholder="Select type"
+            :placeholder="$t('savings.selectType')"
             value-key="value"
             label-key="label"
             :ui="{ content: 'min-w-fit' }"

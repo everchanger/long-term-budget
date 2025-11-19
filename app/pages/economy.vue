@@ -92,30 +92,30 @@
         </div>
 
         <!-- Members Section -->
-        <UCard>
-          <template #header>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <UIcon
-                  name="i-heroicons-users"
-                  class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
-                />
-                <h3 class="text-lg font-semibold">
-                  {{ $t("household.members") }}
-                </h3>
-              </div>
-              <UButton
-                v-if="householdMembers.length > 0"
-                size="sm"
-                variant="soft"
-                icon="i-heroicons-plus"
-                data-testid="add-person-button"
-                @click="openAddPersonModal"
-              >
-                {{ $t("household.addMember") }}
-              </UButton>
+        <div>
+          <div
+            class="flex items-center justify-between pb-3 mb-6 border-b border-gray-200 dark:border-gray-700"
+          >
+            <div class="flex items-center gap-3">
+              <UIcon
+                name="i-heroicons-users"
+                class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
+              />
+              <h3 class="text-lg font-semibold">
+                {{ $t("household.members") }}
+              </h3>
             </div>
-          </template>
+            <UButton
+              v-if="householdMembers.length > 0"
+              size="sm"
+              variant="soft"
+              icon="i-heroicons-plus"
+              data-testid="add-person-button"
+              @click="openAddPersonModal"
+            >
+              {{ $t("household.addMember") }}
+            </UButton>
+          </div>
           <div v-if="householdMembers.length > 0" class="space-y-4">
             <UCard
               v-for="member in householdMembers"
@@ -192,31 +192,33 @@
               {{ $t("household.addFirstMember") }}
             </UButton>
           </div>
-        </UCard>
+        </div>
 
         <!-- Financial Summary Section -->
-        <UCard v-if="financialSummary && householdMembers.length > 0">
-          <template #header>
-            <div class="flex items-center gap-3">
-              <UIcon
-                name="i-heroicons-chart-bar"
-                class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
-              />
-              <div>
-                <h3 class="text-lg font-semibold">
-                  {{ $t("household.financialOverview") }}
-                </h3>
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                  {{ $t("household.combinedFinances") }}
-                </p>
-              </div>
+        <div v-if="financialSummary && householdMembers.length > 0">
+          <div
+            class="flex items-center gap-3 pb-3 mb-6 border-b border-gray-200 dark:border-gray-700"
+          >
+            <UIcon
+              name="i-heroicons-chart-bar"
+              class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
+            />
+            <div>
+              <h3 class="text-lg font-semibold">
+                {{ $t("household.financialOverview") }}
+              </h3>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                {{ $t("household.combinedFinances") }}
+              </p>
             </div>
-          </template>
+          </div>
           <div
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"
           >
             <!-- Monthly Income -->
-            <UCard>
+            <div
+              class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
               <p
                 class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
               >
@@ -229,10 +231,12 @@
                 {{ formatCurrency(financialSummary.totalAnnualIncome) }}
                 {{ $t("household.annually") }}
               </p>
-            </UCard>
+            </div>
 
             <!-- Total Savings -->
-            <UCard>
+            <div
+              class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
               <p
                 class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
               >
@@ -245,10 +249,12 @@
                 {{ financialSummary.savingsAccountsCount }}
                 {{ $t("household.accounts") }}
               </p>
-            </UCard>
+            </div>
 
             <!-- Total Debt -->
-            <UCard>
+            <div
+              class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
               <p
                 class="text-sm font-medium text-neutral-600 dark:text-neutral-400"
               >
@@ -261,7 +267,7 @@
                 {{ financialSummary.loansCount }}
                 {{ $t("loans.title").toLowerCase() }}
               </p>
-            </UCard>
+            </div>
           </div>
 
           <!-- Net Worth Summary -->
@@ -296,37 +302,37 @@
               </p>
             </div>
           </div>
-        </UCard>
+        </div>
 
         <!-- Budget Expenses Section -->
-        <UCard v-if="userHousehold">
-          <template #header>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <UIcon
-                  name="i-heroicons-currency-dollar"
-                  class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
-                />
-                <div>
-                  <h3 class="text-lg font-semibold">
-                    {{ $t("household.fixedMonthlyExpenses") }}
-                  </h3>
-                  <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                    {{ $t("household.rentUtilitiesEtc") }}
-                  </p>
-                </div>
+        <div v-if="userHousehold">
+          <div
+            class="flex items-center justify-between pb-3 mb-6 border-b border-gray-200 dark:border-gray-700"
+          >
+            <div class="flex items-center gap-3">
+              <UIcon
+                name="i-heroicons-currency-dollar"
+                class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
+              />
+              <div>
+                <h3 class="text-lg font-semibold">
+                  {{ $t("household.fixedMonthlyExpenses") }}
+                </h3>
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                  {{ $t("household.rentUtilitiesEtc") }}
+                </p>
               </div>
-              <UButton
-                size="sm"
-                variant="soft"
-                icon="i-heroicons-plus"
-                data-testid="add-budget-expense-button"
-                @click="openBudgetExpenseModal()"
-              >
-                {{ $t("household.addExpense") }}
-              </UButton>
             </div>
-          </template>
+            <UButton
+              size="sm"
+              variant="soft"
+              icon="i-heroicons-plus"
+              data-testid="add-budget-expense-button"
+              @click="openBudgetExpenseModal()"
+            >
+              {{ $t("household.addExpense") }}
+            </UButton>
+          </div>
 
           <div v-if="budgetExpensesLoading" class="text-center py-8">
             <UIcon
@@ -423,36 +429,36 @@
               </div>
             </div>
           </div>
-        </UCard>
+        </div>
 
         <!-- Savings Goals Section -->
-        <UCard v-if="userHousehold && householdMembers.length > 0">
-          <template #header>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <UIcon
-                  name="i-heroicons-flag"
-                  class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
-                />
-                <div>
-                  <h3 class="text-lg font-semibold">
-                    {{ $t("savingsGoals.title") }}
-                  </h3>
-                  <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                    {{ $t("savingsGoals.trackYourObjectives") }}
-                  </p>
-                </div>
+        <div v-if="userHousehold && householdMembers.length > 0">
+          <div
+            class="flex items-center justify-between pb-3 mb-6 border-b border-gray-200 dark:border-gray-700"
+          >
+            <div class="flex items-center gap-3">
+              <UIcon
+                name="i-heroicons-flag"
+                class="w-5 h-5 text-neutral-600 dark:text-neutral-400"
+              />
+              <div>
+                <h3 class="text-lg font-semibold">
+                  {{ $t("savingsGoals.title") }}
+                </h3>
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                  {{ $t("savingsGoals.trackYourObjectives") }}
+                </p>
               </div>
-              <UButton
-                size="sm"
-                variant="soft"
-                icon="i-heroicons-plus"
-                @click="() => openSavingsGoalModal()"
-              >
-                {{ $t("savingsGoals.addGoal") }}
-              </UButton>
             </div>
-          </template>
+            <UButton
+              size="sm"
+              variant="soft"
+              icon="i-heroicons-plus"
+              @click="() => openSavingsGoalModal()"
+            >
+              {{ $t("savingsGoals.addGoal") }}
+            </UButton>
+          </div>
 
           <div v-if="savingsGoalsLoading" class="text-center py-8">
             <UIcon
@@ -671,7 +677,7 @@
               {{ $t("savingsGoals.createFirstGoal") }}
             </UButton>
           </div>
-        </UCard>
+        </div>
       </div>
 
       <!-- Savings Goal Modal -->

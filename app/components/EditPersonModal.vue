@@ -8,7 +8,7 @@
 
     <template #body>
       <div class="space-y-4">
-        <UFormField :label="$t('person.name') + ' *'" name="name" required>
+        <UFormField :label="$t('person.name')" name="name" required>
           <UInput
             id="edit-person-name"
             v-model="formState.name"

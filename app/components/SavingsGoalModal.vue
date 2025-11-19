@@ -12,7 +12,7 @@
       <form class="space-y-6" @submit.prevent="handleSubmit">
         <!-- Goal Name -->
         <UFormField
-          :label="$t('savingsGoals.goalNameRequired')"
+          :label="$t('savingsGoals.goalName')"
           name="goal-name"
           required
         >
@@ -40,7 +40,7 @@
 
         <!-- Target Amount -->
         <UFormField
-          :label="$t('savingsGoals.targetAmountRequired')"
+          :label="$t('savingsGoals.targetAmount')"
           name="goal-target-amount"
           required
         >

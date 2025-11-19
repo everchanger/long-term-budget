@@ -8,7 +8,7 @@
 
     <template #body>
       <div class="space-y-4">
-        <UFormField :label="$t('loans.nameRequired')" name="name" required>
+        <UFormField :label="$t('common.name')" name="name" required>
           <UInput
             id="loan-name"
             v-model="formState.name"
@@ -20,8 +20,8 @@
         </UFormField>
 
         <UFormField
-          :label="$t('loans.originalAmountRequired')"
-          :hint="$t('loans.originalAmountHelp')"
+          :label="$t('loans.originalAmount')"
+          :description="$t('loans.originalAmountHelp')"
           name="originalAmount"
           required
         >
@@ -38,8 +38,8 @@
         </UFormField>
 
         <UFormField
-          :label="$t('loans.currentBalanceRequired')"
-          :hint="$t('loans.currentBalanceHelp')"
+          :label="$t('loans.currentBalance')"
+          :description="$t('loans.currentBalanceHelp')"
           name="currentBalance"
           required
         >

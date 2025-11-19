@@ -27,16 +27,18 @@
       <template v-else-if="data">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <!-- Left Column: Instrument Editors -->
-          <div class="lg:col-span-1 space-y-4">
-            <UCard>
-              <template #header>
+          <div class="lg:col-span-1 space-y-8">
+            <div>
+              <div
+                class="pb-3 mb-6 border-b border-gray-200 dark:border-gray-700"
+              >
                 <h2 class="text-xl font-semibold">
                   {{ $t("projections.adjustInstruments") }}
                 </h2>
-                <p class="text-sm text-gray-500 mt-1">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   {{ $t("projections.adjustInstrumentsDesc") }}
                 </p>
-              </template>
+              </div>
 
               <div class="space-y-3">
                 <PersonInstrumentsEditor
@@ -50,26 +52,26 @@
                   @update="handleInstrumentUpdate"
                 />
               </div>
-            </UCard>
+            </div>
 
             <!-- Global Assumptions (Optional) -->
-            <UCard>
-              <template #header>
-                <div class="flex items-center justify-between">
-                  <div>
-                    <h2 class="text-lg font-semibold">
-                      {{ $t("projections.globalAssumptions") }}
-                    </h2>
-                    <p class="text-xs text-gray-500 mt-1">
-                      {{ $t("projections.globalAssumptionsDesc") }}
-                    </p>
-                  </div>
-                  <USwitch
-                    v-model="enableGlobalAssumptions"
-                    @update:model-value="debouncedUpdate"
-                  />
+            <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+              <div
+                class="flex items-center justify-between pb-3 mb-4 border-b border-gray-200 dark:border-gray-700"
+              >
+                <div>
+                  <h2 class="text-lg font-semibold">
+                    {{ $t("projections.globalAssumptions") }}
+                  </h2>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {{ $t("projections.globalAssumptionsDesc") }}
+                  </p>
                 </div>
-              </template>
+                <USwitch
+                  v-model="enableGlobalAssumptions"
+                  @update:model-value="debouncedUpdate"
+                />
+              </div>
               <div v-if="enableGlobalAssumptions" class="space-y-4">
                 <UFormField
                   :label="$t('projections.incomeGrowth')"
@@ -131,23 +133,23 @@
               >
                 {{ $t("projections.enableToAdjust") }}
               </div>
-            </UCard>
+            </div>
           </div>
 
           <!-- Right Column: Chart and Summary -->
           <div class="lg:col-span-2 space-y-6">
             <!-- Current State (Database Values) -->
-            <UCard>
-              <template #header>
-                <div>
-                  <h2 class="text-xl font-semibold">
-                    {{ $t("projections.storedFinancialData") }}
-                  </h2>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $t("projections.storedFinancialDataDesc") }}
-                  </p>
-                </div>
-              </template>
+            <div>
+              <div
+                class="pb-3 mb-6 border-b border-gray-200 dark:border-gray-700"
+              >
+                <h2 class="text-xl font-semibold">
+                  {{ $t("projections.storedFinancialData") }}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {{ $t("projections.storedFinancialDataDesc") }}
+                </p>
+              </div>
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">
@@ -195,25 +197,26 @@
                   </div>
                 </div>
               </div>
-            </UCard>
+            </div>
 
             <!-- Projected Starting Values (With Adjustments) -->
-            <UCard
+            <div
               v-if="
                 Object.keys(instrumentAdjustments).length > 0 &&
                 data.projection.dataPoints.length > 0
               "
+              class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50"
             >
-              <template #header>
-                <div>
-                  <h2 class="text-xl font-semibold">
-                    {{ $t("projections.adjustedProjectionValues") }}
-                  </h2>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $t("projections.adjustedProjectionValuesDesc") }}
-                  </p>
-                </div>
-              </template>
+              <div
+                class="pb-3 mb-4 border-b border-gray-200 dark:border-gray-700"
+              >
+                <h2 class="text-xl font-semibold">
+                  {{ $t("projections.adjustedProjectionValues") }}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {{ $t("projections.adjustedProjectionValuesDesc") }}
+                </p>
+              </div>
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">
@@ -263,7 +266,7 @@
                   </div>
                 </div>
               </div>
-            </UCard>
+            </div>
 
             <!-- Projection Chart -->
             <FinancialProjectionChartJS
@@ -390,22 +393,26 @@
             </UCard>
 
             <!-- Milestones -->
-            <UCard v-if="data.projection.milestones.length > 0">
-              <template #header>
+            <div v-if="data.projection.milestones.length > 0">
+              <div
+                class="pb-3 mb-6 border-b border-gray-200 dark:border-gray-700"
+              >
                 <h2 class="text-xl font-semibold">
                   {{ $t("projections.keyMilestones") }}
                 </h2>
-              </template>
+              </div>
               <UTimeline :items="timelineItems" color="primary" />
-            </UCard>
+            </div>
 
             <!-- Summary -->
-            <UCard>
-              <template #header>
+            <div>
+              <div
+                class="pb-3 mb-6 border-b border-gray-200 dark:border-gray-700"
+              >
                 <h2 class="text-xl font-semibold">
                   {{ $t("projections.summary") }}
                 </h2>
-              </template>
+              </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4">
                   <div>
@@ -479,7 +486,7 @@
                   </div>
                 </div>
               </div>
-            </UCard>
+            </div>
           </div>
         </div>
       </template>

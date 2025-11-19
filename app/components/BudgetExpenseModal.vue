@@ -13,7 +13,7 @@
     <template #body>
       <div class="space-y-4">
         <UFormField
-          :label="$t('budgetExpenses.name') + ' *'"
+          :label="$t('budgetExpenses.name')"
           name="expense-name"
           required
           :error="
@@ -34,29 +34,29 @@
         </UFormField>
 
         <UFormField
-          :label="$t('budgetExpenses.category') + ' *'"
+          :label="$t('budgetExpenses.category')"
           name="expense-category"
           required
-          :hint="$t(`budgetExpenses.categories.${formState.category}Desc`)"
         >
           <USelect
             id="expense-category"
             v-model="formState.category"
             data-testid="budget-expense-category-select"
-            :options="
+            :items="
               BUDGET_EXPENSE_CATEGORIES.map((cat) => ({
                 value: cat.value,
                 label: $t(`budgetExpenses.categories.${cat.value}`),
                 icon: cat.icon,
               }))
             "
-            option-attribute="label"
-            value-attribute="value"
+            value-key="value"
+            label-key="label"
+            :ui="{ content: 'min-w-fit' }"
           />
         </UFormField>
 
         <UFormField
-          :label="$t('budgetExpenses.monthlyAmount') + ' *'"
+          :label="$t('budgetExpenses.monthlyAmount')"
           name="expense-amount"
           required
           :error="
@@ -100,10 +100,7 @@
 
 <script setup lang="ts">
 import type { BudgetExpense } from "~/composables/useBudgetExpenses";
-import {
-  BUDGET_EXPENSE_CATEGORIES,
-  getCategoryInfo,
-} from "~~/utils/budget-categories";
+import { BUDGET_EXPENSE_CATEGORIES } from "~~/utils/budget-categories";
 
 interface Props {
   open: boolean;

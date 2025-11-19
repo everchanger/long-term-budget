@@ -11,7 +11,7 @@
 
     <!-- Error State -->
     <div v-else-if="!person" class="text-center py-12">
-      <UCard>
+      <div class="max-w-md mx-auto">
         <UIcon
           name="i-heroicons-exclamation-triangle"
           class="mx-auto h-16 w-16 text-red-400 mb-4"
@@ -25,7 +25,7 @@
         <UButton to="/economy" icon="i-heroicons-arrow-left">
           {{ $t("navigation.economy") }}
         </UButton>
-      </UCard>
+      </div>
     </div>
 
     <!-- Person Details -->

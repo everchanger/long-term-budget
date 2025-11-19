@@ -82,8 +82,7 @@ const hasChanges = computed(() => {
     />
 
     <UPageBody>
-      <!-- Settings Card -->
-      <UCard>
+      <div class="max-w-2xl">
         <div class="space-y-6">
           <!-- Language Selection -->
           <UFormField :label="$t('settings.language')" name="language">
@@ -108,29 +107,29 @@ const hasChanges = computed(() => {
               data-testid="currency-select"
             />
           </UFormField>
-
-          <USeparator />
-
-          <!-- Theme Selection -->
-          <UFormField :label="$t('settings.theme')" name="theme">
-            <UColorModeSelect />
-          </UFormField>
-
-          <USeparator />
-
-          <!-- Save Button -->
-          <div class="flex justify-end">
-            <UButton
-              color="primary"
-              :loading="isSaving"
-              :disabled="!hasChanges"
-              @click="savePreferences"
-            >
-              {{ $t("settings.saveChanges") }}
-            </UButton>
-          </div>
         </div>
-      </UCard>
+
+        <USeparator class="my-6" />
+
+        <!-- Theme Selection -->
+        <UFormField :label="$t('settings.theme')" name="theme">
+          <UColorModeSelect />
+        </UFormField>
+
+        <USeparator class="my-6" />
+
+        <!-- Save Button -->
+        <div class="flex justify-end">
+          <UButton
+            color="primary"
+            :loading="isSaving"
+            :disabled="!hasChanges"
+            @click="savePreferences"
+          >
+            {{ $t("settings.saveChanges") }}
+          </UButton>
+        </div>
+      </div>
     </UPageBody>
   </UPage>
 </template>
