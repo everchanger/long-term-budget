@@ -14,7 +14,7 @@ test.describe("Financial Projections", () => {
     await page.getByLabel(/E-post/i).fill(TEST_USER.email);
     await page.getByLabel(/Lösenord/i).fill(TEST_USER.password);
     await page.getByTestId("auth-submit-button").click();
-    await page.waitForURL(/\/(dashboard)?$/);
+    await page.waitForURL("**/economy");
   });
 
   test.describe("Initial State", () => {

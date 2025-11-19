@@ -13,7 +13,7 @@ test.describe("Global Assumptions - Fast", () => {
     await page.getByLabel("E-post").fill(TEST_USER.email);
     await page.getByLabel("Lösenord").fill(TEST_USER.password);
     await page.getByTestId("auth-submit-button").click();
-    await page.waitForURL(/\/(dashboard)?$/);
+    await page.waitForURL("**/economy");
     await page.goto(`${BASE_URL}/projections`);
 
     // Wait for the page to load by checking for the Global Assumptions card

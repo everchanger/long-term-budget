@@ -13,7 +13,7 @@ test.describe("Financial Health Dashboard - Fast", () => {
     await page.getByLabel(/E-post/i).fill(TEST_USER.email);
     await page.getByLabel(/Lösenord/i).fill(TEST_USER.password);
     await page.getByTestId("auth-submit-button").click();
-    await page.waitForURL(/\/(dashboard)?$/);
+    await page.waitForURL("**/economy");
 
     // Navigate directly to financial health page
     await page.goto(`${BASE_URL}/financial-health`);

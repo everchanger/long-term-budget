@@ -141,7 +141,7 @@ export const test = base.extend<{
     await page.getByTestId("auth-password-input").fill(TEST_USER.password);
     await page.getByTestId("auth-submit-button").click();
 
-    await page.waitForURL("/", { timeout: 10000 });
+    await page.waitForURL("**/economy", { timeout: 10000 });
 
     // Extract session cookie
     const cookies = await page.context().cookies();

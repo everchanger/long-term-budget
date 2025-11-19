@@ -370,14 +370,28 @@ test.describe("Authentication and Route Guards", () => {
       await page.waitForURL("**/projections", { timeout: 10000 });
       expect(page.url()).toContain("/projections");
 
+      // Wait a moment for the navigation state to update
+      await page.waitForTimeout(500);
+
+      // Re-query the link to get updated attributes
+      const updatedProjectionsLink = header
+        .getByRole("link", { name: /Prognoser|Projections/i })
+        .first();
+
       // Projections link should now have aria-current="page"
-      const ariaCurrent = await projectionsLink.getAttribute("aria-current");
-      expect(ariaCurrent).toBe("page");
+      await expect(updatedProjectionsLink).toHaveAttribute(
+        "aria-current",
+        "page"
+      );
     });
 
     test("should hide navbar navigation for unauthenticated users", async ({
-      page,
+      browser,
     }) => {
+      // Create a fresh context without authentication
+      const context = await browser.newContext();
+      const page = await context.newPage();
+
       // Navigate to auth page
       await page.goto(`${BASE_URL}/auth`);
       await page.waitForLoadState("networkidle");
@@ -396,6 +410,9 @@ test.describe("Authentication and Route Guards", () => {
         name: /Prognoser|Projections/i,
       });
       await expect(projectionsLink).not.toBeVisible();
+
+      // Clean up
+      await context.close();
     });
   });
 });

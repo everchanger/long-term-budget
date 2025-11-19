@@ -37,9 +37,9 @@ test.describe("Settings Page", () => {
     // Check that language select shows 'sv' (test user's saved preference)
     const languageSelect = page.getByTestId("language-select");
     await expect(languageSelect).toBeVisible();
-    // Check the selected value, not the text content
-    const selectedValue = await languageSelect.inputValue();
-    expect(selectedValue).toBe("sv");
+    // Check the displayed text for Nuxt UI Select component
+    const selectedText = await languageSelect.textContent();
+    expect(selectedText).toContain("Svenska");
   });
 
   test("should display current currency selection", async ({

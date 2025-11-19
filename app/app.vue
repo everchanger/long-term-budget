@@ -69,7 +69,8 @@ const navItems = computed<NavigationMenuItem[]>(() => [
   {
     label: t("navigation.projections"),
     to: "/projections",
-    active: route.path.startsWith("/projections"),
+    active:
+      route.path === "/projections" || route.path.startsWith("/projections"),
   },
 ]);
 

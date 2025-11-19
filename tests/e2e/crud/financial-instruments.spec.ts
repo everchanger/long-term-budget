@@ -64,8 +64,9 @@ test.describe("Financial Instruments CRUD", () => {
       // Fill in income details
       await page.getByTestId("income-source-input").fill("New Salary");
       await page.getByTestId("income-amount-input").fill("6000");
-      // Select frequency
-      await page.selectOption("#income-frequency", "monthly");
+      // Select frequency using Nuxt UI Select component
+      await page.locator("#income-frequency").click();
+      await page.getByRole("option", { name: /Månatlig|Monthly/i }).click();
 
       // Submit form
       await page.getByTestId("income-modal-submit-button").click();

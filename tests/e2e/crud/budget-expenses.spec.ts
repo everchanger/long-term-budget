@@ -177,14 +177,15 @@ test.describe("Budget Expenses CRUD", () => {
     // Click delete button
     await page.getByTestId(`delete-budget-expense-${expenseId}`).click();
 
-    // Wait a bit for deletion to complete
-    await page.waitForTimeout(500);
-
-    // Verify expense is removed and empty state is shown
+    // Wait for the expense to be removed from DOM
     await expect(
       page.getByText("To Delete", { exact: true })
     ).not.toBeVisible();
-    await expect(page.getByText("Inga budgetutgifter ännu")).toBeVisible();
+
+    // Wait for empty state to appear
+    await expect(page.getByText("Inga budgetutgifter ännu")).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test("should show empty state when no expenses exist", async ({
@@ -292,11 +293,16 @@ test.describe("Budget Expenses CRUD", () => {
       .textContent();
 
     if (totalText) {
-      // Handle both USD ($350.50) and SEK (351 kr) formats
-      const displayedTotal = parseFloat(
-        totalText.replace(/[$kr]/g, "").replace(/,/g, "").trim()
-      );
-      // Allow for small rounding differences due to currency conversion
+      // Handle Swedish format with non-breaking spaces (e.g., "350,50 kr" or "350 kr")
+      // Also handle potential USD format
+      const cleanedText = totalText
+        .replace(/[$kr]/g, "")
+        .replace(/\u00a0/g, "") // Remove non-breaking spaces
+        .replace(/\s/g, "") // Remove regular spaces
+        .replace(/,/g, ".") // Convert Swedish decimal comma to dot
+        .trim();
+      const displayedTotal = parseFloat(cleanedText);
+      // Allow for small rounding differences
       expect(Math.abs(displayedTotal - expectedTotal)).toBeLessThan(1);
     }
   });
